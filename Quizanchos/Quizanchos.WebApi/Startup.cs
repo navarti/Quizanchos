@@ -4,6 +4,7 @@ using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.Domain;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Services.Realizations;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi;
 
@@ -23,7 +24,7 @@ public static class Startup
         app.UseAuthorization();
 
         app.UseRouting();
-        
+
         app.MapControllers();
 
         app.MapControllerRoute(
@@ -44,8 +45,13 @@ public static class Startup
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
         });
 
+        builder.Services.AddAutoMapper(typeof(MappingProfile));
+
         builder.Services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
+
         builder.Services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
+        builder.Services.AddTransient<IQuizEntityService, QuizEntityService>();
+
         builder.Services.AddTransient<IClassicalQuizService, ClassicalQuizService>();
     }
 }
