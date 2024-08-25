@@ -46,6 +46,6 @@ public class QuizEntityController : Controller
     public async Task<IActionResult> Delete(Guid id)
     {
         await _quizEntityService.Delete(id);
-        return Ok();
+        return NoContent();
     }
 }
