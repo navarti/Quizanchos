@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Quizanchos.DbUpdater.DataSources;
-using Quizanchos.DbUpdater.Entities;
+using Quizanchos.DbUpdater.SpecificUpdaters;
 using Quizanchos.DbUpdater.Updater;
-using Quizanchos.DbUpdater.Utils;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
@@ -14,16 +12,15 @@ namespace Quizanchos.DbUpdater;
 
 internal class Program
 {
-    static IHost _host;
-
     public static void Main(string[] args)
     {
-        InitDependencies();
-
-        UpdateCountries();
+        using(IHost host = InitHost())
+        {
+            Update(host);
+        }
     }
 
-    private static void InitDependencies()
+    private static IHost InitHost()
     {
         IHost host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
@@ -35,44 +32,27 @@ internal class Program
                     options.UseSqlServer(connectionString);
                 });
 
+                // TODO: Review lifetime of services and choose most appropriate one
                 services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
                 services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
                 services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
                 services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
+
+                services.AddTransient<IDataUpdater, DataUpdater>();
             })
             .Build();
 
-        _host = host;
+        return host;
     }
 
-    private static void UpdateCountries()
+    private static void Update(IHost host)
     {
-        CountryDataSource cityDataSource = new CountryDataSource();
-
-        List<Country> cities = cityDataSource.GetCountriesSafe();
-
-        if (cityDataSource.Exceptions.Count > 0)
+        using (IServiceScope scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
-            foreach (var exception in cityDataSource.Exceptions)
-            {
-                Console.WriteLine(exception.Message);
-                return;
-            }
-        }
-
-        DataToUpdate<float> dataToUpdateWithArea = DataToUpdateBuilder.BuildCountriesDataToUpdateWithArea(cities);
-        DataToUpdate<int> dataToUpdateWithPopulation = DataToUpdateBuilder.BuildCountriesDataToUpdateWithPopulation(cities);
-
-        using (IServiceScope scope = _host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-        {
-            IQuizCategoryRepository quizCategoryRepo = scope.ServiceProvider.GetRequiredService<IQuizCategoryRepository>();
-            IQuizEntityRepository quizEntityRepository = scope.ServiceProvider.GetRequiredService<IQuizEntityRepository>();
-            IFeatureIntRepository featureIntRepository = scope.ServiceProvider.GetRequiredService<IFeatureIntRepository>();
-            IFeatureFloatRepository featureFloatRepository = scope.ServiceProvider.GetRequiredService<IFeatureFloatRepository>();
-
-            Updater.DbUpdater dbUpdater = new Updater.DbUpdater(quizCategoryRepo, quizEntityRepository, featureIntRepository, featureFloatRepository);
-            dbUpdater.UpdateEntities(dataToUpdateWithArea);
-            dbUpdater.UpdateEntities(dataToUpdateWithPopulation);
+            IDataUpdater dbUpdater = scope.ServiceProvider.GetRequiredService<IDataUpdater>();
+            
+            CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
+            countriesUpdater.Update();
         }
     }
 }

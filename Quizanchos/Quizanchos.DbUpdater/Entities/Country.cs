@@ -15,13 +15,13 @@ internal class Country
         Population = population;
     }
 
-    public DataToUpdate<float>.EntityWithValueToUpdate ToUniversalEntityWithArea()
+    public EntityWithValueToUpdate<float> ToUniversalEntityWithArea()
     {
-        return new DataToUpdate<float>.EntityWithValueToUpdate(Name, Area);
+        return new EntityWithValueToUpdate<float>(Name, Area);
     }
 
-    public DataToUpdate<int>.EntityWithValueToUpdate ToUniversalEntityWithPopulation()
+    public EntityWithValueToUpdate<int> ToUniversalEntityWithPopulation()
     {
-        return new DataToUpdate<int>.EntityWithValueToUpdate(Name, Population);
+        return new EntityWithValueToUpdate<int>(Name, Population);
     }
 }
