@@ -8,30 +8,29 @@ internal class DataUpdater : IDataUpdater
 {
     private readonly IQuizCategoryRepository _quizCategoryRepository;
     private readonly IQuizEntityRepository _quizEntityRepository;
-    private readonly IFeatureIntRepository _featureIntRepository;
-    private readonly IFeatureFloatRepository _featureFloatRepository;
+    private readonly FeatureUpdaterFactory _featureUpdaterFactory;
 
     public DataUpdater(
         IQuizCategoryRepository quizCategoryRepository, 
         IQuizEntityRepository quizEntityRepository, 
-        IFeatureIntRepository featureIntRepository, 
-        IFeatureFloatRepository featureFloatRepository)
+        FeatureUpdaterFactory featureUpdaterFactory) 
     {
         _quizCategoryRepository = quizCategoryRepository;
         _quizEntityRepository = quizEntityRepository;
-        _featureIntRepository = featureIntRepository;
-        _featureFloatRepository = featureFloatRepository;
+        _featureUpdaterFactory = featureUpdaterFactory;
     }
 
-    public async Task Update<T>(DataToUpdate<T> data)
+    public async Task Update(DataToUpdate data)
     {
         QuizCategory quizCategory = await GetQuizCategory(data.CategoryName);
 
-        foreach (EntityWithValueToUpdate<T> entity in data.Entities)
+        IFeatureUpdater featureUpdater = _featureUpdaterFactory.CreateFeatureUpdater(data.FeatureType, quizCategory);
+
+        foreach (EntityWithValueToUpdate entity in data.Entities)
         {
             QuizEntity quizEntity = await GetQuizEntity(entity.EntityName);
 
-            await UpdateFeatureValue(entity.FeatureValue, quizEntity, quizCategory);
+            await featureUpdater.UpdateFeature(entity.FeatureValue, quizEntity);
         }
     }
 
@@ -48,7 +47,7 @@ internal class DataUpdater : IDataUpdater
         quizCategory.Id = Guid.NewGuid();
         quizCategory.Name = quizCategoryName;
 
-        return _quizCategoryRepository.Create(quizCategory).Result;
+        return await _quizCategoryRepository.Create(quizCategory);
     }
 
     private async Task<QuizEntity> GetQuizEntity(string entityName)
@@ -64,14 +63,6 @@ internal class DataUpdater : IDataUpdater
         quizEntity.Id = Guid.NewGuid();
         quizEntity.Name = entityName;
 
-        return _quizEntityRepository.Create(quizEntity).Result;
-    }
-
-    private async Task UpdateFeatureValue<T>(T value, QuizEntity quizEntity, QuizCategory quizCategory)
-    {
-        FeatureUpdaterFactory featureUpdaterFactory = new(_featureIntRepository, _featureFloatRepository);
-
-        IFeatureUpdater featureUpdater = featureUpdaterFactory.CreateFeatureUpdater(value, quizEntity, quizCategory);
-        await featureUpdater.UpdateFeature();
+        return await _quizEntityRepository.Create(quizEntity);
     }
 }

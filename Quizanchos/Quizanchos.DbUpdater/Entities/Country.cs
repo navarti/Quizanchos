@@ -1,4 +1,5 @@
-﻿using Quizanchos.DbUpdater.Updater;
+﻿using Quizanchos.Common.FeatureTypes;
+using Quizanchos.DbUpdater.Updater;
 
 namespace Quizanchos.DbUpdater.Entities;
 
@@ -15,13 +16,15 @@ internal class Country
         Population = population;
     }
 
-    public EntityWithValueToUpdate<float> ToUniversalEntityWithArea()
+    public EntityWithValueToUpdate ToUniversalEntityWithArea()
     {
-        return new EntityWithValueToUpdate<float>(Name, Area);
+        FeatureValueFloat featureValueFloat = new FeatureValueFloat(Area);
+        return new EntityWithValueToUpdate(Name, featureValueFloat);
     }
 
-    public EntityWithValueToUpdate<int> ToUniversalEntityWithPopulation()
+    public EntityWithValueToUpdate ToUniversalEntityWithPopulation()
     {
-        return new EntityWithValueToUpdate<int>(Name, Population);
+        FeatureValueInt featureValueInt = new FeatureValueInt(Population);
+        return new EntityWithValueToUpdate(Name, featureValueInt);
     }
 }

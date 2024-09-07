@@ -1,12 +1,14 @@
 ﻿namespace Quizanchos.DbUpdater.Updater;
 
-internal class DataToUpdate<T>
+internal class DataToUpdate
 {
+    public Type FeatureType { get; }
     public string CategoryName { get; }
-    public EntityWithValueToUpdate<T>[] Entities { get; }
+    public EntityWithValueToUpdate[] Entities { get; }
 
-    public DataToUpdate(string categoryName, EntityWithValueToUpdate<T>[] entities)
+    public DataToUpdate(Type featureType, string categoryName, EntityWithValueToUpdate[] entities)
     {
+        FeatureType = featureType;
         CategoryName = categoryName;
         Entities = entities;
     }

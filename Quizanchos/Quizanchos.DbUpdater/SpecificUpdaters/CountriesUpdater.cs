@@ -29,10 +29,10 @@ internal class CountriesUpdater
             }
         }
 
-        DataToUpdate<float> dataToUpdateWithArea = DataToUpdateBuilder.BuildCountriesDataToUpdateWithArea(cities);
+        DataToUpdate dataToUpdateWithArea = DataToUpdateBuilder.BuildCountriesDataToUpdateWithArea(cities);
         _dbUpdater.Update(dataToUpdateWithArea).Wait();
         
-        DataToUpdate<int> dataToUpdateWithPopulation = DataToUpdateBuilder.BuildCountriesDataToUpdateWithPopulation(cities);
+        DataToUpdate dataToUpdateWithPopulation = DataToUpdateBuilder.BuildCountriesDataToUpdateWithPopulation(cities);
         _dbUpdater.Update(dataToUpdateWithPopulation).Wait();
     }
 }

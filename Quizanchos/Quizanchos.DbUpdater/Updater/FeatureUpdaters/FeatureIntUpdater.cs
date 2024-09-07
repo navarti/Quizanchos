@@ -1,34 +1,36 @@
 ﻿using Quizanchos.Domain.Entities.Features;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
+using Quizanchos.Common.FeatureTypes;
 
 namespace Quizanchos.DbUpdater.Updater.FeatureUpdaters;
 
-//TODO: Add this class to DI, make it as dependency of facory
 internal class FeatureIntUpdater : IFeatureUpdater
 {
     private readonly IFeatureIntRepository _featureIntRepository;
-    private readonly int _value;
-    private readonly QuizEntity _quizEntity;
     private readonly QuizCategory _quizCategory;
 
-    public FeatureIntUpdater(IFeatureIntRepository featureIntRepository, int value, QuizEntity quizEntity, QuizCategory quizCategory)
+    public FeatureIntUpdater(IFeatureIntRepository featureIntRepository, QuizCategory quizCategory)
     {
         _featureIntRepository = featureIntRepository;
-        _value = value;
-        _quizEntity = quizEntity;
         _quizCategory = quizCategory;
     }
 
-    public async Task UpdateFeature()
+    public async Task UpdateFeature(FeatureValue value, QuizEntity quizEntity)
     {
-        FeatureInt featureInt = await _featureIntRepository.GetByCategoryAndEntity(_quizCategory.Id, _quizEntity.Id);
+        FeatureValueInt? featureValueInt = value as FeatureValueInt;
+        if (featureValueInt is null)
+        {
+            throw new ArgumentException($"{nameof(value)} is not of type {nameof(FeatureValueInt)}");
+        }
+
+        FeatureInt featureInt = await _featureIntRepository.GetByCategoryAndEntity(_quizCategory.Id, quizEntity.Id);
 
         if (featureInt is not null)
         {
-            if(featureInt.Value != _value)
+            if(featureInt.Value != featureValueInt.Value)
             {
-                featureInt.Value = _value;
+                featureInt.Value = featureValueInt.Value;
                 await _featureIntRepository.Update(featureInt);
             }
 
@@ -38,8 +40,8 @@ internal class FeatureIntUpdater : IFeatureUpdater
         featureInt = new FeatureInt
         {
             Id = Guid.NewGuid(),
-            Value = _value,
-            QuizEntity = _quizEntity,
+            Value = featureValueInt.Value,
+            QuizEntity = quizEntity,
             QuizCategory = _quizCategory
         };
 

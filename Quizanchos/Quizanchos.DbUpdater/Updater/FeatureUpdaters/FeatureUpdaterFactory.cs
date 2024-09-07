@@ -1,9 +1,9 @@
-﻿using Quizanchos.Domain.Entities;
+﻿using Quizanchos.Common.FeatureTypes;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
 namespace Quizanchos.DbUpdater.Updater.FeatureUpdaters;
 
-//TODO: Add this class to DI, make it as dependency of dataupdater
 internal class FeatureUpdaterFactory
 {
     private readonly IFeatureIntRepository _featureIntRepository;
@@ -15,19 +15,18 @@ internal class FeatureUpdaterFactory
         _featureFloatRepository = featureFloatRepository;
     }
 
-    public IFeatureUpdater CreateFeatureUpdater<T>(T value, QuizEntity quizEntity, QuizCategory quizCategory)
+    public IFeatureUpdater CreateFeatureUpdater(Type featureValueType, QuizCategory quizCategory)
     {
-        switch (value)
+        if(featureValueType == typeof(FeatureValueInt))
         {
-            case int valueInt:
-                return new FeatureIntUpdater(_featureIntRepository, valueInt, quizEntity, quizCategory);
-
-            case float valueFloat:
-                return new FeatureFloatUpdater(_featureFloatRepository, valueFloat, quizEntity, quizCategory);
-
-            default:
-                throw new NotImplementedException();
+            return new FeatureIntUpdater(_featureIntRepository, quizCategory);
         }
-    }
 
+        if(featureValueType == typeof(FeatureValueFloat))
+        {
+            return new FeatureFloatUpdater(_featureFloatRepository, quizCategory);
+        }
+
+        throw new NotImplementedException();
+    }
 }

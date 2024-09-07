@@ -2,5 +2,5 @@
 
 internal interface IDataUpdater
 {
-    public Task Update<T>(DataToUpdate<T> data);
+    public Task Update(DataToUpdate data);
 }

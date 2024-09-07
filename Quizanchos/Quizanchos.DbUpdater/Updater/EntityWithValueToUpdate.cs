@@ -1,11 +1,13 @@
-﻿namespace Quizanchos.DbUpdater.Updater;
+﻿using Quizanchos.Common.FeatureTypes;
 
-public class EntityWithValueToUpdate<T>
+namespace Quizanchos.DbUpdater.Updater;
+
+public class EntityWithValueToUpdate
 {
     public string EntityName { get; }
-    public T FeatureValue { get; }
+    public FeatureValue FeatureValue { get; }
 
-    public EntityWithValueToUpdate(string entityName, T featureValue)
+    public EntityWithValueToUpdate(string entityName, FeatureValue featureValue)
     {
         EntityName = entityName;
         FeatureValue = featureValue;

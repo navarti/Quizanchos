@@ -1,34 +1,36 @@
-﻿using Quizanchos.Domain.Entities;
+﻿using Quizanchos.Common.FeatureTypes;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Features;
 using Quizanchos.Domain.Repositories.Interfaces;
 
 namespace Quizanchos.DbUpdater.Updater.FeatureUpdaters;
 
-//TODO: Add this class to DI, make it as dependency of facory
 internal class FeatureFloatUpdater : IFeatureUpdater
 {
     private readonly IFeatureFloatRepository _featureFloatRepository;
-    private readonly float _value;
-    private readonly QuizEntity _quizEntity;
     private readonly QuizCategory _quizCategory;
 
-    public FeatureFloatUpdater(IFeatureFloatRepository featureFloatRepository, float value, QuizEntity quizEntity, QuizCategory quizCategory)
+    public FeatureFloatUpdater(IFeatureFloatRepository featureFloatRepository, QuizCategory quizCategory)
     {
         _featureFloatRepository = featureFloatRepository;
-        _value = value;
-        _quizEntity = quizEntity;
         _quizCategory = quizCategory;
     }
 
-    public async Task UpdateFeature()
+    public async Task UpdateFeature(FeatureValue value, QuizEntity quizEntity)
     {
-        FeatureFloat featureFloat = await _featureFloatRepository.GetByCategoryAndEntity(_quizCategory.Id, _quizEntity.Id);
+        FeatureValueFloat? featureValueFloat = value as FeatureValueFloat;
+        if (featureValueFloat is null)
+        {
+            throw new ArgumentException($"{nameof(value)} is not of type {nameof(FeatureValueFloat)}");
+        }
+
+        FeatureFloat featureFloat = await _featureFloatRepository.GetByCategoryAndEntity(_quizCategory.Id, quizEntity.Id);
 
         if (featureFloat is not null)
         {
-            if (featureFloat.Value != _value)
+            if (featureFloat.Value != featureValueFloat.Value)
             {
-                featureFloat.Value = _value;
+                featureFloat.Value = featureValueFloat.Value;
                 await _featureFloatRepository.Update(featureFloat);
             }
 
@@ -38,8 +40,8 @@ internal class FeatureFloatUpdater : IFeatureUpdater
         featureFloat = new FeatureFloat
         {
             Id = Guid.NewGuid(),
-            Value = _value,
-            QuizEntity = _quizEntity,
+            Value = featureValueFloat.Value,
+            QuizEntity = quizEntity,
             QuizCategory = _quizCategory
         };
 

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quizanchos.DbUpdater.SpecificUpdaters;
 using Quizanchos.DbUpdater.Updater;
+using Quizanchos.DbUpdater.Updater.FeatureUpdaters;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
@@ -37,6 +38,8 @@ internal class Program
                 services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
                 services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
                 services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
+
+                services.AddTransient<FeatureUpdaterFactory>();
 
                 services.AddTransient<IDataUpdater, DataUpdater>();
             })
