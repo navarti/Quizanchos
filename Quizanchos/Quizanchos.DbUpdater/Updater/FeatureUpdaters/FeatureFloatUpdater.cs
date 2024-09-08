@@ -28,9 +28,9 @@ internal class FeatureFloatUpdater : IFeatureUpdater
 
         if (featureFloat is not null)
         {
-            if (featureFloat.Value != featureValueFloat.Value)
+            if (featureFloat.Value != featureValueFloat)
             {
-                featureFloat.Value = featureValueFloat.Value;
+                featureFloat.Value = featureValueFloat;
                 await _featureFloatRepository.Update(featureFloat);
             }
 
@@ -40,7 +40,7 @@ internal class FeatureFloatUpdater : IFeatureUpdater
         featureFloat = new FeatureFloat
         {
             Id = Guid.NewGuid(),
-            Value = featureValueFloat.Value,
+            Value = featureValueFloat,
             QuizEntity = quizEntity,
             QuizCategory = _quizCategory
         };

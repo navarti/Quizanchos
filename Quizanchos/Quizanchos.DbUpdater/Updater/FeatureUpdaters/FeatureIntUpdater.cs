@@ -28,9 +28,9 @@ internal class FeatureIntUpdater : IFeatureUpdater
 
         if (featureInt is not null)
         {
-            if(featureInt.Value != featureValueInt.Value)
+            if(featureInt.Value != featureValueInt)
             {
-                featureInt.Value = featureValueInt.Value;
+                featureInt.Value = featureValueInt;
                 await _featureIntRepository.Update(featureInt);
             }
 
@@ -40,7 +40,7 @@ internal class FeatureIntUpdater : IFeatureUpdater
         featureInt = new FeatureInt
         {
             Id = Guid.NewGuid(),
-            Value = featureValueInt.Value,
+            Value = featureValueInt,
             QuizEntity = quizEntity,
             QuizCategory = _quizCategory
         };

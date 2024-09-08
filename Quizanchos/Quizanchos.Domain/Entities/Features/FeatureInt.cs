@@ -1,8 +1,9 @@
-﻿using Quizanchos.Domain.Entities.Abstractions;
+﻿using Quizanchos.Common.FeatureTypes;
+using Quizanchos.Domain.Entities.Abstractions;
 
 namespace Quizanchos.Domain.Entities.Features;
 
 public class FeatureInt : Feature
 {
-    public int Value { get; set; }
+    public FeatureValueInt Value { get; set; }
 }
