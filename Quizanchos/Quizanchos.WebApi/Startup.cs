@@ -5,6 +5,7 @@ using Quizanchos.Domain;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Services.Realizations;
 using Quizanchos.WebApi.Util;
+using Quizanchos.WebApi.Extensions;
 
 namespace Quizanchos.WebApi;
 
@@ -18,7 +19,13 @@ public static class Startup
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        app.UseMiddleware<ExceptionMiddlewareExtension>();
+
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHttpsRedirection();
+        }
+
         app.UseStaticFiles();
 
         app.UseAuthorization();
@@ -26,7 +33,6 @@ public static class Startup
         app.UseRouting();
 
         app.MapControllers();
-
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
