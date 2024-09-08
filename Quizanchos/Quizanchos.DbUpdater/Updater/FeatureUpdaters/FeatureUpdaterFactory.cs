@@ -1,4 +1,4 @@
-﻿using Quizanchos.Common.FeatureTypes;
+﻿using Quizanchos.Common.Enums;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
@@ -15,18 +15,18 @@ internal class FeatureUpdaterFactory
         _featureFloatRepository = featureFloatRepository;
     }
 
-    public IFeatureUpdater CreateFeatureUpdater(Type featureValueType, QuizCategory quizCategory)
+    public IFeatureUpdater CreateFeatureUpdater(FeatureType featureType, QuizCategory quizCategory)
     {
-        if(featureValueType == typeof(FeatureValueInt))
+        switch(featureType)
         {
-            return new FeatureIntUpdater(_featureIntRepository, quizCategory);
-        }
+            case FeatureType.Int:
+                return new FeatureIntUpdater(_featureIntRepository, quizCategory);
 
-        if(featureValueType == typeof(FeatureValueFloat))
-        {
-            return new FeatureFloatUpdater(_featureFloatRepository, quizCategory);
-        }
+            case FeatureType.Float:
+                return new FeatureFloatUpdater(_featureFloatRepository, quizCategory);
 
-        throw new NotImplementedException();
+            default:
+                throw new NotImplementedException();
+        }
     }
 }

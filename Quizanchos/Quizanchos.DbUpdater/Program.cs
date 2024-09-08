@@ -55,7 +55,7 @@ internal class Program
             IDataUpdater dbUpdater = scope.ServiceProvider.GetRequiredService<IDataUpdater>();
             
             CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
-            countriesUpdater.Update();
+            countriesUpdater.UpdateSafe();
         }
     }
 }

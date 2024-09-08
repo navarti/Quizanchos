@@ -14,25 +14,29 @@ internal class CountriesUpdater
         _dbUpdater = dbUpdater;
     }
 
-    public void Update()
+    public void UpdateSafe()
     {
-        CountryDataSource cityDataSource = new CountryDataSource();
-
-        List<Country> cities = cityDataSource.GetCountriesSafe();
-
-        if (cityDataSource.Exceptions.Count > 0)
+        try
         {
-            foreach (var exception in cityDataSource.Exceptions)
-            {
-                Console.WriteLine(exception.Message);
-                return;
-            }
+            Update();
         }
+        catch(Exception ex)
+        {
+            string message = "Could not update countries\n" + $"Reason: {ex.Message}";
+            Console.WriteLine(message);
+        }
+    }
 
-        DataToUpdate dataToUpdateWithArea = DataToUpdateBuilder.BuildCountriesDataToUpdateWithArea(cities);
-        _dbUpdater.Update(dataToUpdateWithArea).Wait();
-        
-        DataToUpdate dataToUpdateWithPopulation = DataToUpdateBuilder.BuildCountriesDataToUpdateWithPopulation(cities);
-        _dbUpdater.Update(dataToUpdateWithPopulation).Wait();
+    private void Update()
+    {
+        CountryDataSource countryDataSource = new CountryDataSource();
+        List<Country> coutries = countryDataSource.GetCountries().Result;
+
+        CountriesDataToUpdateBuilder countriesDataToUpdateBuilder = new CountriesDataToUpdateBuilder();
+        DataToUpdate[] dataToUpdate = countriesDataToUpdateBuilder.BuildData(coutries);
+        foreach(DataToUpdate data in dataToUpdate)
+        {
+            _dbUpdater.Update(data).Wait();
+        }
     }
 }

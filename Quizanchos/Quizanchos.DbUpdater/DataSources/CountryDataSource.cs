@@ -5,30 +5,22 @@ namespace Quizanchos.DbUpdater.DataSources;
 
 internal class CountryDataSource
 {
-    public List<Exception> Exceptions { get; } = new List<Exception>();
+    private const string Url = "https://restcountries.com/v3.1/all?fields=name,area,population";
     private List<Country> _countries = new List<Country>();
 
-    public List<Country> GetCountriesSafe()
+    public async Task<List<Country>> GetCountries()
     {
-        try
-        {
-            AddCountriesToListAsync().Wait();
-        }
-        catch (Exception ex)
-        {
-            Exceptions.Add(ex);
-        }
-
+        _countries.Clear();
+        await AddCountriesToListAsync();
         return _countries;
     }
 
     private async Task AddCountriesToListAsync()
     {
-        // To fix
+        // TODO: Make wrapper for HttpClient
         HttpClient client = new HttpClient();
 
-        string url = "https://restcountries.com/v3.1/all?fields=name,area,population";
-        HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+        HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, Url);
 
         HttpResponseMessage response = await client.SendAsync(httpRequestMessage);
         string responseContent = await response.Content.ReadAsStringAsync();
@@ -51,9 +43,10 @@ internal class CountryDataSource
             Country country = new Country(name, area, population);
             _countries.Add(country);
         }
-        catch(NullReferenceException ex)
+        catch(NullReferenceException)
         {
-            Exceptions.Add(ex);
+            Console.WriteLine("Could not parse attributes of JToken");
+            throw;
         }
     }
 }
