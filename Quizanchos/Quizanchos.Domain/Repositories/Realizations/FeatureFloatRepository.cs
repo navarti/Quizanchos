@@ -1,4 +1,5 @@
-﻿using Quizanchos.Domain.Entities.Features;
+﻿using Microsoft.EntityFrameworkCore;
+using Quizanchos.Domain.Entities.Features;
 using Quizanchos.Domain.Repositories.Interfaces;
 
 namespace Quizanchos.Domain.Repositories.Realizations;
@@ -7,5 +8,10 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
 {
     public FeatureFloatRepository(QuizDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public Task<FeatureFloat> GetByCategoryAndEntity(Guid categoryId, Guid entityId)
+    {
+        return dbSet.FirstOrDefaultAsync(feature => feature.QuizCategoryId == categoryId && feature.QuizEntityId == entityId);
     }
 }
