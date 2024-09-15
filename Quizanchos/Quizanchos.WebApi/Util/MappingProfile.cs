@@ -10,5 +10,7 @@ public class MappingProfile : Profile
     {
         CreateMap<BaseQuizEntityDto, QuizEntity>();
         CreateMap<QuizEntityDto, QuizEntity>().ReverseMap();
+        CreateMap<BaseQuizCategoryDto, QuizCategory>();
+        CreateMap<QuizCategoryDto, QuizCategory>().ReverseMap();
     }
 }

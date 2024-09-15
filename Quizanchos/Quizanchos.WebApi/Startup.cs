@@ -56,7 +56,9 @@ public static class Startup
         builder.Services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
 
         builder.Services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
+        builder.Services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
         builder.Services.AddTransient<IQuizEntityService, QuizEntityService>();
+        builder.Services.AddTransient<IQuizCategoryService, QuizCategoryService>();
 
         builder.Services.AddTransient<IClassicalQuizService, ClassicalQuizService>();
     }
