@@ -25,7 +25,7 @@ public class QuizAuthorizationController : Controller
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] RegisterModelDto registerModelDto)
     {
-        TokenDto token = await _authorizationService.Login(loginModelDto);
+        TokenDto token = await _authorizationService.RegisterUser(registerModelDto);
         return Ok(token);
     }
 }
