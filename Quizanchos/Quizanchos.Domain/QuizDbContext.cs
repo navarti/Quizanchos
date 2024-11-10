@@ -1,16 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Configurations;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Features;
 
 namespace Quizanchos.Domain;
 
-public class QuizDbContext : DbContext
+public class QuizDbContext : IdentityDbContext<ApplicationUser>
 {
     public QuizDbContext(DbContextOptions<QuizDbContext> options) : base(options)
     {
     }
 
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<QuizEntity> QuizEntities { get; set; }
     public DbSet<QuizCategory> QuizCategories { get; set; }
     public DbSet<FeatureInt> FeatureInts { get; set; }
@@ -20,6 +22,7 @@ public class QuizDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
         modelBuilder.ApplyConfiguration(new QuizEntityConfiguration());
         modelBuilder.ApplyConfiguration(new QuizCategoryConfiguration());
         modelBuilder.ApplyConfiguration(new FeatureConfiguration());

@@ -2,20 +2,18 @@
 
 public static class ExceptionFactory
 {
-    public static ArgumentException CreateIdNotFoundException(Guid id, string entityName)
+    public static UserException CreateIdNotFoundException(Guid id, string entityName)
     {
-        return new ArgumentException(
-            paramName: nameof(id),
-            message: $"No {entityName} with id {id} found");
+        return new UserException($"No {entityName} with id {id} found");
     }
 
-    public static ArgumentNullException CreateNullException(string entityName)
+    public static UserException CreateNullException(string entityName)
     {
-        return new ArgumentNullException($"{entityName} is null");
+        return new UserException($"{entityName} is null");
     }
 
-    public static Exception Create(string message)
+    public static UserException Create(string message)
     {
-        return new Exception(message);
+        return new UserException(message);
     }
 }

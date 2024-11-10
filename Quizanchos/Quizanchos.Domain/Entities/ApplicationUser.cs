@@ -1,6 +1,7 @@
-﻿namespace Quizanchos.Domain.Entities;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class ApplicationUser
+namespace Quizanchos.Domain.Entities;
+
+public class ApplicationUser : IdentityUser
 {
-    public string UserName { get; set; } = string.Empty;
 }

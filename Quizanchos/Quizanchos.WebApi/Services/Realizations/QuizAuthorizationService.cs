@@ -54,7 +54,7 @@ public class QuizAuthorizationService : IQuizAuthorizationService
         };
 
         IdentityResult result = await _userManager.CreateAsync(user, registerModelDto.Password);
-
+        
         string accessTokenStr = await _jwtService.GenerateAcessTokenAsync(user);
         return new TokenDto
         {

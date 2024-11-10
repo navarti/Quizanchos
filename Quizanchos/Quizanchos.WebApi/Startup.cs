@@ -12,6 +12,8 @@ using Quizanchos.WebApi.Services.Realizations;
 using Quizanchos.WebApi.Util;
 using System.Text;
 
+using Microsoft.AspNetCore.Identity;
+
 namespace Quizanchos.WebApi;
 
 public static class Startup
@@ -33,6 +35,7 @@ public static class Startup
 
         app.UseStaticFiles();
 
+        
         app.UseAuthorization();
         app.UseAuthorization();
 
@@ -79,6 +82,14 @@ public static class Startup
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
             };
         });
+
+        //builder.Services.AddAuthorization(options =>
+        //{
+        //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+        //    options.AddPolicy("User", policy => policy.RequireRole("User"));
+        //}); 
+
+        //builder.Services.AddTransient<UserManager<ApplicationUser>>();
     }
 
     public static void AddApplicationServices(this WebApplicationBuilder builder)

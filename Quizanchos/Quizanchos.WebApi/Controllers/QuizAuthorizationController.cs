@@ -6,6 +6,7 @@ using Quizanchos.WebApi.Services.Interfaces;
 namespace Quizanchos.WebApi.Controllers;
 
 [AllowAnonymous]
+[Route("[controller]/[action]")]
 public class QuizAuthorizationController : Controller
 {
     private readonly IQuizAuthorizationService _authorizationService;
