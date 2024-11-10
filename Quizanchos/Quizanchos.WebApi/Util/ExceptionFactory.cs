@@ -13,4 +13,9 @@ public static class ExceptionFactory
     {
         return new ArgumentNullException($"{entityName} is null");
     }
+
+    public static Exception Create(string message)
+    {
+        return new Exception(message);
+    }
 }

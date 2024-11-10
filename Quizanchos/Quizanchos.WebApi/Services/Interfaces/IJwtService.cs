@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Quizanchos.Domain.Entities;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services.Interfaces;

@@ -1,6 +1,6 @@
 ﻿namespace Quizanchos.Domain.Entities;
 
-internal class ApplicationUser
+public class ApplicationUser
 {
-
+    public string UserName { get; set; } = string.Empty;
 }
