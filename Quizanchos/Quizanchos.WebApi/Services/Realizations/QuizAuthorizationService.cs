@@ -50,11 +50,12 @@ public class QuizAuthorizationService : IQuizAuthorizationService
 
         user = new ApplicationUser
         {
-            UserName = registerModelDto.Username
+            UserName = registerModelDto.Username,
         };
 
-        IdentityResult result = await _userManager.CreateAsync(user, registerModelDto.Password);
-        
+        await _userManager.CreateAsync(user, registerModelDto.Password);
+        await _userManager.AddToRoleAsync(user, "User");
+
         string accessTokenStr = await _jwtService.GenerateAcessTokenAsync(user);
         return new TokenDto
         {

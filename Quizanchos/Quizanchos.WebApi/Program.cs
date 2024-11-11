@@ -11,4 +11,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.Configure();
 
+await app.SeedData();
+
 app.Run();

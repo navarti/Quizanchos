@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
@@ -33,10 +34,10 @@ public static class Startup
 
         app.UseStaticFiles();
 
+        app.UseRouting();
+
         app.UseAuthentication();
         app.UseAuthorization();
-
-        app.UseRouting();
 
         app.MapControllers();
         app.MapControllerRoute(
@@ -53,64 +54,25 @@ public static class Startup
             options.Password.RequireUppercase = false;
             options.Password.RequireNonAlphanumeric = false;
         })
-            .AddEntityFrameworkStores<QuizDbContext>()
-            .AddDefaultTokenProviders();
+        .AddEntityFrameworkStores<QuizDbContext>()
+        .AddDefaultTokenProviders();
 
-        var tokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-
-            ValidAudience = "A",
-            ValidIssuer = "A",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-        };
-
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
-            options.SaveToken = true;
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = tokenValidationParameters;
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            };
         });
 
-        //builder.Services.AddAuthentication(options =>
-        //{
-        //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        //})
-        //.AddJwtBearer(options =>
-        //{
-        //    options.SaveToken = true;
-        //    options.RequireHttpsMetadata = false;
-        //    options.Audience = "A";
-        //    options.Authority = "A";
-        //    options.TokenValidationParameters = new TokenValidationParameters()
-        //    {
-        //        ValidateIssuer = true,
-        //        ValidateAudience = true,
-        //        //ValidateLifetime = true,
-        //        ValidateIssuerSigningKey = true,
-        //        ValidAudiences = builder.Configuration.GetSection("JWT:ValidAudience").Get<string[]>(),
-        //        ValidIssuers = builder.Configuration.GetSection("JWT:ValidIssuer").Get<string[]>(),
-        //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-        //    };
-        //});
-
-        builder.Services.AddAuthorization();
-        //builder.Services.AddAuthorization(options =>
-        //{
-        //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-        //    options.AddPolicy("User", policy => policy.RequireRole("User"));
-        //}); 
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("User", policy => policy.RequireRole("User"));
+        });
     }
 
     public static void AddApplicationServices(this WebApplicationBuilder builder)
@@ -118,7 +80,34 @@ public static class Startup
         builder.Services.AddControllersWithViews();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "Bearer",
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] {}
+                }
+            });
+        });
 
         builder.Services.AddDbContext<QuizDbContext>(options =>
         {
@@ -138,5 +127,14 @@ public static class Startup
         builder.Services.AddTransient<IQuizCategoryService, QuizCategoryService>();
 
         builder.Services.AddTransient<IClassicalQuizService, ClassicalQuizService>();
+    }
+
+    public async static Task SeedData(this WebApplication app)
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var services = scope.ServiceProvider;
+            await DataSeeder.SeedRoles(services);
+        }
     }
 }

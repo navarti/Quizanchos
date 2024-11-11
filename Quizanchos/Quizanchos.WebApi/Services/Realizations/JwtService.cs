@@ -19,68 +19,43 @@ public class JwtService : IJwtService
         _userManager = userManager;
     }
 
-    public JwtSecurityToken CreateToken(List<Claim> authClaims)
-    {
-        var authSignKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? ""));
-
-        int tokenValidityInMinutes = GetAccessTokenValidityInMinutes();
-
-        var token = new JwtSecurityToken(
-            issuer: _configuration["JWT:ValidIssuer"],
-            audience: _configuration["JWT:ValidAudience"],
-            expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
-            claims: authClaims,
-            signingCredentials: new SigningCredentials(authSignKey, SecurityAlgorithms.HmacSha256));
-
-        return token;
-    }
-
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
-    {
-        var tokenValidationParameters = new TokenValidationParameters()
-        {
-            ValidateAudience = false,
-            ValidateIssuer = false,
-            ValidateIssuerSigningKey = false,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "")),
-            ValidateLifetime = false,
-        };
-
-        var principal = new JwtSecurityTokenHandler().ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-
-        if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-        {
-            throw new SecurityTokenException("Invalid token");
-        }
-
-        return principal;
-    }
-
-    public int GetAccessTokenValidityInMinutes()
-    {
-        _ = int.TryParse(_configuration["JWT:AccessTokenValidityInMinutes"], out int tokenValidityInMinutes);
-
-        return tokenValidityInMinutes;
-    }
-
     public async Task<string> GenerateAcessTokenAsync(ApplicationUser user)
     {
-        var userRoles = await _userManager.GetRolesAsync(user);
+        JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
 
-        var authClaims = new List<Claim>
-            {
-                new(ClaimTypes.Name, user.UserName),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+        byte[] privateKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "");
 
-        foreach (var userRole in userRoles)
+        SigningCredentials credentials = new SigningCredentials(
+            new SymmetricSecurityKey(privateKey),
+            SecurityAlgorithms.HmacSha256);
+
+        SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
-            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-        }
+            SigningCredentials = credentials,
+            Expires = GetExpiryDate(),
+            Subject = await GenerateClaims(user)
+        };
 
-        var accessToken = CreateToken(authClaims);
-        var accessTokenStr = new JwtSecurityTokenHandler().WriteToken(accessToken);
+        SecurityToken token = handler.CreateToken(tokenDescriptor);
+        return handler.WriteToken(token);
+    }
 
-        return accessTokenStr;
+    private async Task<ClaimsIdentity> GenerateClaims(ApplicationUser user)
+    {
+        ClaimsIdentity ci = new ClaimsIdentity();
+
+        ci.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
+
+        IList<string> userRoles = await _userManager.GetRolesAsync(user);
+        foreach (var role in userRoles)
+            ci.AddClaim(new Claim(ClaimTypes.Role, role));
+        
+        return ci;
+    }
+
+    private DateTime GetExpiryDate()
+    {
+        _ = int.TryParse(_configuration["JWT:AccessTokenValidityInMinutes"], out int tokenValidityInMinutes);
+        return DateTime.UtcNow.AddMinutes(tokenValidityInMinutes);
     }
 }
