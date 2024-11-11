@@ -20,7 +20,7 @@ public class QuizAuthorizationController : Controller
     public async Task<IActionResult> Login([FromBody] LoginModelDto loginModelDto)
     {
         TokenDto token = await _authorizationService.Login(loginModelDto);
-        return  Ok(token);
+        return Ok(token);
     }
 
     [HttpPost]

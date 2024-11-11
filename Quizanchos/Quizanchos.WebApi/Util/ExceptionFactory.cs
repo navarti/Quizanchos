@@ -2,18 +2,18 @@
 
 public static class ExceptionFactory
 {
-    public static UserException CreateIdNotFoundException(Guid id, string entityName)
+    public static ApiException CreateIdNotFoundException(Guid id, string entityName)
     {
-        return new UserException($"No {entityName} with id {id} found");
+        return new ApiException($"No {entityName} with id {id} found");
     }
 
-    public static UserException CreateNullException(string entityName)
+    public static ApiException CreateNullException(string entityName)
     {
-        return new UserException($"{entityName} is null");
+        return new ApiException($"{entityName} is null");
     }
 
-    public static UserException Create(string message)
+    public static ApiException Create(string message)
     {
-        return new UserException(message);
+        return new ApiException(message);
     }
 }

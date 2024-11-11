@@ -12,8 +12,6 @@ using Quizanchos.WebApi.Services.Realizations;
 using Quizanchos.WebApi.Util;
 using System.Text;
 
-using Microsoft.AspNetCore.Identity;
-
 namespace Quizanchos.WebApi;
 
 public static class Startup
@@ -35,8 +33,7 @@ public static class Startup
 
         app.UseStaticFiles();
 
-        
-        app.UseAuthorization();
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseRouting();
@@ -59,6 +56,18 @@ public static class Startup
             .AddEntityFrameworkStores<QuizDbContext>()
             .AddDefaultTokenProviders();
 
+        var tokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidAudience = "A",
+            ValidIssuer = "A",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        };
+
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -69,27 +78,39 @@ public static class Startup
         {
             options.SaveToken = true;
             options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = new TokenValidationParameters()
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ClockSkew = TimeSpan.Zero,
-
-                ValidAudience = builder.Configuration["JWT:ValidAudience"],
-                ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-            };
+            options.TokenValidationParameters = tokenValidationParameters;
         });
 
+        //builder.Services.AddAuthentication(options =>
+        //{
+        //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        //})
+        //.AddJwtBearer(options =>
+        //{
+        //    options.SaveToken = true;
+        //    options.RequireHttpsMetadata = false;
+        //    options.Audience = "A";
+        //    options.Authority = "A";
+        //    options.TokenValidationParameters = new TokenValidationParameters()
+        //    {
+        //        ValidateIssuer = true,
+        //        ValidateAudience = true,
+        //        //ValidateLifetime = true,
+        //        ValidateIssuerSigningKey = true,
+        //        ValidAudiences = builder.Configuration.GetSection("JWT:ValidAudience").Get<string[]>(),
+        //        ValidIssuers = builder.Configuration.GetSection("JWT:ValidIssuer").Get<string[]>(),
+        //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+        //    };
+        //});
+
+        builder.Services.AddAuthorization();
         //builder.Services.AddAuthorization(options =>
         //{
         //    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
         //    options.AddPolicy("User", policy => policy.RequireRole("User"));
         //}); 
-
-        //builder.Services.AddTransient<UserManager<ApplicationUser>>();
     }
 
     public static void AddApplicationServices(this WebApplicationBuilder builder)
