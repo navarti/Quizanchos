@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Services.Interfaces;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Quizanchos.WebApi.Services.Realizations;
 
@@ -21,12 +21,8 @@ public class JwtService : IJwtService
 
     public async Task<string> GenerateAcessTokenAsync(ApplicationUser user)
     {
-        JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-
-        byte[] privateKey = Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "");
-
         SigningCredentials credentials = new SigningCredentials(
-            new SymmetricSecurityKey(privateKey),
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? "")),
             SecurityAlgorithms.HmacSha256);
 
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
@@ -36,8 +32,7 @@ public class JwtService : IJwtService
             Subject = await GenerateClaims(user)
         };
 
-        SecurityToken token = handler.CreateToken(tokenDescriptor);
-        return handler.WriteToken(token);
+        return new JsonWebTokenHandler().CreateToken(tokenDescriptor);
     }
 
     private async Task<ClaimsIdentity> GenerateClaims(ApplicationUser user)

@@ -19,13 +19,13 @@ public static class Startup
 {
     public static void Configure(this WebApplication app)
     {
+        app.UseMiddleware<ExceptionMiddlewareExtension>();
+        
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
-        app.UseMiddleware<ExceptionMiddlewareExtension>();
 
         if (!app.Environment.IsDevelopment())
         {
@@ -57,14 +57,19 @@ public static class Startup
         .AddEntityFrameworkStores<QuizDbContext>()
         .AddDefaultTokenProviders();
 
-        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        builder.Services
+        .AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
         .AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = new TokenValidationParameters()
+            options.TokenValidationParameters = new TokenValidationParameters
             {
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"])),
                 ValidateIssuer = false,
-                ValidateAudience = false,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+                ValidateAudience = false
             };
         });
 

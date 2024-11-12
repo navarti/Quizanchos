@@ -2,18 +2,18 @@
 
 public static class ExceptionFactory
 {
-    public static ApiException CreateIdNotFoundException(Guid id, string entityName)
+    public static QuizanchosException CreateIdNotFoundException(Guid id, string entityName)
     {
-        return new ApiException($"No {entityName} with id {id} found");
+        return new QuizanchosException($"No {entityName} with id {id} found");
     }
 
-    public static ApiException CreateNullException(string entityName)
+    public static QuizanchosException CreateNullException(string entityName)
     {
-        return new ApiException($"{entityName} is null");
+        return new QuizanchosException($"{entityName} is null");
     }
 
-    public static ApiException Create(string message)
+    public static QuizanchosException Create(string message)
     {
-        return new ApiException(message);
+        return new QuizanchosException(message);
     }
 }

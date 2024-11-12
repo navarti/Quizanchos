@@ -27,7 +27,7 @@ public class ExceptionMiddlewareExtension
             string messageForUser = ex.Message;
             await HandleExceptionAsync(context, messageForUser, StatusCodes.Status403Forbidden).ConfigureAwait(false);
         }
-        catch (ApiException ex)
+        catch (QuizanchosException ex)
         {
             string messageForUser = ex.Message;
             await HandleExceptionAsync(context, messageForUser, StatusCodes.Status400BadRequest).ConfigureAwait(false);
