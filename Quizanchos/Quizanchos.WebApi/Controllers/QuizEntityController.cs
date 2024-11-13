@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services.Interfaces;
 
@@ -29,6 +30,7 @@ public class QuizEntityController : Controller
     }
 
     [HttpGet]
+    [Authorize("User")]
     public async Task<IActionResult> GetAll()
     {
         List<QuizEntityDto> quizEntityDtos = await _quizEntityService.GetAll();

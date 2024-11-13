@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Quizanchos.WebApi.Util;
+using System.Text.Json;
 
 namespace Quizanchos.WebApi.Extensions;
 
@@ -21,20 +22,15 @@ public class ExceptionMiddlewareExtension
         {
             await _next(context).ConfigureAwait(false);
         }
-        catch (ArgumentNullException ex)
-        {
-            string messageForUser = ex.Message;
-            await HandleExceptionAsync(context, messageForUser, StatusCodes.Status400BadRequest).ConfigureAwait(false);
-        }
-        catch (ArgumentException ex)
-        {
-            string messageForUser = ex.Message;
-            await HandleExceptionAsync(context, messageForUser, StatusCodes.Status400BadRequest).ConfigureAwait(false);
-        }
         catch (UnauthorizedAccessException ex)
         {
             string messageForUser = ex.Message;
             await HandleExceptionAsync(context, messageForUser, StatusCodes.Status403Forbidden).ConfigureAwait(false);
+        }
+        catch (QuizanchosException ex)
+        {
+            string messageForUser = ex.Message;
+            await HandleExceptionAsync(context, messageForUser, StatusCodes.Status400BadRequest).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

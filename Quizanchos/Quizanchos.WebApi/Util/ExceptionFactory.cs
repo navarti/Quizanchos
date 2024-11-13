@@ -2,15 +2,18 @@
 
 public static class ExceptionFactory
 {
-    public static ArgumentException CreateIdNotFoundException(Guid id, string entityName)
+    public static QuizanchosException CreateIdNotFoundException(Guid id, string entityName)
     {
-        return new ArgumentException(
-            paramName: nameof(id),
-            message: $"No {entityName} with id {id} found");
+        return new QuizanchosException($"No {entityName} with id {id} found");
     }
 
-    public static ArgumentNullException CreateNullException(string entityName)
+    public static QuizanchosException CreateNullException(string entityName)
     {
-        return new ArgumentNullException($"{entityName} is null");
+        return new QuizanchosException($"{entityName} is null");
+    }
+
+    public static QuizanchosException Create(string message)
+    {
+        return new QuizanchosException(message);
     }
 }
