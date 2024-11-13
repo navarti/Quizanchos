@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
@@ -11,7 +9,6 @@ using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Services.Realizations;
 using Quizanchos.WebApi.Util;
-using System.Text;
 
 namespace Quizanchos.WebApi;
 
@@ -58,19 +55,14 @@ public static class Startup
         .AddDefaultTokenProviders();
 
         builder.Services
-        .AddAuthentication(options =>
+        .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:Secret"])),
-                ValidateIssuer = false,
-                ValidateAudience = false
-            };
+            options.Cookie.Name = "QAuth";
+            options.LoginPath = "/QuizAuthorization/Login";
+            options.LogoutPath = "/QuizAuthorization/Logout";
+            int.TryParse(builder.Configuration["Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(tokenValidityInMinutes);
         });
 
         builder.Services.AddAuthorization(options =>
@@ -85,34 +77,8 @@ public static class Startup
         builder.Services.AddControllersWithViews();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Please enter a valid token",
-                Name = "Authorization",
-                Type = SecuritySchemeType.Http,
-                BearerFormat = "JWT",
-                Scheme = "Bearer",
-            });
 
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    new string[] {}
-                }
-            });
-        });
+        builder.Services.AddSwaggerGen();
 
         builder.Services.AddDbContext<QuizDbContext>(options =>
         {
@@ -121,7 +87,6 @@ public static class Startup
 
         builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-        builder.Services.AddTransient<IJwtService, JwtService>();
         builder.Services.AddTransient<IQuizAuthorizationService, QuizAuthorizationService>(); 
 
         builder.Services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
