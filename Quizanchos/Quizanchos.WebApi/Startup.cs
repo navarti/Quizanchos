@@ -54,13 +54,14 @@ public static class Startup
         .AddEntityFrameworkStores<QuizDbContext>()
         .AddDefaultTokenProviders();
 
-        builder.Services
-        .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        .AddCookie(options =>
+        builder.Services.ConfigureApplicationCookie(options =>
         {
-            options.Cookie.Name = "QAuth";
-            options.LoginPath = "/QuizAuthorization/Login";
+            options.LoginPath = new PathString("/QuizAuthorization/Login");
             options.LogoutPath = "/QuizAuthorization/Logout";
+            options.Cookie = new CookieBuilder
+{
+                Name = "QAuth",
+            };
             int.TryParse(builder.Configuration["Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes);
             options.ExpireTimeSpan = TimeSpan.FromMinutes(tokenValidityInMinutes);
         });
