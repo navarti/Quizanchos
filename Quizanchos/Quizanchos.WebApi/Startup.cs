@@ -60,8 +60,8 @@ public static class Startup
         .AddCookie()
         .AddGoogle(googleOptions =>
         {
-            googleOptions.ClientId = configuration["Auth:Google:ClientId"] ?? throw ExceptionFactory.CreateStartupException("Google client id could not be found");
-            googleOptions.ClientSecret = configuration["Auth:Google:ClientSecret"] ?? throw ExceptionFactory.CreateStartupException("Google client secret could not be found");
+            googleOptions.ClientId = configuration["Auth:Google:ClientId"] ?? throw new Exception("Google client id could not be found");
+            googleOptions.ClientSecret = configuration["Auth:Google:ClientSecret"] ?? throw new Exception("Google client secret could not be found");
         });
 
         services.ConfigureApplicationCookie(options =>
@@ -74,7 +74,7 @@ public static class Startup
             };
             if (!int.TryParse(configuration["Auth:Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes))
             {
-                throw ExceptionFactory.CreateStartupException("Cookie.TokenValidityInMinutes could not be found");
+                throw new Exception("Cookie.TokenValidityInMinutes could not be found");
             }
             options.ExpireTimeSpan = TimeSpan.FromMinutes(tokenValidityInMinutes);
         });
@@ -98,7 +98,7 @@ public static class Startup
 
         services.AddDbContext<QuizDbContext>(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw ExceptionFactory.CreateStartupException("Connection string could not be found"));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new Exception("Connection string could not be found"));
         });
 
         services.AddAutoMapper(typeof(MappingProfile));
