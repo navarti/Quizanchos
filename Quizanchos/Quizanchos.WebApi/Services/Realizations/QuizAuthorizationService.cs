@@ -9,35 +9,23 @@ namespace Quizanchos.WebApi.Services.Realizations;
 public class QuizAuthorizationService : IQuizAuthorizationService
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IJwtService _jwtService;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public QuizAuthorizationService(UserManager<ApplicationUser> userManager, IJwtService jwtService)
+    public QuizAuthorizationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
     {
         _userManager = userManager;
-        _jwtService = jwtService;
+        _signInManager = signInManager;
     }
 
-    public async Task<TokenDto> Login(LoginModelDto loginModelDto)
+    public async Task Login(LoginModelDto loginModelDto)
     {
         _ = loginModelDto.Username ?? throw ExceptionFactory.CreateNullException(nameof(loginModelDto.Username));
         _ = loginModelDto.Password ?? throw ExceptionFactory.CreateNullException(nameof(loginModelDto.Password));
-        
-        ApplicationUser? user = await _userManager.FindByNameAsync(loginModelDto.Username);
-        _ = user ?? throw ExceptionFactory.Create("User with this name does not exist");
 
-        if (!await _userManager.CheckPasswordAsync(user, loginModelDto.Password))
-        {
-            throw ExceptionFactory.Create("Invalid password");
-        }
-
-        string accessTokenStr = await _jwtService.GenerateAcessTokenAsync(user);
-        return new TokenDto
-        {
-            AccessToken = accessTokenStr
-        };
+        await _signInManager.PasswordSignInAsync(loginModelDto.Username, loginModelDto.Password, isPersistent: true, lockoutOnFailure: false);
     }
 
-    public async Task<TokenDto> RegisterUser(RegisterModelDto registerModelDto)
+    public async Task RegisterUser(RegisterModelDto registerModelDto)
     {
         _ = registerModelDto.Username ?? throw ExceptionFactory.CreateNullException(nameof(registerModelDto.Username));
         _ = registerModelDto.Password ?? throw ExceptionFactory.CreateNullException(nameof(registerModelDto.Password));
@@ -56,10 +44,6 @@ public class QuizAuthorizationService : IQuizAuthorizationService
         await _userManager.CreateAsync(user, registerModelDto.Password);
         await _userManager.AddToRoleAsync(user, "User");
 
-        string accessTokenStr = await _jwtService.GenerateAcessTokenAsync(user);
-        return new TokenDto
-        {
-            AccessToken = accessTokenStr
-        };
+        await _signInManager.SignInAsync(user, isPersistent: true);
     }
 }

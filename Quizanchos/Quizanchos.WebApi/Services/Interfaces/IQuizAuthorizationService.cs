@@ -4,7 +4,7 @@ namespace Quizanchos.WebApi.Services.Interfaces;
 
 public interface IQuizAuthorizationService
 {
-    Task<TokenDto> Login(LoginModelDto loginModelDto);
+    Task Login(LoginModelDto loginModelDto);
 
-    Task<TokenDto> RegisterUser(RegisterModelDto registerModelDto);
+    Task RegisterUser(RegisterModelDto registerModelDto);
 }
