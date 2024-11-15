@@ -22,7 +22,11 @@ public class QuizAuthorizationService : IQuizAuthorizationService
         _ = loginModelDto.Username ?? throw ExceptionFactory.CreateNullException(nameof(loginModelDto.Username));
         _ = loginModelDto.Password ?? throw ExceptionFactory.CreateNullException(nameof(loginModelDto.Password));
 
-        await _signInManager.PasswordSignInAsync(loginModelDto.Username, loginModelDto.Password, isPersistent: true, lockoutOnFailure: false);
+        SignInResult result = await _signInManager.PasswordSignInAsync(loginModelDto.Username, loginModelDto.Password, isPersistent: true, lockoutOnFailure: false);
+        if (!result.Succeeded)
+        {
+            throw ExceptionFactory.Create("Invalid username or password");
+        }
     }
 
     public async Task RegisterUser(RegisterModelDto registerModelDto)
