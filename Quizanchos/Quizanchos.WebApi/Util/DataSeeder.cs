@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Quizanchos.WebApi.Constants;
 
 namespace Quizanchos.WebApi.Util;
 
@@ -8,10 +9,9 @@ public class DataSeeder
     {
         RoleManager<IdentityRole> roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        string[] roleNames = { "Admin", "User" };
         IdentityResult roleResult;
 
-        foreach (var roleName in roleNames)
+        foreach (var roleName in Roles.All)
         {
             bool roleExist = await roleManager.RoleExistsAsync(roleName);
             if (!roleExist)

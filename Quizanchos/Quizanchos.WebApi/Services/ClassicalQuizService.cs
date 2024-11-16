@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Services.Realizations;
+﻿namespace Quizanchos.WebApi.Services;
 
 public class ClassicalQuizService
 {

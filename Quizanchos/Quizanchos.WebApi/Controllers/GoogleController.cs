@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Domain.Entities;
-using Quizanchos.WebApi.Services.Realizations;
+using Quizanchos.WebApi.Services;
 
 namespace Quizanchos.WebApi.Controllers;
 

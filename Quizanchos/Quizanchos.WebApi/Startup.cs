@@ -5,7 +5,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Extensions;
-using Quizanchos.WebApi.Services.Realizations;
+using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi;

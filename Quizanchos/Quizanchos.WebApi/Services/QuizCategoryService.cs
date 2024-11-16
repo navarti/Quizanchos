@@ -6,7 +6,7 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Util;
 
 
-namespace Quizanchos.WebApi.Services.Realizations;
+namespace Quizanchos.WebApi.Services;
 
 public class QuizCategoryService
 {
@@ -21,7 +21,7 @@ public class QuizCategoryService
 
     public async Task<QuizCategoryDto> Create(BaseQuizCategoryDto BaseQuizCategoryDto)
     {
-        _ = BaseQuizCategoryDto ?? throw ExceptionFactory.CreateNullException(nameof(BaseQuizCategoryDto));
+        _ = BaseQuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(BaseQuizCategoryDto));
 
         QuizCategory quizCategory = _mapper.Map<QuizCategory>(BaseQuizCategoryDto);
 
@@ -33,7 +33,7 @@ public class QuizCategoryService
     public async Task<QuizCategoryDto> GetById(Guid id)
     {
         QuizCategory quizCategory = await _quizCategoryRepository.GetById(id).ConfigureAwait(false)
-            ?? throw ExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
+            ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
 
         return _mapper.Map<QuizCategoryDto>(quizCategory);
     }
@@ -47,10 +47,10 @@ public class QuizCategoryService
 
     public async Task<QuizCategoryDto> Update(QuizCategoryDto QuizCategoryDto)
     {
-        _ = QuizCategoryDto ?? throw ExceptionFactory.CreateNullException(nameof(QuizCategoryDto));
+        _ = QuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(QuizCategoryDto));
 
         QuizCategory quizCategory = await _quizCategoryRepository.GetById(QuizCategoryDto.Id).ConfigureAwait(false) ??
-            throw ExceptionFactory.CreateIdNotFoundException(QuizCategoryDto.Id, nameof(quizCategory));
+            throw HandledExceptionFactory.CreateIdNotFoundException(QuizCategoryDto.Id, nameof(quizCategory));
 
         _mapper.Map(QuizCategoryDto, quizCategory);
 
@@ -62,7 +62,7 @@ public class QuizCategoryService
     public async Task Delete(Guid id)
     {
         QuizCategory quizCategory = await _quizCategoryRepository.GetById(id).ConfigureAwait(false)
-            ?? throw ExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
+            ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
 
         await _quizCategoryRepository.Delete(quizCategory);
     }

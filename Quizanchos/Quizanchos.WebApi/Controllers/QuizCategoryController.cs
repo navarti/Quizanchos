@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Realizations;
+using Quizanchos.WebApi.Constants;
+using Quizanchos.WebApi.Services;
 
 namespace Quizanchos.WebApi.Controllers;
 
@@ -30,7 +31,7 @@ public class QuizCategoryController : Controller
     }
 
     [HttpGet]
-    [Authorize("User")]
+    [Authorize(Roles.User)]
     public async Task<IActionResult> GetAll()
     {
         List<QuizCategoryDto> quizCategoryDtos = await _quizCategoryService.GetAll();

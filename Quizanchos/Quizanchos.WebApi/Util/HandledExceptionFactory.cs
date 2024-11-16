@@ -1,6 +1,6 @@
 ﻿namespace Quizanchos.WebApi.Util;
 
-public static class ExceptionFactory
+public static class HandledExceptionFactory
 {
     public static QuizanchosException CreateIdNotFoundException(Guid id, string entityName)
     {

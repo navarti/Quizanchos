@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Quizanchos.Domain.Entities;
+using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Util;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Services.Realizations;
+namespace Quizanchos.WebApi.Services;
 
 public class GoogleAuthorizationService
 {
@@ -20,7 +21,7 @@ public class GoogleAuthorizationService
     public async Task SignIn(AuthenticateResult authenticateResult)
     {
         string? email = authenticateResult?.Principal?.FindFirstValue(ClaimTypes.Email);
-        _ = email ?? throw ExceptionFactory.Create("Could not retrieve email from google response");
+        _ = email ?? throw HandledExceptionFactory.Create("Could not retrieve email from google response");
 
         ApplicationUser? user = await _userManager.FindByEmailAsync(email);
         if (user is null)
@@ -29,6 +30,7 @@ public class GoogleAuthorizationService
             user = await CreateNewUser(email, userName);
         }
 
+        // TODO: check result of this
         await _signInManager.SignInAsync(user, isPersistent: true);
     }
 
@@ -36,14 +38,22 @@ public class GoogleAuthorizationService
     {
         ApplicationUser user = new ApplicationUser
         {
-            // Todo: make normal username
-            UserName = "username",
+            // TODO: make normal username
+            UserName = Guid.NewGuid().ToString(),
             Email = email,
         };
 
-        await _userManager.CreateAsync(user);
+        IdentityResult result = await _userManager.CreateAsync(user);
+        if (!result.Succeeded)
+        {
+            throw CriticalExceptionFactory.CreateIdentityResultException(result);
+        }
 
-        await _userManager.AddToRoleAsync(user, "User");
+        result = await _userManager.AddToRoleAsync(user, Roles.User);
+        if (!result.Succeeded)
+        {
+            throw CriticalExceptionFactory.CreateIdentityResultException(result);
+        }
 
         return user;
     }
