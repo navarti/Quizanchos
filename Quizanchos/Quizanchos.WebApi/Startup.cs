@@ -84,9 +84,9 @@ public static class Startup
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(QuizPolicy.Owner, policy => policy.RequireRole(QuzRole.Owner));
-            options.AddPolicy(QuizPolicy.Admin, policy => policy.RequireRole(QuzRole.Owner, QuzRole.Admin));
-            options.AddPolicy(QuizPolicy.User, policy => policy.RequireRole(QuzRole.Owner, QuzRole.Admin, QuzRole.User));
+            options.AddPolicy(QuizPolicy.Owner, policy => policy.RequireRole(QuizRole.Owner));
+            options.AddPolicy(QuizPolicy.Admin, policy => policy.RequireRole(QuizRole.Owner, QuizRole.Admin));
+            options.AddPolicy(QuizPolicy.User, policy => policy.RequireRole(QuizRole.Owner, QuizRole.Admin, QuizRole.User));
         });
     }
 
@@ -114,6 +114,7 @@ public static class Startup
 
         services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
+        services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
 
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();

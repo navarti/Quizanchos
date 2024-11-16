@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
 
@@ -15,7 +17,8 @@ public class QuizEntityController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(BaseQuizEntityDto baseQuizEntityDto)
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> Create([FromBody] BaseQuizEntityDto baseQuizEntityDto)
     {
         QuizEntityDto quizEntityDto = await _quizEntityService.Create(baseQuizEntityDto);
         return Ok(quizEntityDto);
@@ -36,13 +39,15 @@ public class QuizEntityController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(QuizEntityDto quizEntityDto)
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> Update([FromBody] QuizEntityDto quizEntityDto)
     {
         QuizEntityDto updatedQuizEntityDto = await _quizEntityService.Update(quizEntityDto);
         return Ok(updatedQuizEntityDto);
     }
 
     [HttpDelete]
+    [Authorize(QuizPolicy.Admin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _quizEntityService.Delete(id);

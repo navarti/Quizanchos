@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Quizanchos.WebApi.Constants;
+using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
+using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Controllers;
 
@@ -11,5 +15,13 @@ public class SingleGameSessionController : Controller
     public SingleGameSessionController(SingleGameSessionService singleGameSessionService)
     {
         _singleGameSessionService = singleGameSessionService;
+    }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> Create([FromBody] BaseSingleGameSessionDto baseSingleGameSessionDto)
+    {
+        SingleGameSessionDto singleGameSession = await _singleGameSessionService.Create(baseSingleGameSessionDto, User);
+        return Ok(singleGameSession);
     }
 }

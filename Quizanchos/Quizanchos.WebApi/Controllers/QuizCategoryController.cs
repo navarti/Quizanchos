@@ -18,7 +18,7 @@ public class QuizCategoryController : Controller
 
     [HttpPost]
     [Authorize(QuizPolicy.Admin)]
-    public async Task<IActionResult> Create(BaseQuizCategoryDto baseQuizCategoryDto)
+    public async Task<IActionResult> Create([FromBody] BaseQuizCategoryDto baseQuizCategoryDto)
     {
         QuizCategoryDto quizCategoryDto = await _quizCategoryService.Create(baseQuizCategoryDto);
         return Ok(quizCategoryDto);
@@ -65,7 +65,7 @@ public class QuizCategoryController : Controller
 
     [HttpPost]
     [Authorize(QuizPolicy.Admin)]
-    public async Task<IActionResult> Update(QuizCategoryDto quizCategoryDto)
+    public async Task<IActionResult> Update([FromBody] QuizCategoryDto quizCategoryDto)
     {
         QuizCategoryDto updatedQuizCategoryDto = await _quizCategoryService.Update(quizCategoryDto);
         return Ok(updatedQuizCategoryDto);

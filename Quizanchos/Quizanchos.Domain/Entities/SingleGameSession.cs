@@ -8,5 +8,5 @@ public class SingleGameSession : IKeyedEntity<Guid>
     public DateTime CreationTime { get; set; }
 
     public ApplicationUser ApplicationUser { get; set; }
-    public QuizEntity QuizEntity { get; set; }
+    public QuizCategory QuizCategory { get; set; }
 }

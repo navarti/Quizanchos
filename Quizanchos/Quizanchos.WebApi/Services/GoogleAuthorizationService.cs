@@ -48,7 +48,7 @@ public class GoogleAuthorizationService
             throw CriticalExceptionFactory.CreateIdentityResultException(result);
         }
 
-        result = await _userManager.AddToRoleAsync(user, QuzRole.User);
+        result = await _userManager.AddToRoleAsync(user, QuizRole.User);
         if (!result.Succeeded)
         {
             throw CriticalExceptionFactory.CreateIdentityResultException(result);

@@ -1,6 +1,6 @@
 ﻿namespace Quizanchos.WebApi.Constants;
 
-public static class QuzRole
+public static class QuizRole
 {
     public static readonly List<string> All = new List<string> { User, Admin, Owner };
     

@@ -19,11 +19,11 @@ public class QuizCategoryService
         _mapper = mapper;
     }
 
-    public async Task<QuizCategoryDto> Create(BaseQuizCategoryDto BaseQuizCategoryDto)
+    public async Task<QuizCategoryDto> Create(BaseQuizCategoryDto baseQuizCategoryDto)
     {
-        _ = BaseQuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(BaseQuizCategoryDto));
+        _ = baseQuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(baseQuizCategoryDto));
 
-        QuizCategory quizCategory = _mapper.Map<QuizCategory>(BaseQuizCategoryDto);
+        QuizCategory quizCategory = _mapper.Map<QuizCategory>(baseQuizCategoryDto);
 
         quizCategory = await _quizCategoryRepository.Create(quizCategory).ConfigureAwait(false);
 
