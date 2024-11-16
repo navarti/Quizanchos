@@ -31,7 +31,7 @@ public class QuizCategoryController : Controller
     }
 
     [HttpGet]
-    [Authorize(Roles.User)]
+    [Authorize(Role.User)]
     public async Task<IActionResult> GetAll()
     {
         List<QuizCategoryDto> quizCategoryDtos = await _quizCategoryService.GetAll();
