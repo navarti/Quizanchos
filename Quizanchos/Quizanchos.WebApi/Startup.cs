@@ -52,6 +52,7 @@ public static class Startup
             options.Password.RequireLowercase = false;
             options.Password.RequireUppercase = false;
             options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 1;
         })
         .AddEntityFrameworkStores<QuizDbContext>()
         .AddDefaultTokenProviders();
@@ -60,8 +61,10 @@ public static class Startup
         .AddCookie()
         .AddGoogle(googleOptions =>
         {
-            googleOptions.ClientId = configuration["Auth:Google:ClientId"] ?? throw new Exception("Google client id could not be found");
-            googleOptions.ClientSecret = configuration["Auth:Google:ClientSecret"] ?? throw new Exception("Google client secret could not be found");
+            googleOptions.ClientId = configuration["Auth:Google:ClientId"] 
+                ?? throw CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientId");
+            googleOptions.ClientSecret = configuration["Auth:Google:ClientSecret"] 
+                ?? throw CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientSecret");
         });
 
         services.ConfigureApplicationCookie(options =>
@@ -74,15 +77,16 @@ public static class Startup
             };
             if (!int.TryParse(configuration["Auth:Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes))
             {
-                throw new Exception("Cookie.TokenValidityInMinutes could not be found");
+                throw CriticalExceptionFactory.CreateConfigException("Auth:Cookie:TokenValidityInMinutes");
             }
             options.ExpireTimeSpan = TimeSpan.FromMinutes(tokenValidityInMinutes);
         });
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(Role.Admin, policy => policy.RequireRole(Role.Admin));
-            options.AddPolicy(Role.User, policy => policy.RequireRole(Role.User));
+            options.AddPolicy(QuizPolicy.Owner, policy => policy.RequireRole(QuzRole.Owner));
+            options.AddPolicy(QuizPolicy.Admin, policy => policy.RequireRole(QuzRole.Owner, QuzRole.Admin));
+            options.AddPolicy(QuizPolicy.User, policy => policy.RequireRole(QuzRole.Owner, QuzRole.Admin, QuzRole.User));
         });
     }
 
@@ -98,7 +102,8 @@ public static class Startup
 
         services.AddDbContext<QuizDbContext>(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new Exception("Connection string could not be found"));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
+                ?? throw CriticalExceptionFactory.CreateConfigException("DefaultConnection"));
         });
 
         services.AddAutoMapper(typeof(MappingProfile));
@@ -114,15 +119,15 @@ public static class Startup
         services.AddTransient<QuizCategoryService>();
 
         services.AddTransient<GoogleAuthorizationService>();
-        services.AddTransient<ClassicalQuizService>();
+        services.AddTransient<SingleGameSessionService>();
     }
 
-    public async static Task SeedData(this WebApplication app)
+    public async static Task SeedData(this WebApplication app, ConfigurationManager configuration)
     {
         using (IServiceScope scope = app.Services.CreateScope())
         {
             IServiceProvider services = scope.ServiceProvider;
-            await DataSeeder.SeedRoles(services);
+            await DataSeeder.SeedDatabase(services, configuration);
         }
     }
 }

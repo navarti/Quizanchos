@@ -17,7 +17,7 @@ public class QuizAuthorizationService
         _signInManager = signInManager;
     }
 
-    public async Task Login(LoginModelDto loginModelDto)
+    public async Task SignIn(LoginModelDto loginModelDto)
     {
         _ = loginModelDto.Email ?? throw HandledExceptionFactory.CreateNullException(nameof(loginModelDto.Email));
         _ = loginModelDto.Password ?? throw HandledExceptionFactory.CreateNullException(nameof(loginModelDto.Password));
@@ -32,7 +32,11 @@ public class QuizAuthorizationService
         }
     }
 
-    public async Task RegisterUser(RegisterModelDto registerModelDto)
+    public async Task RegisterUser(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, QuzRole.User);
+
+    public async Task RegisterAdmin(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, QuzRole.Admin);
+
+    private async Task RegisterWithRole(RegisterModelDto registerModelDto, string roleName)
     {
         _ = registerModelDto.Email ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto.Email));
         _ = registerModelDto.Password ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto.Password));
@@ -56,7 +60,7 @@ public class QuizAuthorizationService
             throw CriticalExceptionFactory.CreateIdentityResultException(result);
         }
 
-        result = await _userManager.AddToRoleAsync(user, Role.User);
+        result = await _userManager.AddToRoleAsync(user, roleName);
         if (!result.Succeeded)
         {
             throw CriticalExceptionFactory.CreateIdentityResultException(result);

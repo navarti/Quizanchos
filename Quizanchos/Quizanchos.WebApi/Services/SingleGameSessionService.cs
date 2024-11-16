@@ -1,8 +1,8 @@
 ﻿namespace Quizanchos.WebApi.Services;
 
-public class ClassicalQuizService
+public class SingleGameSessionService
 {
-    public ClassicalQuizService()
+    public SingleGameSessionService()
     {
     }
 

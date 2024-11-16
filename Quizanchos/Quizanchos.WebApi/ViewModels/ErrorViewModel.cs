@@ -1,4 +1,4 @@
-namespace Quizanchos.Models
+namespace Quizanchos.ViewModels
 {
     public class ErrorViewModel
     {

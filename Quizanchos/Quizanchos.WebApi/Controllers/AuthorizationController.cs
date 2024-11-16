@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
 
@@ -17,16 +18,24 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login([FromBody] LoginModelDto loginModelDto)
+    public async Task<IActionResult> SignIn([FromBody] LoginModelDto loginModelDto)
     {
-        await _authorizationService.Login(loginModelDto);
+        await _authorizationService.SignIn(loginModelDto);
         return Ok();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Register([FromBody] RegisterModelDto registerModelDto)
+    public async Task<IActionResult> SignUp([FromBody] RegisterModelDto registerModelDto)
     {
         await _authorizationService.RegisterUser(registerModelDto);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModelDto registerModelDto)
+    {
+        await _authorizationService.RegisterAdmin(registerModelDto);
         return Ok();
     }
 }
