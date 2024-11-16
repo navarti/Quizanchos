@@ -11,7 +11,7 @@ public class DataSeeder
 
         IdentityResult roleResult;
 
-        foreach (var roleName in Roles.All)
+        foreach (var roleName in Role.All)
         {
             bool roleExist = await roleManager.RoleExistsAsync(roleName);
             if (!roleExist)

@@ -56,7 +56,7 @@ public class QuizAuthorizationService
             throw CriticalExceptionFactory.CreateIdentityResultException(result);
         }
 
-        result = await _userManager.AddToRoleAsync(user, Roles.User);
+        result = await _userManager.AddToRoleAsync(user, Role.User);
         if (!result.Succeeded)
         {
             throw CriticalExceptionFactory.CreateIdentityResultException(result);

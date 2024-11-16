@@ -4,6 +4,7 @@ using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
+using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Util;
@@ -80,8 +81,8 @@ public static class Startup
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-            options.AddPolicy("User", policy => policy.RequireRole("User"));
+            options.AddPolicy(Role.Admin, policy => policy.RequireRole(Role.Admin));
+            options.AddPolicy(Role.User, policy => policy.RequireRole(Role.User));
         });
     }
 
