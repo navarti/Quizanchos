@@ -32,7 +32,7 @@ public class QuizCategoryService
 
     public async Task<QuizCategoryDto> GetById(Guid id)
     {
-        QuizCategory quizCategory = await _quizCategoryRepository.GetById(id).ConfigureAwait(false)
+        QuizCategory quizCategory = await _quizCategoryRepository.FindById(id).ConfigureAwait(false)
             ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
 
         return _mapper.Map<QuizCategoryDto>(quizCategory);
@@ -49,8 +49,8 @@ public class QuizCategoryService
     {
         _ = QuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(QuizCategoryDto));
 
-        QuizCategory quizCategory = await _quizCategoryRepository.GetById(QuizCategoryDto.Id).ConfigureAwait(false) ??
-            throw HandledExceptionFactory.CreateIdNotFoundException(QuizCategoryDto.Id, nameof(quizCategory));
+        QuizCategory quizCategory = await _quizCategoryRepository.FindById(QuizCategoryDto.Id).ConfigureAwait(false) 
+            ?? throw HandledExceptionFactory.CreateIdNotFoundException(QuizCategoryDto.Id, nameof(quizCategory));
 
         _mapper.Map(QuizCategoryDto, quizCategory);
 
@@ -61,7 +61,7 @@ public class QuizCategoryService
 
     public async Task Delete(Guid id)
     {
-        QuizCategory quizCategory = await _quizCategoryRepository.GetById(id).ConfigureAwait(false)
+        QuizCategory quizCategory = await _quizCategoryRepository.FindById(id).ConfigureAwait(false)
             ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
 
         await _quizCategoryRepository.Delete(quizCategory);

@@ -24,8 +24,7 @@ internal class FeatureFloatUpdater : IFeatureUpdater
             throw new ArgumentException($"{nameof(value)} is not of type {nameof(FeatureValueFloat)}");
         }
 
-        FeatureFloat featureFloat = await _featureFloatRepository.GetByCategoryAndEntity(_quizCategory.Id, quizEntity.Id);
-
+        FeatureFloat? featureFloat = await _featureFloatRepository.FindByCategoryAndEntity(_quizCategory.Id, quizEntity.Id);
         if (featureFloat is not null)
         {
             if (featureFloat.Value != featureValueFloat)

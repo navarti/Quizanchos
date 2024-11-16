@@ -31,7 +31,7 @@ public class QuizEntityService
 
     public async Task<QuizEntityDto> GetById(Guid id)
     {
-        QuizEntity quizEntity = await _quizEntityRepository.GetById(id).ConfigureAwait(false)
+        QuizEntity quizEntity = await _quizEntityRepository.FindById(id).ConfigureAwait(false)
             ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizEntity));
 
         return _mapper.Map<QuizEntityDto>(quizEntity);
@@ -48,7 +48,7 @@ public class QuizEntityService
     {
         _ = quizEntityDto ?? throw HandledExceptionFactory.CreateNullException(nameof(quizEntityDto));
 
-        QuizEntity quizEntity = await _quizEntityRepository.GetById(quizEntityDto.Id).ConfigureAwait(false) ??
+        QuizEntity quizEntity = await _quizEntityRepository.FindById(quizEntityDto.Id).ConfigureAwait(false) ??
             throw HandledExceptionFactory.CreateIdNotFoundException(quizEntityDto.Id, nameof(quizEntity));
 
         _mapper.Map(quizEntityDto, quizEntity);
@@ -60,7 +60,7 @@ public class QuizEntityService
 
     public async Task Delete(Guid id)
     {
-        QuizEntity quizEntity = await _quizEntityRepository.GetById(id).ConfigureAwait(false)
+        QuizEntity quizEntity = await _quizEntityRepository.FindById(id).ConfigureAwait(false)
             ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizEntity));
 
         await _quizEntityRepository.Delete(quizEntity);

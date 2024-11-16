@@ -24,8 +24,7 @@ internal class FeatureIntUpdater : IFeatureUpdater
             throw new ArgumentException($"{nameof(value)} is not of type {nameof(FeatureValueInt)}");
         }
 
-        FeatureInt featureInt = await _featureIntRepository.GetByCategoryAndEntity(_quizCategory.Id, quizEntity.Id);
-
+        FeatureInt? featureInt = await _featureIntRepository.FindByCategoryAndEntity(_quizCategory.Id, quizEntity.Id);
         if (featureInt is not null)
         {
             if(featureInt.Value != featureValueInt)

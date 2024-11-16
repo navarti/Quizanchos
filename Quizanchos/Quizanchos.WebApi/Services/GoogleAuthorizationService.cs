@@ -30,7 +30,6 @@ public class GoogleAuthorizationService
             user = await CreateNewUser(email, userName);
         }
 
-        // TODO: check result of this
         await _signInManager.SignInAsync(user, isPersistent: true);
     }
 

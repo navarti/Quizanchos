@@ -14,7 +14,7 @@ public interface IEntityRepository<TKey, TEntity>
         Dictionary<Expression<Func<TEntity, object>>, SortDirection>? orderBy = null,
         bool asNoTracking = false);
 
-    Task<TEntity> GetById(TKey id);
+    Task<TEntity?> FindById(TKey id);
 
     Task<TEntity> Update(TEntity entity);
 
@@ -22,5 +22,5 @@ public interface IEntityRepository<TKey, TEntity>
 
     Task Delete(TEntity entity);
 
-    Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> whereExpression);
+    Task<TEntity?> FindFirstOrDefaultAsync(Expression<Func<TEntity, bool>> whereExpression);
 }

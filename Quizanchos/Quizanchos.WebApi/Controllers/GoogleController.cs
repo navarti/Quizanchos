@@ -9,6 +9,8 @@ namespace Quizanchos.WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class GoogleAuthController : Controller
 {
+    private const string AuthScheme = "Google";
+
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly GoogleAuthorizationService _googleAuthService;
@@ -21,26 +23,26 @@ public class GoogleAuthController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> SignIn()
+    public IActionResult SignIn()
     {
         var authenticationProperties = new AuthenticationProperties
         {
             RedirectUri = Url.Action(nameof(Callback))
         };
-        return Challenge(authenticationProperties, "Google");
+        return Challenge(authenticationProperties, AuthScheme);
     }
 
     [HttpGet]
     public async Task<IActionResult> Callback()
     {
-        AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync("Google");
+        AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(AuthScheme);
         if (!authenticateResult.Succeeded)
         {
+            // TOD: change this
             return RedirectToAction("Login", "Account");
         }
 
         await _googleAuthService.SignIn(authenticateResult);
-
         return Redirect("/");
     }
 }

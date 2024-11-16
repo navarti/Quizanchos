@@ -10,7 +10,7 @@ public class QuizEntityRepository : EntityRepositoryBase<Guid, QuizEntity>, IQui
     {
     }
 
-    public Task<QuizEntity> GetByName(string name)
+    public Task<QuizEntity?> FindByName(string name)
     {
         return dbSet.FirstOrDefaultAsync(quizEntity => quizEntity.Name == name);
     }

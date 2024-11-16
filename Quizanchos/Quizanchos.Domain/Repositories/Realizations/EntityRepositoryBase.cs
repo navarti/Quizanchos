@@ -23,22 +23,20 @@ public class EntityRepositoryBase<TKey, TEntity> : IEntityRepository<TKey, TEnti
     {
         await dbSet.AddAsync(entity).ConfigureAwait(false);
         await dbContext.SaveChangesAsync().ConfigureAwait(false);
-
         return entity;
     }
 
     public virtual async Task Delete(TEntity entity)
     {
         dbContext.Entry(entity).State = EntityState.Deleted;
-
         await dbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
     public virtual IQueryable<TEntity> Get(
         int skip = 0,
         int take = 0,
-        Expression<Func<TEntity, bool>> whereExpression = null,
-        Dictionary<Expression<Func<TEntity, object>>, SortDirection> orderBy = null,
+        Expression<Func<TEntity, bool>>? whereExpression = null,
+        Dictionary<Expression<Func<TEntity, object>>, SortDirection>? orderBy = null,
         bool asNoTracking = false)
     {
         IQueryable<TEntity> query = dbSet;
@@ -82,18 +80,16 @@ public class EntityRepositoryBase<TKey, TEntity> : IEntityRepository<TKey, TEnti
         return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public virtual Task<TEntity> GetById(TKey id) => dbSet.FirstOrDefaultAsync(x => x.Id.Equals(id));
+    public virtual Task<TEntity?> FindById(TKey id) => dbSet.FirstOrDefaultAsync(x => x.Id != null && x.Id.Equals(id));
 
     public virtual async Task<TEntity> Update(TEntity entity)
     {
         dbContext.Entry(entity).State = EntityState.Modified;
-
         await dbContext.SaveChangesAsync().ConfigureAwait(false);
-
         return entity;
     }
 
-    public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> whereExpression)
+    public async Task<TEntity?> FindFirstOrDefaultAsync(Expression<Func<TEntity, bool>> whereExpression)
     {
         var query = dbSet.FirstOrDefaultAsync(whereExpression);
         return await query.ConfigureAwait(false);

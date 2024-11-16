@@ -4,5 +4,5 @@ namespace Quizanchos.Domain.Repositories.Interfaces;
 
 public interface IQuizEntityRepository : IEntityRepository<Guid, QuizEntity>
 {
-    public Task<QuizEntity> GetByName(string name);
+    public Task<QuizEntity?> FindByName(string name);
 }

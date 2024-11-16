@@ -10,7 +10,7 @@ public class FeatureIntRepository : EntityRepositoryBase<Guid, FeatureInt>, IFea
     {
     }
 
-    public Task<FeatureInt> GetByCategoryAndEntity(Guid categoryId, Guid entityId)
+    public Task<FeatureInt?> FindByCategoryAndEntity(Guid categoryId, Guid entityId)
     {
         return dbSet.FirstOrDefaultAsync(feature => feature.QuizCategoryId == categoryId && feature.QuizEntityId == entityId);
     }

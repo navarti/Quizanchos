@@ -36,8 +36,7 @@ internal class DataUpdater : IDataUpdater
 
     private async Task<QuizCategory> GetQuizCategory(string quizCategoryName)
     {
-        QuizCategory quizCategory = await _quizCategoryRepository.GetByName(quizCategoryName);
-
+        QuizCategory? quizCategory = await _quizCategoryRepository.FindByName(quizCategoryName);
         if (quizCategory is not null)
         {
             return quizCategory;
@@ -52,8 +51,7 @@ internal class DataUpdater : IDataUpdater
 
     private async Task<QuizEntity> GetQuizEntity(string entityName)
     {
-        QuizEntity quizEntity = await _quizEntityRepository.GetByName(entityName);
-
+        QuizEntity? quizEntity = await _quizEntityRepository.FindByName(entityName);
         if(quizEntity is not null)
         {
             return quizEntity;

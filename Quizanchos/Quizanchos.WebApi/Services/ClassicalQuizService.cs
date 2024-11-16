@@ -6,7 +6,8 @@ public class ClassicalQuizService
     {
     }
 
-    public async Task Create()
+    public Task Create()
     {
+        return Task.CompletedTask;
     }
 }

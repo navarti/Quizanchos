@@ -13,15 +13,14 @@ public class ClassicalQuizController : Controller
         _classicalQuizService = classicalQuizService;
     }
 
-    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet]
-    public async Task<IActionResult> Test()
+    public IActionResult Test()
     {
         return Ok("Server is running");
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         return View();
     }
