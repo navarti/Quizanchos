@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Quizanchos.WebApi.Services.Interfaces;
+using Quizanchos.WebApi.Services.Realizations;
 
 namespace Quizanchos.WebApi.Controllers;
 
 [Route("[controller]/[action]")]
 public class ClassicalQuizController : Controller
 {
-    private readonly IClassicalQuizService _classicalQuizService;
+    private readonly ClassicalQuizService _classicalQuizService;
 
-    public ClassicalQuizController(IClassicalQuizService classicalQuizService)
+    public ClassicalQuizController(ClassicalQuizService classicalQuizService)
     {
         _classicalQuizService = classicalQuizService;
     }

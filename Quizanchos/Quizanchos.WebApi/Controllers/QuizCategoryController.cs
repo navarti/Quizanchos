@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Interfaces;
+using Quizanchos.WebApi.Services.Realizations;
 
 namespace Quizanchos.WebApi.Controllers;
 
 [Route("[controller]/[action]")]
 public class QuizCategoryController : Controller
 {
-    private readonly IQuizCategoryService _quizCategoryService;
+    private readonly QuizCategoryService _quizCategoryService;
 
-    public QuizCategoryController(IQuizCategoryService quizCategoryService)
+    public QuizCategoryController(QuizCategoryService quizCategoryService)
     {
         _quizCategoryService = quizCategoryService;
     }

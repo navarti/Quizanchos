@@ -1,8 +1,6 @@
-﻿using Quizanchos.WebApi.Services.Interfaces;
+﻿namespace Quizanchos.WebApi.Services.Realizations;
 
-namespace Quizanchos.WebApi.Services.Realizations;
-
-public class ClassicalQuizService : IClassicalQuizService
+public class ClassicalQuizService
 {
     public ClassicalQuizService()
     {

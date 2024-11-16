@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Interfaces;
+using Quizanchos.WebApi.Services.Realizations;
 
 namespace Quizanchos.WebApi.Controllers;
 
@@ -9,9 +9,9 @@ namespace Quizanchos.WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class AuthorizationController : Controller
 {
-    private readonly IQuizAuthorizationService _authorizationService;
+    private readonly QuizAuthorizationService _authorizationService;
 
-    public AuthorizationController(IQuizAuthorizationService authorizationService)
+    public AuthorizationController(QuizAuthorizationService authorizationService)
     {
         _authorizationService = authorizationService;
     }

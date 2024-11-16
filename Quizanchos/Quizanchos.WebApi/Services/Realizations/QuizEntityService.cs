@@ -3,12 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services.Realizations;
 
-public class QuizEntityService : IQuizEntityService
+public class QuizEntityService
 {
     private readonly IQuizEntityRepository _quizEntityRepository;
     private readonly IMapper _mapper;

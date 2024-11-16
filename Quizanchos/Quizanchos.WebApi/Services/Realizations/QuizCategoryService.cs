@@ -1,17 +1,14 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
 
 namespace Quizanchos.WebApi.Services.Realizations;
 
-public class QuizCategoryService : IQuizCategoryService
+public class QuizCategoryService
 {
     private readonly IQuizCategoryRepository _quizCategoryRepository;
     private readonly IMapper _mapper;

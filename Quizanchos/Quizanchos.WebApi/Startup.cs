@@ -5,7 +5,6 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Extensions;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Services.Realizations;
 using Quizanchos.WebApi.Util;
 
@@ -103,16 +102,18 @@ public static class Startup
 
         services.AddAutoMapper(typeof(MappingProfile));
 
-        services.AddTransient<IQuizAuthorizationService, QuizAuthorizationService>(); 
+        services.AddTransient<QuizAuthorizationService>(); 
 
         services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
 
         services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
-        services.AddTransient<IQuizEntityService, QuizEntityService>();
-        services.AddTransient<IQuizCategoryService, QuizCategoryService>();
 
-        services.AddTransient<IClassicalQuizService, ClassicalQuizService>();
+        services.AddTransient<QuizEntityService>();
+        services.AddTransient<QuizCategoryService>();
+
+        services.AddTransient<GoogleAuthorizationService>();
+        services.AddTransient<ClassicalQuizService>();
     }
 
     public async static Task SeedData(this WebApplication app)
