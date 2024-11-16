@@ -3,12 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
-namespace Quizanchos.WebApi.Services.Realizations;
+namespace Quizanchos.WebApi.Services;
 
-public class QuizEntityService : IQuizEntityService
+public class QuizEntityService
 {
     private readonly IQuizEntityRepository _quizEntityRepository;
     private readonly IMapper _mapper;
@@ -21,7 +20,7 @@ public class QuizEntityService : IQuizEntityService
 
     public async Task<QuizEntityDto> Create(BaseQuizEntityDto baseQuizEntityDto)
     {
-        _ = baseQuizEntityDto ?? throw ExceptionFactory.CreateNullException(nameof(baseQuizEntityDto));
+        _ = baseQuizEntityDto ?? throw HandledExceptionFactory.CreateNullException(nameof(baseQuizEntityDto));
 
         QuizEntity quizEntity = _mapper.Map<QuizEntity>(baseQuizEntityDto);
 
@@ -33,7 +32,7 @@ public class QuizEntityService : IQuizEntityService
     public async Task<QuizEntityDto> GetById(Guid id)
     {
         QuizEntity quizEntity = await _quizEntityRepository.GetById(id).ConfigureAwait(false)
-            ?? throw ExceptionFactory.CreateIdNotFoundException(id, nameof(quizEntity));
+            ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizEntity));
 
         return _mapper.Map<QuizEntityDto>(quizEntity);
     }
@@ -47,10 +46,10 @@ public class QuizEntityService : IQuizEntityService
 
     public async Task<QuizEntityDto> Update(QuizEntityDto quizEntityDto)
     {
-        _ = quizEntityDto ?? throw ExceptionFactory.CreateNullException(nameof(quizEntityDto));
+        _ = quizEntityDto ?? throw HandledExceptionFactory.CreateNullException(nameof(quizEntityDto));
 
         QuizEntity quizEntity = await _quizEntityRepository.GetById(quizEntityDto.Id).ConfigureAwait(false) ??
-            throw ExceptionFactory.CreateIdNotFoundException(quizEntityDto.Id, nameof(quizEntity));
+            throw HandledExceptionFactory.CreateIdNotFoundException(quizEntityDto.Id, nameof(quizEntity));
 
         _mapper.Map(quizEntityDto, quizEntity);
 
@@ -62,7 +61,7 @@ public class QuizEntityService : IQuizEntityService
     public async Task Delete(Guid id)
     {
         QuizEntity quizEntity = await _quizEntityRepository.GetById(id).ConfigureAwait(false)
-            ?? throw ExceptionFactory.CreateIdNotFoundException(id, nameof(quizEntity));
+            ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizEntity));
 
         await _quizEntityRepository.Delete(quizEntity);
     }

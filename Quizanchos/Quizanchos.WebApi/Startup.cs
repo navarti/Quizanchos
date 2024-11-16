@@ -5,8 +5,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Extensions;
-using Quizanchos.WebApi.Services.Interfaces;
-using Quizanchos.WebApi.Services.Realizations;
+using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi;
@@ -43,7 +42,10 @@ public static class Startup
 
     public static void AddAuthorizaiton(this WebApplicationBuilder builder)
     {
-        builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        IServiceCollection services = builder.Services;
+        ConfigurationManager configuration = builder.Configuration;
+
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
             options.Password.RequireDigit = false;
             options.Password.RequireLowercase = false;
@@ -53,19 +55,30 @@ public static class Startup
         .AddEntityFrameworkStores<QuizDbContext>()
         .AddDefaultTokenProviders();
 
-        builder.Services.ConfigureApplicationCookie(options =>
+        services.AddAuthentication()
+        .AddCookie()
+        .AddGoogle(googleOptions =>
+        {
+            googleOptions.ClientId = configuration["Auth:Google:ClientId"] ?? throw new Exception("Google client id could not be found");
+            googleOptions.ClientSecret = configuration["Auth:Google:ClientSecret"] ?? throw new Exception("Google client secret could not be found");
+        });
+
+        services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = new PathString("/QuizAuthorization/Login");
             options.LogoutPath = "/QuizAuthorization/Logout";
             options.Cookie = new CookieBuilder
-{
+            {
                 Name = "QAuth",
             };
-            int.TryParse(builder.Configuration["Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+            if (!int.TryParse(configuration["Auth:Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes))
+            {
+                throw new Exception("Cookie.TokenValidityInMinutes could not be found");
+            }
             options.ExpireTimeSpan = TimeSpan.FromMinutes(tokenValidityInMinutes);
         });
 
-        builder.Services.AddAuthorization(options =>
+        services.AddAuthorization(options =>
         {
             options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
             options.AddPolicy("User", policy => policy.RequireRole("User"));
@@ -74,36 +87,40 @@ public static class Startup
 
     public static void AddApplicationServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddControllersWithViews();
+        IServiceCollection services = builder.Services;
+
+        services.AddControllersWithViews();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
+        services.AddEndpointsApiExplorer();
 
-        builder.Services.AddSwaggerGen();
+        services.AddSwaggerGen();
 
-        builder.Services.AddDbContext<QuizDbContext>(options =>
+        services.AddDbContext<QuizDbContext>(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new Exception("Connection string could not be found"));
         });
 
-        builder.Services.AddAutoMapper(typeof(MappingProfile));
+        services.AddAutoMapper(typeof(MappingProfile));
 
-        builder.Services.AddTransient<IQuizAuthorizationService, QuizAuthorizationService>(); 
+        services.AddTransient<QuizAuthorizationService>(); 
 
-        builder.Services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
+        services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
 
-        builder.Services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
-        builder.Services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
-        builder.Services.AddTransient<IQuizEntityService, QuizEntityService>();
-        builder.Services.AddTransient<IQuizCategoryService, QuizCategoryService>();
+        services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
+        services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
 
-        builder.Services.AddTransient<IClassicalQuizService, ClassicalQuizService>();
+        services.AddTransient<QuizEntityService>();
+        services.AddTransient<QuizCategoryService>();
+
+        services.AddTransient<GoogleAuthorizationService>();
+        services.AddTransient<ClassicalQuizService>();
     }
 
     public async static Task SeedData(this WebApplication app)
     {
-        using (var scope = app.Services.CreateScope())
+        using (IServiceScope scope = app.Services.CreateScope())
         {
-            var services = scope.ServiceProvider;
+            IServiceProvider services = scope.ServiceProvider;
             await DataSeeder.SeedRoles(services);
         }
     }
