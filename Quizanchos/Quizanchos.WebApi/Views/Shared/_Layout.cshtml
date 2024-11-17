@@ -1,36 +1,41 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Quizanchos</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - Quizzes</title>
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Quizanchos</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="ClassicalQuiz" asp-action="Index">Classical Quiz</a>
-                        </li>
-                    </ul>
-                </div>
+
+    <header class="navbar">
+        <div class="container">
+            <a href="/" class="logo">Quizanchos</a>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/LeaderBoard">LeaderBoard</a></li>
+                    <li>
+                        <a href="/Quizzes">Quizzes</a>
+                        <ul class="dropdown">
+                            <li><a href="/Quizzes/Category1">Category 1</a></li>
+                            <li><a href="/Quizzes/Category2">Category 2</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/FAQ">FAQ</a></li>
+                    <li><a href="/Contact">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <a href="/Account/SignUp" class="btn btn-secondary">Sign up</a>
+                <a href="/Account/SignIn" class="btn btn-primary">Sign in</a>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+
+    <main class="container">
+        @RenderBody()
+    </main>
 
     <footer class="border-top footer text-muted fixed-bottom">
         <div class="container">
