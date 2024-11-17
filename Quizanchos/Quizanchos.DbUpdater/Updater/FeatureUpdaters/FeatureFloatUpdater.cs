@@ -1,6 +1,5 @@
 ﻿using Quizanchos.Common.FeatureTypes;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Entities.Features;
 using Quizanchos.Domain.Repositories.Interfaces;
 
 namespace Quizanchos.DbUpdater.Updater.FeatureUpdaters;
@@ -38,7 +37,6 @@ internal class FeatureFloatUpdater : IFeatureUpdater
 
         featureFloat = new FeatureFloat
         {
-            Id = Guid.NewGuid(),
             Value = featureValueFloat,
             QuizEntity = quizEntity,
             QuizCategory = _quizCategory

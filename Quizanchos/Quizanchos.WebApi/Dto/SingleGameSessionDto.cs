@@ -1,14 +1,17 @@
-﻿namespace Quizanchos.WebApi.Dto;
+﻿using Quizanchos.Common.Enums;
 
-public record BaseSingleGameSessionDto(Guid QuizCategoryId);
+namespace Quizanchos.WebApi.Dto;
+
+public record BaseSingleGameSessionDto(Guid QuizCategoryId, GameLevel GameLevel);
 
 public record SingleGameSessionDto(
     Guid Id, 
-    Guid QuizCategoryId, 
+    Guid QuizCategoryId,
+    GameLevel GameLevel,
     string UserId,
     DateTime CreationTime,
-    int CurrentQuestionIndex,
+    int CurrentCardIndex,
     int Score,
     bool IsFinished,
-    int QuestionsCount
-) : BaseSingleGameSessionDto(QuizCategoryId);
+    int CardsCount
+) : BaseSingleGameSessionDto(QuizCategoryId, GameLevel);

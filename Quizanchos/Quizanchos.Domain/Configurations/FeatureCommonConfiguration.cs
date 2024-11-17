@@ -4,9 +4,9 @@ using Quizanchos.Domain.Entities.Abstractions;
 
 namespace Quizanchos.Domain.Configurations;
 
-public class FeatureConfiguration : IEntityTypeConfiguration<Feature>
+internal class FeatureCommonConfiguration : IEntityTypeConfiguration<FeatureAbstract>
 {
-    public void Configure(EntityTypeBuilder<Feature> builder)
+    public void Configure(EntityTypeBuilder<FeatureAbstract> builder)
     {
         builder.HasKey(x => x.Id);
     }

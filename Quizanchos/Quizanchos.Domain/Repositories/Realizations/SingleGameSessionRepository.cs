@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
@@ -13,5 +14,21 @@ public class SingleGameSessionRepository : EntityRepositoryBase<Guid, SingleGame
     public Task<SingleGameSession?> FindAliveGameSessionForUser(string userId)
     {
         return _dbSet.FirstOrDefaultAsync(s => !s.IsFinished && s.ApplicationUser.Id == userId);
+    }
+
+    public Task<SingleGameSession?> FindAliveGameSessionForUserIncluding(string userId)
+    {
+        return _dbSet
+            .Include(s => s.ApplicationUser)
+            .Include(s => s.QuizCategory)
+            .FirstOrDefaultAsync(s => !s.IsFinished && s.ApplicationUser.Id == userId);
+    }
+
+    public async Task<SingleGameSession> GetByIdIncluding(Guid id)
+    {
+        return await _dbSet
+            .Include(s => s.ApplicationUser)
+            .Include(s => s.QuizCategory)
+            .FirstOrDefaultAsync(s => s.Id == id) ?? throw HandledExceptionFactory.CreateIdNotFoundException(id);
     }
 }

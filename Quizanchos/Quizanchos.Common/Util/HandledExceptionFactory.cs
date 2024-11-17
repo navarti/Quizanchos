@@ -16,4 +16,9 @@ public static class HandledExceptionFactory
     {
         return new QuizanchosException(message);
     }
+
+    public static QuizanchosException CreateForbiddenException()
+    {
+        return new QuizanchosException("Forbidden");
+    }
 }

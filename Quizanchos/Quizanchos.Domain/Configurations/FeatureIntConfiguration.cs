@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Quizanchos.Common.FeatureTypes;
-using Quizanchos.Domain.Entities.Features;
+using Quizanchos.Domain.Entities;
 
 namespace Quizanchos.Domain.Configurations;
 

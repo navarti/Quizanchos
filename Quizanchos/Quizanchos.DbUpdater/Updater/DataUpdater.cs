@@ -22,7 +22,7 @@ internal class DataUpdater : IDataUpdater
 
     public async Task Update(DataToUpdate data)
     {
-        QuizCategory quizCategory = await GetQuizCategory(data.CategoryName);
+        QuizCategory quizCategory = await GetQuizCategory(data);
 
         IFeatureUpdater featureUpdater = _featureUpdaterFactory.CreateFeatureUpdater(data.FeatureType, quizCategory);
 
@@ -34,18 +34,20 @@ internal class DataUpdater : IDataUpdater
         }
     }
 
-    private async Task<QuizCategory> GetQuizCategory(string quizCategoryName)
+    private async Task<QuizCategory> GetQuizCategory(DataToUpdate data)
     {
-        QuizCategory? quizCategory = await _quizCategoryRepository.FindByName(quizCategoryName);
+        QuizCategory? quizCategory = await _quizCategoryRepository.FindByName(data.CategoryName);
         if (quizCategory is not null)
         {
             return quizCategory;
         }
 
-        quizCategory = new QuizCategory();
-        quizCategory.Id = Guid.NewGuid();
-        quizCategory.Name = quizCategoryName;
-
+        quizCategory = new QuizCategory()
+        {
+            Name = data.CategoryName,
+            FeatureType = data.FeatureType
+        };
+        
         return await _quizCategoryRepository.Create(quizCategory);
     }
 
@@ -57,9 +59,10 @@ internal class DataUpdater : IDataUpdater
             return quizEntity;
         }
 
-        quizEntity = new QuizEntity();
-        quizEntity.Id = Guid.NewGuid();
-        quizEntity.Name = entityName;
+        quizEntity = new QuizEntity()
+        {
+            Name = entityName
+        };
 
         return await _quizEntityRepository.Create(quizEntity);
     }
