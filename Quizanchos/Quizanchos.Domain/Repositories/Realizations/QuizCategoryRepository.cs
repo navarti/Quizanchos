@@ -12,6 +12,6 @@ public class QuizCategoryRepository : EntityRepositoryBase<Guid, QuizCategory>, 
 
     public Task<QuizCategory?> FindByName(string name)
     {
-        return dbSet.FirstOrDefaultAsync(quizCategory => quizCategory.Name == name);
+        return _dbSet.FirstOrDefaultAsync(quizCategory => quizCategory.Name == name);
     }
 }

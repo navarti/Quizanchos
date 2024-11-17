@@ -7,6 +7,7 @@ using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi;
@@ -116,9 +117,11 @@ public static class Startup
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
         services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
 
+
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();
 
+        services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<SingleGameSessionService>();
     }

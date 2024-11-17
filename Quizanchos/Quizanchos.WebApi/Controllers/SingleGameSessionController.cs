@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
-using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Controllers;
 
@@ -22,6 +21,18 @@ public class SingleGameSessionController : Controller
     public async Task<IActionResult> Create([FromBody] BaseSingleGameSessionDto baseSingleGameSessionDto)
     {
         SingleGameSessionDto singleGameSession = await _singleGameSessionService.Create(baseSingleGameSessionDto, User);
+        return Ok(singleGameSession);
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetAliveSession()
+    {
+        SingleGameSessionDto? singleGameSession = await _singleGameSessionService.FindAliveSession(User);
+        if (singleGameSession is null)
+        {
+            return NotFound();
+        }
         return Ok(singleGameSession);
     }
 }

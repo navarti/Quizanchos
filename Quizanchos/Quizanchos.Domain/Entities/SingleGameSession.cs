@@ -6,6 +6,10 @@ public class SingleGameSession : IKeyedEntity<Guid>
 {
     public Guid Id { get; set; }
     public DateTime CreationTime { get; set; }
+    public int QuestionsCount { get; set; }
+    public int CurrentQuestionIndex { get; set; }
+    public int Score { get; set; }
+    public bool IsFinished { get; set; }
 
     public ApplicationUser ApplicationUser { get; set; }
     public QuizCategory QuizCategory { get; set; }

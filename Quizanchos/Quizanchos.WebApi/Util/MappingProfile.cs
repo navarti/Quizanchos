@@ -14,7 +14,8 @@ public class MappingProfile : Profile
         CreateMap<BaseQuizCategoryDto, QuizCategory>();
         CreateMap<QuizCategoryDto, QuizCategory>().ReverseMap();
 
-        CreateMap<SingleGameSession, SingleGameSessionDto>();
-            //.ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.ApplicationUser.Id.ToString()));
+        CreateMap<SingleGameSession, SingleGameSessionDto>()
+            .ConstructUsing(src => new SingleGameSessionDto(src.Id, src.QuizCategory.Id, src.ApplicationUser.Id.ToString(), 
+                src.CreationTime, src.CurrentQuestionIndex, src.Score, src.IsFinished, src.QuestionsCount));
     }
 }

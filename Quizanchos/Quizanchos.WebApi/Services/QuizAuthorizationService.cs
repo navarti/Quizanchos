@@ -3,6 +3,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Util;
+using Quizanchos.Common.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -21,8 +22,8 @@ public class QuizAuthorizationService
     {
         _ = loginModelDto ?? throw HandledExceptionFactory.CreateNullException(nameof(loginModelDto));
 
-        ApplicationUser? user = await _userManager.FindByEmailAsync(loginModelDto.Email);
-        _ = user ?? throw HandledExceptionFactory.Create("The user with this email does not exist");
+        ApplicationUser user = await _userManager.FindByEmailAsync(loginModelDto.Email) 
+            ?? throw HandledExceptionFactory.Create("The user with this email does not exist");
 
         SignInResult result = await _signInManager.PasswordSignInAsync(user, loginModelDto.Password, isPersistent: true, lockoutOnFailure: false);
         if (!result.Succeeded)
