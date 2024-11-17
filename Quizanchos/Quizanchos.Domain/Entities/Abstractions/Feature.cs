@@ -2,13 +2,11 @@
 
 namespace Quizanchos.Domain.Entities.Abstractions;
 
-public abstract class Feature : IKeyedEntity<Guid>
+public abstract class Feature<T> : IKeyedEntity<Guid>
 {
     public Guid Id { get; set; }
-    
-    public Guid QuizCategoryId { get; set; }
-    public QuizCategory QuizCategory { get; set; }
+    public T Value { get; set; }
 
-    public Guid QuizEntityId { get; set; }
+    public QuizCategory QuizCategory { get; set; }
     public QuizEntity QuizEntity { get; set; }
 }

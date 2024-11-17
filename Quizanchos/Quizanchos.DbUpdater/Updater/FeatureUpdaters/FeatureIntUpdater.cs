@@ -38,7 +38,6 @@ internal class FeatureIntUpdater : IFeatureUpdater
 
         featureInt = new FeatureInt
         {
-            Id = Guid.NewGuid(),
             Value = featureValueInt,
             QuizEntity = quizEntity,
             QuizCategory = _quizCategory

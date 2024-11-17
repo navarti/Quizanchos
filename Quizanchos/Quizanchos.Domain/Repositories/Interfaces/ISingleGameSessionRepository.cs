@@ -4,5 +4,5 @@ namespace Quizanchos.Domain.Repositories.Interfaces;
 
 public interface ISingleGameSessionRepository : IEntityRepository<Guid, SingleGameSession>
 {
-    Task<SingleGameSession?> FindAliveGameSessionForUser(string userId);
+    Task<SingleGameSession?> FindAliveGameSessionForUser(string userId, bool includeOther = true);
 }

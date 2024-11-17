@@ -26,7 +26,6 @@ public class QuizDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
         modelBuilder.ApplyConfiguration(new QuizEntityConfiguration());
         modelBuilder.ApplyConfiguration(new QuizCategoryConfiguration());
-        modelBuilder.ApplyConfiguration(new FeatureConfiguration());
         modelBuilder.ApplyConfiguration(new FeatureIntConfiguration());
         modelBuilder.ApplyConfiguration(new FeatureFloatConfiguration());
         modelBuilder.ApplyConfiguration(new SingleGameSessionConfiguration());

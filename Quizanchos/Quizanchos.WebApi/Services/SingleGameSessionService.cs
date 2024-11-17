@@ -35,7 +35,7 @@ public class SingleGameSessionService
 
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
 
-        SingleGameSession? existingGameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(user.Id).ConfigureAwait(false);
+        SingleGameSession? existingGameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(user.Id, includeOther: false).ConfigureAwait(false);
         if (existingGameSession is not null)
         {
             throw HandledExceptionFactory.Create("There is already an active game session for this user.");
@@ -48,8 +48,9 @@ public class SingleGameSessionService
             CreationTime = DateTime.UtcNow,
             IsFinished = false,
             Score = 0,
-            CurrentQuestionIndex = 0,
-            QuestionsCount = 10
+            CurrentCardIndex = 0,
+            CardsCount = 10,
+            GameLevel = baseSingleGameSessionDto.GameLevel
         };
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);

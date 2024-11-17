@@ -10,8 +10,13 @@ public class SingleGameSessionRepository : EntityRepositoryBase<Guid, SingleGame
     {
     }
 
-    public Task<SingleGameSession?> FindAliveGameSessionForUser(string userId)
+    public Task<SingleGameSession?> FindAliveGameSessionForUser(string userId, bool includeOther = true)
     {
+        if(!includeOther)
+        {
+            return _dbSet.FirstOrDefaultAsync(s => !s.IsFinished && s.ApplicationUser.Id == userId);
+        }
+
         return _dbSet
             .Include(s => s.ApplicationUser)
             .Include(s => s.QuizCategory)

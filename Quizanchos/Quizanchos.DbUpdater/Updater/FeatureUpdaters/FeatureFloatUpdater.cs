@@ -38,7 +38,6 @@ internal class FeatureFloatUpdater : IFeatureUpdater
 
         featureFloat = new FeatureFloat
         {
-            Id = Guid.NewGuid(),
             Value = featureValueFloat,
             QuizEntity = quizEntity,
             QuizCategory = _quizCategory
