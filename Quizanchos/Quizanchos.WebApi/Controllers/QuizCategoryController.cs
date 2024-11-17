@@ -17,7 +17,8 @@ public class QuizCategoryController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(BaseQuizCategoryDto baseQuizCategoryDto)
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> Create([FromBody] BaseQuizCategoryDto baseQuizCategoryDto)
     {
         QuizCategoryDto quizCategoryDto = await _quizCategoryService.Create(baseQuizCategoryDto);
         return Ok(quizCategoryDto);
@@ -31,21 +32,47 @@ public class QuizCategoryController : Controller
     }
 
     [HttpGet]
-    [Authorize(Role.User)]
     public async Task<IActionResult> GetAll()
     {
         List<QuizCategoryDto> quizCategoryDtos = await _quizCategoryService.GetAll();
         return Ok(quizCategoryDtos);
     }
+    
+    #region Test purposes
+#if DEBUG
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> TestGetAllByUser()
+    {
+        return await GetAll();
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> TestGetAllByAdmin()
+    {
+        return await GetAll();
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.Owner)]
+    public async Task<IActionResult> TestGetAllByOwner()
+    {
+        return await GetAll();
+    }
+#endif
+    #endregion
 
     [HttpPost]
-    public async Task<IActionResult> Update(QuizCategoryDto quizCategoryDto)
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> Update([FromBody] QuizCategoryDto quizCategoryDto)
     {
         QuizCategoryDto updatedQuizCategoryDto = await _quizCategoryService.Update(quizCategoryDto);
         return Ok(updatedQuizCategoryDto);
     }
 
     [HttpDelete]
+    [Authorize(QuizPolicy.Admin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _quizCategoryService.Delete(id);

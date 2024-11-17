@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Util;
@@ -20,8 +21,8 @@ public class GoogleAuthorizationService
 
     public async Task SignIn(AuthenticateResult authenticateResult)
     {
-        string? email = authenticateResult?.Principal?.FindFirstValue(ClaimTypes.Email);
-        _ = email ?? throw HandledExceptionFactory.Create("Could not retrieve email from google response");
+        string email = authenticateResult?.Principal?.FindFirstValue(ClaimTypes.Email)
+            ?? throw HandledExceptionFactory.Create("Could not retrieve email from google response");
 
         ApplicationUser? user = await _userManager.FindByEmailAsync(email);
         if (user is null)
@@ -48,7 +49,7 @@ public class GoogleAuthorizationService
             throw CriticalExceptionFactory.CreateIdentityResultException(result);
         }
 
-        result = await _userManager.AddToRoleAsync(user, Role.User);
+        result = await _userManager.AddToRoleAsync(user, QuizRole.User);
         if (!result.Succeeded)
         {
             throw CriticalExceptionFactory.CreateIdentityResultException(result);

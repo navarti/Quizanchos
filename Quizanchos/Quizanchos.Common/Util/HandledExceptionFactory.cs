@@ -1,10 +1,10 @@
-﻿namespace Quizanchos.WebApi.Util;
+﻿namespace Quizanchos.Common.Util;
 
 public static class HandledExceptionFactory
 {
-    public static QuizanchosException CreateIdNotFoundException(Guid id, string entityName)
+    public static QuizanchosException CreateIdNotFoundException<T>(T id)
     {
-        return new QuizanchosException($"No {entityName} with id {id} found");
+        return new QuizanchosException($"No entity with id {id?.ToString() ?? "null"} found");
     }
 
     public static QuizanchosException CreateNullException(string entityName)

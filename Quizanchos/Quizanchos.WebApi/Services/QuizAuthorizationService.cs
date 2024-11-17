@@ -3,6 +3,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Util;
+using Quizanchos.Common.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -17,13 +18,12 @@ public class QuizAuthorizationService
         _signInManager = signInManager;
     }
 
-    public async Task Login(LoginModelDto loginModelDto)
+    public async Task SignIn(LoginModelDto loginModelDto)
     {
-        _ = loginModelDto.Email ?? throw HandledExceptionFactory.CreateNullException(nameof(loginModelDto.Email));
-        _ = loginModelDto.Password ?? throw HandledExceptionFactory.CreateNullException(nameof(loginModelDto.Password));
+        _ = loginModelDto ?? throw HandledExceptionFactory.CreateNullException(nameof(loginModelDto));
 
-        ApplicationUser? user = await _userManager.FindByEmailAsync(loginModelDto.Email);
-        _ = user ?? throw HandledExceptionFactory.Create("The user with this email does not exist");
+        ApplicationUser user = await _userManager.FindByEmailAsync(loginModelDto.Email) 
+            ?? throw HandledExceptionFactory.Create("The user with this email does not exist");
 
         SignInResult result = await _signInManager.PasswordSignInAsync(user, loginModelDto.Password, isPersistent: true, lockoutOnFailure: false);
         if (!result.Succeeded)
@@ -32,10 +32,13 @@ public class QuizAuthorizationService
         }
     }
 
-    public async Task RegisterUser(RegisterModelDto registerModelDto)
+    public async Task RegisterUser(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, QuizRole.User);
+
+    public async Task RegisterAdmin(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, QuizRole.Admin);
+
+    private async Task RegisterWithRole(RegisterModelDto registerModelDto, string roleName)
     {
-        _ = registerModelDto.Email ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto.Email));
-        _ = registerModelDto.Password ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto.Password));
+        _ = registerModelDto ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto));
 
         ApplicationUser? user = await _userManager.FindByEmailAsync(registerModelDto.Email);
         if (user is not null)
@@ -56,7 +59,7 @@ public class QuizAuthorizationService
             throw CriticalExceptionFactory.CreateIdentityResultException(result);
         }
 
-        result = await _userManager.AddToRoleAsync(user, Role.User);
+        result = await _userManager.AddToRoleAsync(user, roleName);
         if (!result.Succeeded)
         {
             throw CriticalExceptionFactory.CreateIdentityResultException(result);

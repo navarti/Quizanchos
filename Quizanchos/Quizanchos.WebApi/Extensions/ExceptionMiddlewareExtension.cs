@@ -1,4 +1,4 @@
-﻿using Quizanchos.WebApi.Util;
+﻿using Quizanchos.Common.Util;
 using System.Text.Json;
 
 namespace Quizanchos.WebApi.Extensions;
@@ -32,13 +32,13 @@ public class ExceptionMiddlewareExtension
             string messageForUser = ex.Message;
             await HandleExceptionAsync(context, messageForUser, StatusCodes.Status400BadRequest).ConfigureAwait(false);
         }
-        //catch (Exception ex)
-        //{
-        //    Console.WriteLine(ex.Message);
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
 
-        //    string messageForUser = "Internal Server Error. Please try again later or contact support.";
-        //    await HandleExceptionAsync(context, messageForUser, StatusCodes.Status500InternalServerError).ConfigureAwait(false);
-        //}
+            string messageForUser = "Internal Server Error. Please try again later or contact support.";
+            await HandleExceptionAsync(context, messageForUser, StatusCodes.Status500InternalServerError).ConfigureAwait(false);
+        }
     }
 
     private Task HandleExceptionAsync(HttpContext context, string messageForUser, int statusCode)

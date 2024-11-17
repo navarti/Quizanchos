@@ -17,6 +17,7 @@ public class QuizDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<QuizCategory> QuizCategories { get; set; }
     public DbSet<FeatureInt> FeatureInts { get; set; }
     public DbSet<FeatureFloat> FeatureFloats { get; set; }
+    public DbSet<SingleGameSession> SingleGameSessions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,5 +29,6 @@ public class QuizDbContext : IdentityDbContext<ApplicationUser>
         modelBuilder.ApplyConfiguration(new FeatureConfiguration());
         modelBuilder.ApplyConfiguration(new FeatureIntConfiguration());
         modelBuilder.ApplyConfiguration(new FeatureFloatConfiguration());
+        modelBuilder.ApplyConfiguration(new SingleGameSessionConfiguration());
     }
 }

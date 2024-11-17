@@ -1,11 +1,5 @@
 ﻿namespace Quizanchos.WebApi.Dto;
 
-public class BaseQuizCategoryDto
-{
-    public string Name { get; set; } = string.Empty;
-}
+public record BaseQuizCategoryDto(string Name);
 
-public class QuizCategoryDto : BaseQuizCategoryDto
-{
-    public Guid Id { get; set; }
-}
+public record QuizCategoryDto(Guid Id, string Name) : BaseQuizCategoryDto(Name);

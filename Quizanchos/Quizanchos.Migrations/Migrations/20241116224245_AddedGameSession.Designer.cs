@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizanchos.Domain;
 
@@ -11,9 +12,11 @@ using Quizanchos.Domain;
 namespace Quizanchos.Migrations.Migrations
 {
     [DbContext(typeof(QuizDbContext))]
-    partial class QuizDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241116224245_AddedGameSession")]
+    partial class AddedGameSession
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -293,20 +296,8 @@ namespace Quizanchos.Migrations.Migrations
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CurrentQuestionIndex")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsFinished")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("QuestionsCount")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("QuizCategoryId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Score")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

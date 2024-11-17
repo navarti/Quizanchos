@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Util;
+﻿namespace Quizanchos.Common.Util;
 
 public class QuizanchosException : Exception
 {

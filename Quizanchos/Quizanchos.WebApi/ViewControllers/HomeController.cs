@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using Quizanchos.Models;
+using Quizanchos.ViewModels;
 
-namespace WebApplication1.Controllers;
+namespace Quizanchos.WebApi.ViewControllers;
 
 public class HomeController : Controller
 {

@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Util;
 
 
 namespace Quizanchos.WebApi.Services;
@@ -19,12 +19,11 @@ public class QuizCategoryService
         _mapper = mapper;
     }
 
-    public async Task<QuizCategoryDto> Create(BaseQuizCategoryDto BaseQuizCategoryDto)
+    public async Task<QuizCategoryDto> Create(BaseQuizCategoryDto baseQuizCategoryDto)
     {
-        _ = BaseQuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(BaseQuizCategoryDto));
+        _ = baseQuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(baseQuizCategoryDto));
 
-        QuizCategory quizCategory = _mapper.Map<QuizCategory>(BaseQuizCategoryDto);
-
+        QuizCategory quizCategory = _mapper.Map<QuizCategory>(baseQuizCategoryDto);
         quizCategory = await _quizCategoryRepository.Create(quizCategory).ConfigureAwait(false);
 
         return _mapper.Map<QuizCategoryDto>(quizCategory);
@@ -32,38 +31,31 @@ public class QuizCategoryService
 
     public async Task<QuizCategoryDto> GetById(Guid id)
     {
-        QuizCategory quizCategory = await _quizCategoryRepository.FindById(id).ConfigureAwait(false)
-            ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
-
+        QuizCategory quizCategory = await _quizCategoryRepository.GetById(id).ConfigureAwait(false);
         return _mapper.Map<QuizCategoryDto>(quizCategory);
     }
 
     public async Task<List<QuizCategoryDto>> GetAll()
     {
         List<QuizCategory> quizCategories = await _quizCategoryRepository.Get().ToListAsync().ConfigureAwait(false);
-
         return _mapper.Map<List<QuizCategoryDto>>(quizCategories);
     }
 
-    public async Task<QuizCategoryDto> Update(QuizCategoryDto QuizCategoryDto)
+    public async Task<QuizCategoryDto> Update(QuizCategoryDto quizCategoryDto)
     {
-        _ = QuizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(QuizCategoryDto));
+        _ = quizCategoryDto ?? throw HandledExceptionFactory.CreateNullException(nameof(quizCategoryDto));
 
-        QuizCategory quizCategory = await _quizCategoryRepository.FindById(QuizCategoryDto.Id).ConfigureAwait(false) 
-            ?? throw HandledExceptionFactory.CreateIdNotFoundException(QuizCategoryDto.Id, nameof(quizCategory));
-
-        _mapper.Map(QuizCategoryDto, quizCategory);
+        QuizCategory quizCategory = await _quizCategoryRepository.GetById(quizCategoryDto.Id).ConfigureAwait(false);
+        
+        _mapper.Map(quizCategoryDto, quizCategory);
 
         await _quizCategoryRepository.Update(quizCategory);
-
-        return QuizCategoryDto;
+        return quizCategoryDto;
     }
 
     public async Task Delete(Guid id)
     {
-        QuizCategory quizCategory = await _quizCategoryRepository.FindById(id).ConfigureAwait(false)
-            ?? throw HandledExceptionFactory.CreateIdNotFoundException(id, nameof(quizCategory));
-
+        QuizCategory quizCategory = await _quizCategoryRepository.GetById(id).ConfigureAwait(false);
         await _quizCategoryRepository.Delete(quizCategory);
     }
 }

@@ -6,4 +6,6 @@ public class QuizCategory : IKeyedEntity<Guid>
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = "";
+
+    public ICollection<SingleGameSession> SingleGameSessions { get; }
 }
