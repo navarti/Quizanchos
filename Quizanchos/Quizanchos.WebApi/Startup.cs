@@ -116,7 +116,8 @@ public static class Startup
         services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
         services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
-
+        services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
+        services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
 
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();
@@ -124,6 +125,9 @@ public static class Startup
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<SingleGameSessionService>();
+        services.AddTransient<MainQuizCardService>();
+        services.AddTransient<QuizCardFloatService>();
+        services.AddTransient<QuizCardIntService>();
     }
 
     public async static Task SeedData(this WebApplication app, ConfigurationManager configuration)

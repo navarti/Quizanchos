@@ -19,7 +19,9 @@ public class SingleGameSessionService
         IMapper mapper, 
         ISingleGameSessionRepository singleGameSessionRepository, 
         IQuizCategoryRepository quizCategoryRepository,
-        UserRetrieverService userRetrieverService)
+        UserRetrieverService userRetrieverService,
+        QuizCardFloatService featureFloatService,
+        QuizCardIntService featureIntService)
     {
         _mapper = mapper;
         _singleGameSessionRepository = singleGameSessionRepository;
@@ -35,7 +37,7 @@ public class SingleGameSessionService
 
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
 
-        SingleGameSession? existingGameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(user.Id, includeOther: false).ConfigureAwait(false);
+        SingleGameSession? existingGameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(user.Id).ConfigureAwait(false);
         if (existingGameSession is not null)
         {
             throw HandledExceptionFactory.Create("There is already an active game session for this user.");
@@ -61,7 +63,7 @@ public class SingleGameSessionService
     public async Task<SingleGameSessionDto?> FindAliveSession(ClaimsPrincipal claimsPrincipal)
     {
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(userId).ConfigureAwait(false);
+        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
         if(gameSession is null)
         {
             return null;
