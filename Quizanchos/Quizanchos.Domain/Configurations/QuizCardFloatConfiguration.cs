@@ -10,10 +10,10 @@ internal class QuizCardFloatConfiguration : IEntityTypeConfiguration<QuizCardFlo
     {
         builder.HasOne(x => x.Option1)
             .WithMany()
-            .OnDelete(DeleteBehavior.NoAction);
+            .HasForeignKey(x => x.Option1Id);
 
         builder.HasOne(x => x.Option2)
             .WithMany()
-            .OnDelete(DeleteBehavior.NoAction);
+            .HasForeignKey(x => x.Option2Id);
     }
 }

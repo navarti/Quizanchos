@@ -387,10 +387,10 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract");
 
-                    b.Property<Guid>("Option1Id")
+                    b.Property<Guid?>("Option1Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Option2Id")
+                    b.Property<Guid?>("Option2Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasIndex("Option1Id");
@@ -404,10 +404,10 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract");
 
-                    b.Property<Guid>("Option1Id")
+                    b.Property<Guid?>("Option1Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("Option2Id")
+                    b.Property<Guid?>("Option2Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasIndex("Option1Id");
@@ -528,15 +528,11 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasOne("Quizanchos.Domain.Entities.FeatureFloat", "Option1")
                         .WithMany()
-                        .HasForeignKey("Option1Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("Option1Id");
 
                     b.HasOne("Quizanchos.Domain.Entities.FeatureFloat", "Option2")
                         .WithMany()
-                        .HasForeignKey("Option2Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("Option2Id");
 
                     b.Navigation("Option1");
 
@@ -547,15 +543,11 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasOne("Quizanchos.Domain.Entities.FeatureInt", "Option1")
                         .WithMany()
-                        .HasForeignKey("Option1Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("Option1Id");
 
                     b.HasOne("Quizanchos.Domain.Entities.FeatureInt", "Option2")
                         .WithMany()
-                        .HasForeignKey("Option2Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("Option2Id");
 
                     b.Navigation("Option1");
 
