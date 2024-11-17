@@ -2,6 +2,7 @@
 using Quizanchos.Common.Enums;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
@@ -48,8 +49,8 @@ public class MainQuizCardService
         }
 
         IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
-        
-        return new QuizCardFloatDto(Guid.NewGuid(), 0, 0, 0, 0);
+        QuizCardAbstract card = await quizCardService.GetCardForSession(sessionid, cardIndex);
+        return MapQuizCardDto(card);
     }
 
     private IQuizCardService GetQuizCardService(FeatureType featureType)
@@ -59,6 +60,16 @@ public class MainQuizCardService
             FeatureType.Float => _featureFloatService,
             FeatureType.Int => _featureIntService,
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(FeatureType)}: {featureType}")
+        };
+    }
+
+    private QuizCardDtoAbstract MapQuizCardDto(QuizCardAbstract quizCard)
+    {
+        return quizCard switch
+        {
+            QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
+            QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
+            _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }
 }

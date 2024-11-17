@@ -1,4 +1,5 @@
-﻿using Quizanchos.Domain.Repositories.Interfaces;
+﻿using Quizanchos.Domain.Entities.Abstractions;
+using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Services.Interfaces;
 
 namespace Quizanchos.WebApi.Services;
@@ -12,8 +13,8 @@ public class QuizCardIntService : IQuizCardService
         _quizCardIntRepository = quizCardIntRepository;
     }
 
-    public Task GetCardForSession(Guid gameSessionid, int cardIndex)
+    public async Task<QuizCardAbstract> GetCardForSession(Guid gameSessionid, int cardIndex)
     {
-        return _quizCardIntRepository.GetCardForSession(gameSessionid, cardIndex);
+        return await _quizCardIntRepository.GetCardForSession(gameSessionid, cardIndex);
     }
 }

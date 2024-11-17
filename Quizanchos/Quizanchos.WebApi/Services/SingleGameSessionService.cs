@@ -19,9 +19,7 @@ public class SingleGameSessionService
         IMapper mapper, 
         ISingleGameSessionRepository singleGameSessionRepository, 
         IQuizCategoryRepository quizCategoryRepository,
-        UserRetrieverService userRetrieverService,
-        QuizCardFloatService featureFloatService,
-        QuizCardIntService featureIntService)
+        UserRetrieverService userRetrieverService)
     {
         _mapper = mapper;
         _singleGameSessionRepository = singleGameSessionRepository;
@@ -57,6 +55,12 @@ public class SingleGameSessionService
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
 
+        return _mapper.Map<SingleGameSessionDto>(gameSession);
+    }
+
+    public async Task<SingleGameSessionDto> GetById(Guid id)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetById(id).ConfigureAwait(false);
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
 

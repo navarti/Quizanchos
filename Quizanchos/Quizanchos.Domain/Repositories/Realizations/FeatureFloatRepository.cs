@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Quizanchos.Domain.Entities.Features;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
 namespace Quizanchos.Domain.Repositories.Realizations;

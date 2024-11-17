@@ -1,5 +1,4 @@
-﻿using Quizanchos.Domain.Entities.Features;
-using Quizanchos.Domain.Entities;
+﻿using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Common.FeatureTypes;
 

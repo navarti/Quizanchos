@@ -1,6 +1,8 @@
-﻿namespace Quizanchos.WebApi.Services.Interfaces;
+﻿using Quizanchos.Domain.Entities.Abstractions;
+
+namespace Quizanchos.WebApi.Services.Interfaces;
 
 public interface IQuizCardService
 {
-    public Task GetCardForSession(Guid gameSessionid, int cardIndex);
+    public Task<QuizCardAbstract> GetCardForSession(Guid gameSessionid, int cardIndex);
 }

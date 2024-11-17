@@ -12,8 +12,8 @@ using Quizanchos.Domain;
 namespace Quizanchos.Migrations.Migrations
 {
     [DbContext(typeof(QuizDbContext))]
-    [Migration("20241117132054_AddedQuizCards")]
-    partial class AddedQuizCards
+    [Migration("20241117174744_AddedGameSession")]
+    partial class AddedGameSession
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -158,6 +158,70 @@ namespace Quizanchos.Migrations.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Quizanchos.Domain.Entities.Abstractions.FeatureAbstract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
+                    b.Property<Guid>("QuizCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("QuizEntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuizCategoryId");
+
+                    b.HasIndex("QuizEntityId");
+
+                    b.ToTable("FeatureAbstract");
+
+                    b.HasDiscriminator().HasValue("FeatureAbstract");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CardIndex")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CorrectOption")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
+                    b.Property<int>("OptionPicked")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("SingleGameSessionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SingleGameSessionId");
+
+                    b.ToTable("QuizCardAbstract");
+
+                    b.HasDiscriminator().HasValue("QuizCardAbstract");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("Quizanchos.Domain.Entities.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -221,54 +285,6 @@ namespace Quizanchos.Migrations.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Quizanchos.Domain.Entities.Features.FeatureFloat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("QuizCategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("QuizEntityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<float?>("Value")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizCategoryId");
-
-                    b.HasIndex("QuizEntityId");
-
-                    b.ToTable("FeatureFloats");
-                });
-
-            modelBuilder.Entity("Quizanchos.Domain.Entities.Features.FeatureInt", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("QuizCategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("QuizEntityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuizCategoryId");
-
-                    b.HasIndex("QuizEntityId");
-
-                    b.ToTable("FeatureInts");
                 });
 
             modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCategory", b =>
@@ -344,6 +360,75 @@ namespace Quizanchos.Migrations.Migrations
                     b.ToTable("SingleGameSessions");
                 });
 
+            modelBuilder.Entity("Quizanchos.Domain.Entities.FeatureFloat", b =>
+                {
+                    b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.FeatureAbstract");
+
+                    b.Property<float>("Value")
+                        .HasColumnType("real");
+
+                    b.HasDiscriminator().HasValue("FeatureFloat");
+                });
+
+            modelBuilder.Entity("Quizanchos.Domain.Entities.FeatureInt", b =>
+                {
+                    b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.FeatureAbstract");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.ToTable("FeatureAbstract", t =>
+                        {
+                            t.Property("Value")
+                                .HasColumnName("FeatureInt_Value");
+                        });
+
+                    b.HasDiscriminator().HasValue("FeatureInt");
+                });
+
+            modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCardFloat", b =>
+                {
+                    b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract");
+
+                    b.Property<Guid>("Option1Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Option2Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasIndex("Option1Id");
+
+                    b.HasIndex("Option2Id");
+
+                    b.HasDiscriminator().HasValue("QuizCardFloat");
+                });
+
+            modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCardInt", b =>
+                {
+                    b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract");
+
+                    b.Property<Guid>("Option1Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Option2Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasIndex("Option1Id");
+
+                    b.HasIndex("Option2Id");
+
+                    b.ToTable("QuizCardAbstract", t =>
+                        {
+                            t.Property("Option1Id")
+                                .HasColumnName("QuizCardInt_Option1Id");
+
+                            t.Property("Option2Id")
+                                .HasColumnName("QuizCardInt_Option2Id");
+                        });
+
+                    b.HasDiscriminator().HasValue("QuizCardInt");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -395,7 +480,7 @@ namespace Quizanchos.Migrations.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Quizanchos.Domain.Entities.Features.FeatureFloat", b =>
+            modelBuilder.Entity("Quizanchos.Domain.Entities.Abstractions.FeatureAbstract", b =>
                 {
                     b.HasOne("Quizanchos.Domain.Entities.QuizCategory", "QuizCategory")
                         .WithMany()
@@ -414,23 +499,13 @@ namespace Quizanchos.Migrations.Migrations
                     b.Navigation("QuizEntity");
                 });
 
-            modelBuilder.Entity("Quizanchos.Domain.Entities.Features.FeatureInt", b =>
+            modelBuilder.Entity("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract", b =>
                 {
-                    b.HasOne("Quizanchos.Domain.Entities.QuizCategory", "QuizCategory")
+                    b.HasOne("Quizanchos.Domain.Entities.SingleGameSession", "SingleGameSession")
                         .WithMany()
-                        .HasForeignKey("QuizCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SingleGameSessionId");
 
-                    b.HasOne("Quizanchos.Domain.Entities.QuizEntity", "QuizEntity")
-                        .WithMany()
-                        .HasForeignKey("QuizEntityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("QuizCategory");
-
-                    b.Navigation("QuizEntity");
+                    b.Navigation("SingleGameSession");
                 });
 
             modelBuilder.Entity("Quizanchos.Domain.Entities.SingleGameSession", b =>
@@ -450,6 +525,44 @@ namespace Quizanchos.Migrations.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("QuizCategory");
+                });
+
+            modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCardFloat", b =>
+                {
+                    b.HasOne("Quizanchos.Domain.Entities.FeatureFloat", "Option1")
+                        .WithMany()
+                        .HasForeignKey("Option1Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Quizanchos.Domain.Entities.FeatureFloat", "Option2")
+                        .WithMany()
+                        .HasForeignKey("Option2Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Option1");
+
+                    b.Navigation("Option2");
+                });
+
+            modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCardInt", b =>
+                {
+                    b.HasOne("Quizanchos.Domain.Entities.FeatureInt", "Option1")
+                        .WithMany()
+                        .HasForeignKey("Option1Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Quizanchos.Domain.Entities.FeatureInt", "Option2")
+                        .WithMany()
+                        .HasForeignKey("Option2Id")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Option1");
+
+                    b.Navigation("Option2");
                 });
 #pragma warning restore 612, 618
         }
