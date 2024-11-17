@@ -48,8 +48,9 @@ public class SingleGameSessionService
             CreationTime = DateTime.UtcNow,
             IsFinished = false,
             Score = 0,
-            CurrentQuestionIndex = 0,
-            QuestionsCount = 10
+            CurrentCardIndex = 0,
+            CardsCount = 10,
+            GameLevel = baseSingleGameSessionDto.GameLevel
         };
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
@@ -57,10 +58,16 @@ public class SingleGameSessionService
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
 
+    public async Task<SingleGameSessionDto> GetById(Guid id)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetById(id).ConfigureAwait(false);
+        return _mapper.Map<SingleGameSessionDto>(gameSession);
+    }
+
     public async Task<SingleGameSessionDto?> FindAliveSession(ClaimsPrincipal claimsPrincipal)
     {
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(userId).ConfigureAwait(false);
+        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
         if(gameSession is null)
         {
             return null;

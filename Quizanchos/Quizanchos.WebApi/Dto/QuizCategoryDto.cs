@@ -1,5 +1,7 @@
-﻿namespace Quizanchos.WebApi.Dto;
+﻿using Quizanchos.Common.Enums;
 
-public record BaseQuizCategoryDto(string Name);
+namespace Quizanchos.WebApi.Dto;
 
-public record QuizCategoryDto(Guid Id, string Name) : BaseQuizCategoryDto(Name);
+public record BaseQuizCategoryDto(string Name, FeatureType FeatureType);
+
+public record QuizCategoryDto(Guid Id, string Name, FeatureType FeatureType) : BaseQuizCategoryDto(Name, FeatureType);

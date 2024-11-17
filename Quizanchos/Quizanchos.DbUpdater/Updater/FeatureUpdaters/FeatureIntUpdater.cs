@@ -1,5 +1,4 @@
-﻿using Quizanchos.Domain.Entities.Features;
-using Quizanchos.Domain.Entities;
+﻿using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Common.FeatureTypes;
 
@@ -38,7 +37,6 @@ internal class FeatureIntUpdater : IFeatureUpdater
 
         featureInt = new FeatureInt
         {
-            Id = Guid.NewGuid(),
             Value = featureValueInt,
             QuizEntity = quizEntity,
             QuizCategory = _quizCategory
