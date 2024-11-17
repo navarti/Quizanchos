@@ -12,6 +12,9 @@ public class SingleGameSessionRepository : EntityRepositoryBase<Guid, SingleGame
 
     public Task<SingleGameSession?> FindAliveGameSessionForUser(string userId)
     {
-        return _dbSet.FirstOrDefaultAsync(s => !s.IsFinished && s.ApplicationUser.Id == userId);
+        return _dbSet
+            .Include(s => s.ApplicationUser)
+            .Include(s => s.QuizCategory)
+            .FirstOrDefaultAsync(s => !s.IsFinished && s.ApplicationUser.Id == userId);
     }
 }
