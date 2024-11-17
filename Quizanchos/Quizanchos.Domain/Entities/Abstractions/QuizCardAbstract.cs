@@ -2,7 +2,7 @@
 
 namespace Quizanchos.Domain.Entities.Abstractions;
 
-public abstract class QuizCard<T> : IKeyedEntity<Guid>
+public abstract class QuizCardAbstract<T> : IKeyedEntity<Guid>
 {
     public Guid Id { get; set; }
     public int CardIndex { get; set; }

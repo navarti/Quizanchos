@@ -3,6 +3,6 @@ using Quizanchos.Domain.Entities.Features;
 
 namespace Quizanchos.Domain.Entities;
 
-public class QuizCardInt : QuizCard<FeatureInt>
+public class QuizCardInt : QuizCardAbstract<FeatureInt>
 {
 }

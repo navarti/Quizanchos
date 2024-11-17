@@ -8,4 +8,4 @@ public record QuizCardIntDto(
     int Option1,
     int Option2,
     int OptionPicked
-) : QuizCardDto<int>(Id, CardIndex, Option1, Option2, OptionPicked);
+) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked);

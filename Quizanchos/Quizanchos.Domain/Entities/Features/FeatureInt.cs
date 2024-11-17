@@ -3,6 +3,6 @@ using Quizanchos.Domain.Entities.Abstractions;
 
 namespace Quizanchos.Domain.Entities.Features;
 
-public class FeatureInt : Feature<FeatureValueInt>
+public class FeatureInt : FeatureAbstract<FeatureValueInt>
 {
 }

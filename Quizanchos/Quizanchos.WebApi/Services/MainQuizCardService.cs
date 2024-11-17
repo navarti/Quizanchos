@@ -37,7 +37,7 @@ public class MainQuizCardService
         _featureIntService = featureIntService;
     }
 
-    public async Task<QuizCardDto<float>> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
+    public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
     {
         SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
 

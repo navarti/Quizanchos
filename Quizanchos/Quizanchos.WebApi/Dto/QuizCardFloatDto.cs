@@ -8,4 +8,4 @@ public record QuizCardFloatDto(
     float Option1,
     float Option2,
     int OptionPicked
-) : QuizCardDto<float>(Id, CardIndex, Option1, Option2, OptionPicked);
+) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked);

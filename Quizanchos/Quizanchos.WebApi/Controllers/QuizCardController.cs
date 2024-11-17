@@ -19,7 +19,7 @@ public class QuizCardController : Controller
     [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> GetCardForSession(Guid sessionId, int cardIndex)
     {
-        Dto.Abstractions.QuizCardDto<float> res = await _quizCardService.GetCardForSession(User, sessionId, cardIndex);
+        Dto.Abstractions.QuizCardDtoAbstract res = await _quizCardService.GetCardForSession(User, sessionId, cardIndex);
         return Ok(res);
     }
 }

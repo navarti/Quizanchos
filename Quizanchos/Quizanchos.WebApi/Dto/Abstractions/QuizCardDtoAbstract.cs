@@ -1,9 +1,7 @@
 ﻿namespace Quizanchos.WebApi.Dto.Abstractions;
 
-public abstract record QuizCardDto<T>(
+public abstract record QuizCardDtoAbstract(
     Guid Id,
     int CardIndex,
-    T Option1,
-    T Option2,
     int OptionPicked
 );
