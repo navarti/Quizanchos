@@ -19,9 +19,9 @@ public class MappingProfile : Profile
                 src.CreationTime, src.CurrentCardIndex, src.Score, src.IsFinished, src.CardsCount));
 
         CreateMap<QuizCardFloat, QuizCardFloatDto>()
-            .ConstructUsing(src => new QuizCardFloatDto(src.Id, src.CardIndex, src.Option1.Value.Value, src.Option2.Value.Value, src.OptionPicked));
+            .ConstructUsing(src => new QuizCardFloatDto(src.Id, src.CardIndex, src.Option1.Value.Value, src.Option2.Value.Value, src.OptionPicked ?? -1));
 
         CreateMap<QuizCardInt, QuizCardIntDto>()
-            .ConstructUsing(src => new QuizCardIntDto(src.Id, src.CardIndex, src.Option1.Value.Value, src.Option2.Value.Value, src.OptionPicked));
+            .ConstructUsing(src => new QuizCardIntDto(src.Id, src.CardIndex, src.Option1.Value.Value, src.Option2.Value.Value, src.OptionPicked ?? -1));
     }
 }

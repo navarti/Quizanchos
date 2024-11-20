@@ -4,5 +4,6 @@ namespace Quizanchos.Domain.Repositories.Interfaces;
 
 public interface IFeatureIntRepository : IEntityRepository<Guid, FeatureInt>
 {
-    public Task<FeatureInt?> FindByCategoryAndEntity(Guid categoryId, Guid entityId);
+    Task<FeatureInt?> FindByCategoryAndEntity(Guid categoryId, Guid entityId);
+    Task<FeatureInt?> FindRandomByCategory(Guid categoryId);
 }

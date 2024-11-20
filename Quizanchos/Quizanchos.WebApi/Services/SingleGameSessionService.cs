@@ -49,7 +49,7 @@ public class SingleGameSessionService
             IsFinished = false,
             Score = 0,
             CurrentCardIndex = 0,
-            CardsCount = 10,
+            CardsCount = 5,
             GameLevel = baseSingleGameSessionDto.GameLevel
         };
 

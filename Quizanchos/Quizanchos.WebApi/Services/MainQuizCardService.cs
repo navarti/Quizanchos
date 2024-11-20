@@ -53,6 +53,37 @@ public class MainQuizCardService
         return MapQuizCardDto(card);
     }
 
+    public async Task<QuizCardDtoAbstract> CreateNextCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
+        if(gameSession.IsFinished)
+        {
+            throw HandledExceptionFactory.Create("Game session is already finished");
+        }
+
+        // TODO: add check if the user has not yet answered the current card throw exception
+
+        IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
+        QuizCardAbstract card = await quizCardService.CreateCardForSession(gameSession);
+
+        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
+        {
+            gameSession.IsFinished = true;
+        }
+        gameSession.CurrentCardIndex++;
+
+        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
+
+        return MapQuizCardDto(card);
+    }
+
     private IQuizCardService GetQuizCardService(FeatureType featureType)
     {
         return featureType switch
@@ -67,8 +98,11 @@ public class MainQuizCardService
     {
         return quizCard switch
         {
-            QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
+            // TODO: fix
+            //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
+            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked ?? -1),
+            //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
+            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked ?? -1),
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }
