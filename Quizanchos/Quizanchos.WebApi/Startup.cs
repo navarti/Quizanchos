@@ -115,6 +115,8 @@ public static class Startup
 
         services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
+        services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
+        services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
         services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
         services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
         services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();

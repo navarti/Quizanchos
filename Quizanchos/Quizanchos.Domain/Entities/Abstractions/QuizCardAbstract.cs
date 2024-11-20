@@ -8,7 +8,7 @@ public abstract class QuizCardAbstract : IKeyedEntity<Guid>
     public int CardIndex { get; set; }
     // TODO: make many to many
     public int CorrectOption { get; set; }
-    public int OptionPicked { get; set; }
+    public int? OptionPicked { get; set; }
 
     public SingleGameSession? SingleGameSession { get; set; }
 }
