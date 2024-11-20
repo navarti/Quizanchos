@@ -28,6 +28,12 @@ public class HomeController : Controller
     [HttpGet("/FAQ")]
     public IActionResult Faq()
     {
-        return View("~/Views/Shared/FAQ");
+        return View();
+    }
+    
+    [HttpGet("/Signup")]
+    public IActionResult Signup()
+    {
+        return View();
     }
 }

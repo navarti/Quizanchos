@@ -5,46 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - Quizzes</title>
     <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="container">
-            <a href="/" class="logo">Quizanchos</a>
-            <nav>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/LeaderBoard">LeaderBoard</a></li>
-                    <li>
-                        <a href="/Quizzes">Quizzes</a>
-                        <ul class="dropdown">
-                            <li><a href="/Quizzes/Category1">Category 1</a></li>
-                            <li><a href="/Quizzes/Category2">Category 2</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="/FAQ">FAQ</a></li>
-                    <li><a href="/Contact">Contact</a></li>
-                </ul>
-            </nav>
-            <div class="auth-buttons">
-                <a href="/Account/SignUp" class="btn btn-secondary">Sign up</a>
-                <a href="/Account/SignIn" class="btn btn-primary">Sign in</a>
-            </div>
+<header class="navbar">
+    <div class="container">
+        <a href="/" class="logo">Quizanchos</a>
+        <button class="burger-menu" aria-label="Toggle navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <nav class="nav-list">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/LeaderBoard">LeaderBoard</a></li>
+                <li><a href="/Quizzes">Quizzes</a></li>
+                <li><a href="/FAQ">FAQ</a></li>
+                <li><a href="/Contact">Contact</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <a href="/Signup" class="btn btn-secondary">Sign up</a>
+            <a href="/Account/SignIn" class="btn btn-primary">Sign in</a>
         </div>
-    </header>
+    </div>
+</header>
 
-    <main class="container">
-        @RenderBody()
-    </main>
 
-    <footer class="border-top footer text-muted fixed-bottom">
-        <div class="container">
-            &copy; 2024 - Course work by: Danchos & Vanchos - <a href="https://github.com/navarti/Quizanchos">Github</a>
-        </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+<main class="container">
+    @RenderBody()
+</main>
+
+<footer class="border-top footer text-muted fixed-bottom">
+    <div class="container">
+        &copy; 2024 - Course work by: Danchos & Vanchos - <a href="https://github.com/navarti/Quizanchos">Github</a>
+    </div>
+</footer>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
