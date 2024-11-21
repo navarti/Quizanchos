@@ -36,4 +36,9 @@ public class HomeController : Controller
     {
         return View();
     }
+    [HttpGet("/Signin")]
+    public IActionResult Signin()
+    {
+        return View();
+    }
 }

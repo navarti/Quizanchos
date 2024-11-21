@@ -26,10 +26,21 @@
                 <li><a href="/Contact">Contact</a></li>
             </ul>
         </nav>
-        <div class="auth-buttons">
-            <a href="/Signup" class="btn btn-secondary">Sign up</a>
-            <a href="/Account/SignIn" class="btn btn-primary">Sign in</a>
-        </div>
+            <div class="auth-buttons">
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a href="/Account/Profile" class="btn-profile">
+                        <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">
+                        <span>Profile</span>
+                    </a>
+                    <a href="/Account/Logout" class="btn-logout">Logout</a>
+                }
+                else
+                {
+                    <a href="/Signup" class="btn btn-secondary">Sign up</a>
+                    <a href="/Signin" class="btn btn-primary">Sign in</a>
+                }
+            </div>
     </div>
 </header>
 

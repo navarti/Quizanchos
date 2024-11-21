@@ -28,21 +28,32 @@
             <span>or</span>
         </div>
 
-        <form id="signupForm">
-            <div class="form-group">
-                <label for="email">Your email address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="Email" required />
+            <form id="signupForm" novalidate>
+                <div class="form-group">
+                    <label for="email">Your email address</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Email" required />
+                    <small class="error-message" id="emailError"></small>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
+                    <small class="error-message" id="passwordError"></small>
+                </div>
+                <div class="form-group">
+                    <label for="repeatPassword">Repeat password</label>
+                    <input type="password" id="repeatPassword" name="repeatPassword" class="form-control" placeholder="Repeat Password" required />
+                    <small class="error-message" id="repeatPasswordError"></small>
+                </div>
+                <button type="button" id="submitButton" class="btn btn-primary">Submit</button>
+            </form>
+
+            <div id="errorModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-btn" id="closeModal">&times;</span>
+                    <h2 id="modalHeader">Notification</h2>
+                    <p id="modalErrorText"></p>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required />
-            </div>
-            <div class="form-group">
-                <label for="repeatPassword">Repeat password</label>
-                <input type="password" id="repeatPassword" name="repeatPassword" class="form-control" placeholder="Repeat Password" required />
-            </div>
-            <button type="button" id="submitButton" class="btn btn-primary">Submit</button>
-        </form>
 
         
         <div class="signup-footer">
