@@ -491,7 +491,6 @@
     background-color: rgba(0, 0, 0, 0.7); 
 }
 
-/* Содержание модального окна */
 .modal-content {
     position: relative;
     background: linear-gradient(145deg, #d1c4e9, #b39ddb); 
@@ -616,71 +615,135 @@
         transform: translateY(-2px);
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
+
+body {
+    background-color: #ffffff; 
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
 .signin-page {
-    max-width: 400px;
-    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.signin-form {
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
     text-align: center;
+}
+
+
+.google-signin-container {
+    margin-bottom: 25px;
 }
 
 .google-signin-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    padding: 10px;
-    background-color: #6c63ff;
-    color: #fff;
-    font-size: 16px;
+    background: #4285f4;
+    color: #ffffff;
+    font-size: 1rem;
     font-weight: 600;
+    padding: 12px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background 0.3s ease;
+    width: 100%;
 }
 
-    .google-signin-btn img {
-        margin-right: 8px;
+    .google-signin-btn:hover {
+        background: #357ae8;
     }
 
-    .google-signin-btn:hover {
-        background-color: #5a54d6;
+    .google-signin-btn img {
+        margin-right: 10px;
     }
+
 
 .separator {
     display: flex;
     align-items: center;
-    margin: 20px 0;
-    color: #888;
+    justify-content: center;
+    margin: 25px 0;
+    color: #999999;
     font-size: 14px;
+    font-weight: 500;
 }
 
     .separator::before,
     .separator::after {
-        content: "";
+        content: '';
         flex: 1;
         height: 1px;
-        background: #ddd;
+        background-color: #e0e0e0;
         margin: 0 10px;
     }
 
-.forgot-password-link {
-    color: #6c63ff;
-    font-size: 14px;
-    text-decoration: none;
-    transition: color 0.3s ease;
+.signin-form .form-group {
+    margin-bottom: 20px;
+    text-align: left;
 }
 
-    .forgot-password-link:hover {
-        color: #463bff;
+.signin-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+    .signin-form input:focus {
+        outline: none;
+        border-color: #6c63ff;
+        box-shadow: 0 0 4px rgba(108, 99, 255, 0.5);
+    }
+
+.forgot-password {
+    display: block;
+    font-size: 0.9rem;
+    color: #6c63ff;
+    margin-bottom: 20px;
+    text-decoration: none;
+    text-align: left;
+}
+
+    .forgot-password:hover {
+        text-decoration: underline;
+    }
+
+.signin-form .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: #6c63ff;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+    .signin-form .btn-primary:hover {
+        background: #463bff;
     }
 
 .signin-footer {
+    font-size: 0.9rem;
+    color: #666666;
     margin-top: 20px;
-    font-size: 14px;
 }
 
     .signin-footer a {
@@ -688,6 +751,6 @@
         text-decoration: none;
     }
 
-        .signin-footer a:hover {
-            text-decoration: underline;
-        }
+    .signin-footer a:hover {
+        text-decoration: underline;
+    }
