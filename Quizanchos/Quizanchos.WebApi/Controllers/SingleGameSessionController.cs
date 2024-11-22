@@ -45,7 +45,7 @@ public class SingleGameSessionController : Controller
         return Ok(card);
     }
 
-    [HttpGet]
+    [HttpPost]
     [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> CreateNextCardForSession(Guid sessionId)
     {

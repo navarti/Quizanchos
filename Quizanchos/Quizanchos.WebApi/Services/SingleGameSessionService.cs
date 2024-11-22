@@ -90,7 +90,6 @@ public class SingleGameSessionService
     public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
     {
         SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
-        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
 
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
         if (gameSession.ApplicationUser.Id != userId)
@@ -125,5 +124,19 @@ public class SingleGameSessionService
         }
 
         return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
+    }
+
+    public async Task PickAnswer(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
+
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
+        // make dto (session + answer)
     }
 }
