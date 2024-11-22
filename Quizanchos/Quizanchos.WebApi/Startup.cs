@@ -109,6 +109,8 @@ public static class Startup
 
         services.AddAutoMapper(typeof(MappingProfile));
 
+        services.AddTransient<UserRetrieverService>();
+        services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<QuizAuthorizationService>(); 
 
         services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
@@ -123,13 +125,11 @@ public static class Startup
 
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();
-
-        services.AddTransient<UserRetrieverService>();
-        services.AddTransient<GoogleAuthorizationService>();
-        services.AddTransient<SingleGameSessionService>();
-        services.AddTransient<MainQuizCardService>();
         services.AddTransient<QuizCardFloatService>();
         services.AddTransient<QuizCardIntService>();
+        services.AddTransient<MainQuizCardService>();
+        services.AddTransient<SessionTerminatorService>();
+        services.AddTransient<SingleGameSessionService>();
     }
 
     public async static Task SeedData(this WebApplication app, ConfigurationManager configuration)

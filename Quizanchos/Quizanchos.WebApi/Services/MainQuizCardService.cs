@@ -6,81 +6,52 @@ using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
-using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
-using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;
 
 public class MainQuizCardService
 {
     private readonly IMapper _mapper;
-    private readonly ISingleGameSessionRepository _singleGameSessionRepository;
     private readonly IQuizCategoryRepository _quizCategoryRepository;
-    private readonly UserRetrieverService _userRetrieverService;
     private readonly QuizCardFloatService _featureFloatService;
     private readonly QuizCardIntService _featureIntService;
 
     public MainQuizCardService(
         IMapper mapper,
-        ISingleGameSessionRepository singleGameSessionRepository,
         IQuizCategoryRepository quizCategoryRepository,
-        UserRetrieverService userRetrieverService,
         QuizCardFloatService featureFloatService,
         QuizCardIntService featureIntService)
     {
         _mapper = mapper;
-        _singleGameSessionRepository = singleGameSessionRepository;
         _quizCategoryRepository = quizCategoryRepository;
-        _userRetrieverService = userRetrieverService;
         _featureFloatService = featureFloatService;
         _featureIntService = featureIntService;
     }
 
-    public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
+    public async Task<QuizCardDtoAbstract> GetCardDtoForSession(SingleGameSession gameSession, int cardIndex)
     {
-        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
-
-        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        if (gameSession.ApplicationUser.Id != userId)
-        {
-            throw HandledExceptionFactory.CreateForbiddenException();
-        }
-
-        IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
-        QuizCardAbstract card = await quizCardService.GetCardForSession(sessionid, cardIndex);
+        QuizCardAbstract? card = await FindCardForSession(gameSession, cardIndex);
+        _ = card ?? throw HandledExceptionFactory.Create($"Could not find card with index {cardIndex} for session {gameSession.Id}");
         return MapQuizCardDto(card);
     }
 
-    public async Task<QuizCardDtoAbstract> CreateNextCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    public async Task<QuizCardAbstract?> FindCardForSession(SingleGameSession gameSession, int cardIndex)
     {
-        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
-
-        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        if (gameSession.ApplicationUser.Id != userId)
+        IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
+        QuizCardAbstract? card = await quizCardService.FindCardForSession(gameSession.Id, cardIndex);
+        if (card is null)
         {
-            throw HandledExceptionFactory.CreateForbiddenException();
+            return null;
         }
+        return card;
+    }
 
-        if(gameSession.IsFinished)
-        {
-            throw HandledExceptionFactory.Create("Game session is already finished");
-        }
-
-        // TODO: add check if the user has not yet answered the current card throw exception
-
+    public async Task<QuizCardDtoAbstract> CreateNextCardForSession(SingleGameSession gameSession)
+    {
         IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
         QuizCardAbstract card = await quizCardService.CreateCardForSession(gameSession);
-
-        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
-        {
-            gameSession.IsFinished = true;
-        }
-        gameSession.CurrentCardIndex++;
-
-        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
-
         return MapQuizCardDto(card);
     }
 
@@ -100,9 +71,9 @@ public class MainQuizCardService
         {
             // TODO: fix
             //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked ?? -1),
+            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked ?? -1, quizCardFloat.CreationTime),
             //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
-            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked ?? -1),
+            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked ?? -1, quizCardInt.CreationTime),
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }

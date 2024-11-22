@@ -32,14 +32,15 @@ public class QuizCardFloatService : IQuizCardService
             Option1 = featureFloat1,
             Option2 = featureFloat2,
             CorrectOption = 0,
-            OptionPicked = null
+            OptionPicked = null,
+            CreationTime = DateTime.UtcNow
         };
 
         return await _quizCardFloatRepository.Create(quizCardFloat);
     }
 
-    public async Task<QuizCardAbstract> GetCardForSession(Guid gameSessionid, int cardIndex)
+    public async Task<QuizCardAbstract?> FindCardForSession(Guid gameSessionid, int cardIndex)
     {
-        return await _quizCardFloatRepository.GetCardForSession(gameSessionid, cardIndex);
+        return await _quizCardFloatRepository.FindCardForSessionIncluding(gameSessionid, cardIndex);
     }
 }

@@ -7,5 +7,6 @@ public record QuizCardFloatDto(
     int CardIndex,
     float Option1,
     float Option2,
-    int OptionPicked
-) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked);
+    int OptionPicked,
+    DateTime CreationTime
+) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked, CreationTime);

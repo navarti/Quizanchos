@@ -32,14 +32,15 @@ public class QuizCardIntService : IQuizCardService
             Option1 = featureInt1,
             Option2 = featureInt2,
             CorrectOption = 0,
-            OptionPicked = null
+            OptionPicked = null,
+            CreationTime = DateTime.UtcNow
         };
 
         return await _quizCardIntRepository.Create(quizCardInt);
     }
 
-    public async Task<QuizCardAbstract> GetCardForSession(Guid gameSessionid, int cardIndex)
+    public async Task<QuizCardAbstract?> FindCardForSession(Guid gameSessionid, int cardIndex)
     {
-        return await _quizCardIntRepository.GetCardForSession(gameSessionid, cardIndex);
+        return await _quizCardIntRepository.FindCardForSessionIncluding(gameSessionid, cardIndex);
     }
 }

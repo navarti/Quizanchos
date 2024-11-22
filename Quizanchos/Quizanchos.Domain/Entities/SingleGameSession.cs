@@ -11,7 +11,9 @@ public class SingleGameSession : IKeyedEntity<Guid>
     public int CurrentCardIndex { get; set; }
     public int Score { get; set; }
     public bool IsFinished { get; set; }
+    public bool IsTerminatedByTime { get; set; }
     public GameLevel GameLevel { get; set; }
+    public int SecondsPerCard { get; set; }
 
     public ApplicationUser ApplicationUser { get; set; }
     public QuizCategory QuizCategory { get; set; }
