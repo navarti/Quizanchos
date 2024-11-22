@@ -1,22 +1,28 @@
-﻿document.getElementById('signinButton').addEventListener('click', async function (event) {
-    event.preventDefault(); 
+document.getElementById('registerAdminButton').addEventListener('click', async function (event) {
 
-    const email = document.getElementById('signinEmail');
-    const password = document.getElementById('signinPassword');
+    const email = document.getElementById('registerAdminEmail');
+    const password = document.getElementById('registerAdminPassword');
+    const confirmPassword = document.getElementById('registerAdminConfirmPassword');
 
     clearErrors();
 
     let isValid = true;
-
+    
     if (!validateEmail(email.value.trim())) {
-        showError('signinEmailError', 'Please enter a valid email address.');
+        showError('registerAdminEmailError', 'Please enter a valid email address.');
         addErrorClass(email);
         isValid = false;
     }
-
+    
     if (!password.value.trim()) {
-        showError('signinPasswordError', 'Password cannot be empty.');
+        showError('registerAdminPasswordError', 'Password cannot be empty.');
         addErrorClass(password);
+        isValid = false;
+    }
+    
+    if (password.value.trim() !== confirmPassword.value.trim()) {
+        showError('registerAdminConfirmPasswordError', 'Passwords do not match.');
+        addErrorClass(confirmPassword);
         isValid = false;
     }
 
@@ -28,7 +34,7 @@
     };
 
     try {
-        const response = await fetch('/Authorization/SignIn', {
+        const response = await fetch('/Authorization/RegisterAdmin', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,14 +43,14 @@
         });
 
         if (response.ok) {
-            showModal('Sign in successful! Welcome back!', true);
+            showModal('Admin registration successful! Redirecting...', true);
             setTimeout(() => {
-                window.location.href = "/";
-            }, 2000); 
+                window.location.href = "/Admin";
+            }, 2000);
         } else {
             const errorData = await response.json();
             if (errorData.Message) {
-                showModal(errorData.Message); 
+                showModal(errorData.Message);
             } else {
                 showModal('An unexpected error occurred. Please try again.');
             }

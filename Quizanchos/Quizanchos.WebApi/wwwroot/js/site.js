@@ -56,15 +56,10 @@ document.getElementById('submitButton').addEventListener('click', async function
         });
 
         if (response.ok) {
-            const responseData = await response.json();
-            if (responseData.redirectUrl) {
                 showModal('Registration successful! Welcome to Quizanchos!', true);
                 setTimeout(() => {
-                    window.location.href = responseData.redirectUrl;
-                }, 2000); 
-            } else {
-                showModal('Registration successful! Welcome to Quizanchos!', true);
-            }
+                    window.location.href = "/";
+                }, 2000);
         } else {
             const errorData = await response.json();
             if (errorData.Message) {
