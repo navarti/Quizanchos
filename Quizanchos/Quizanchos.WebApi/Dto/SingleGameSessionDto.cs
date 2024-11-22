@@ -13,5 +13,7 @@ public record SingleGameSessionDto(
     int CurrentCardIndex,
     int Score,
     bool IsFinished,
-    int CardsCount
+    bool IsTerminatedByTime,
+    int CardsCount,
+    int SecondPerCard
 ) : BaseSingleGameSessionDto(QuizCategoryId, GameLevel);

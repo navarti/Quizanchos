@@ -109,25 +109,27 @@ public static class Startup
 
         services.AddAutoMapper(typeof(MappingProfile));
 
+        services.AddTransient<UserRetrieverService>();
+        services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<QuizAuthorizationService>(); 
 
         services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
 
         services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
+        services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
+        services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
         services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
         services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
         services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
 
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();
-
-        services.AddTransient<UserRetrieverService>();
-        services.AddTransient<GoogleAuthorizationService>();
-        services.AddTransient<SingleGameSessionService>();
-        services.AddTransient<MainQuizCardService>();
         services.AddTransient<QuizCardFloatService>();
         services.AddTransient<QuizCardIntService>();
+        services.AddTransient<MainQuizCardService>();
+        services.AddTransient<SessionTerminatorService>();
+        services.AddTransient<SingleGameSessionService>();
     }
 
     public async static Task SeedData(this WebApplication app, ConfigurationManager configuration)

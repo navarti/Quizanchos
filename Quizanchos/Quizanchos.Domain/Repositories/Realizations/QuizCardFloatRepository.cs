@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
@@ -11,9 +10,11 @@ public class QuizCardFloatRepository : EntityRepositoryBase<Guid, QuizCardFloat>
     {
     }
 
-    public async Task<QuizCardFloat> GetCardForSession(Guid gameSessionid, int cardIndex)
+    public async Task<QuizCardFloat?> FindCardForSessionIncluding(Guid gameSessionid, int cardIndex)
     {
-        return await _dbSet.FirstOrDefaultAsync(q => q.SingleGameSession.Id == gameSessionid && q.CardIndex == cardIndex)
-            ?? throw HandledExceptionFactory.Create($"No card with index {cardIndex} for gameSessionid {gameSessionid} found");
+        return await _dbSet
+            .Include(q => q.Option1)
+            .Include(q => q.Option2)
+            .FirstOrDefaultAsync(q => q.SingleGameSession.Id == gameSessionid && q.CardIndex == cardIndex);
     }
 }

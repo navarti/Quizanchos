@@ -3,6 +3,7 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
+using Quizanchos.WebApi.Dto.Abstractions;
 using Quizanchos.WebApi.Services.HelperServices;
 using System.Security.Claims;
 
@@ -14,17 +15,23 @@ public class SingleGameSessionService
     private readonly ISingleGameSessionRepository _singleGameSessionRepository;
     private readonly IQuizCategoryRepository _quizCategoryRepository;
     private readonly UserRetrieverService _userRetrieverService;
+    private readonly MainQuizCardService _mainQuizCardService;
+    private readonly SessionTerminatorService _sessionTerminatorService;
 
     public SingleGameSessionService(
-        IMapper mapper, 
-        ISingleGameSessionRepository singleGameSessionRepository, 
+        IMapper mapper,
+        ISingleGameSessionRepository singleGameSessionRepository,
         IQuizCategoryRepository quizCategoryRepository,
-        UserRetrieverService userRetrieverService)
+        UserRetrieverService userRetrieverService,
+        MainQuizCardService mainQuizCardService,
+        SessionTerminatorService sessionTerminatorService)
     {
         _mapper = mapper;
         _singleGameSessionRepository = singleGameSessionRepository;
         _quizCategoryRepository = quizCategoryRepository;
         _userRetrieverService = userRetrieverService;
+        _mainQuizCardService = mainQuizCardService;
+        _sessionTerminatorService = sessionTerminatorService;
     }
 
     public async Task<SingleGameSessionDto> Create(BaseSingleGameSessionDto baseSingleGameSessionDto, ClaimsPrincipal claimsPrincipal)
@@ -47,10 +54,12 @@ public class SingleGameSessionService
             ApplicationUser = user,
             CreationTime = DateTime.UtcNow,
             IsFinished = false,
+            IsTerminatedByTime = false,
             Score = 0,
-            CurrentCardIndex = 0,
-            CardsCount = 10,
-            GameLevel = baseSingleGameSessionDto.GameLevel
+            CurrentCardIndex = -1,
+            CardsCount = 5,
+            GameLevel = baseSingleGameSessionDto.GameLevel,
+            SecondsPerCard = 10
         };
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
@@ -61,6 +70,7 @@ public class SingleGameSessionService
     public async Task<SingleGameSessionDto> GetById(Guid id)
     {
         SingleGameSession gameSession = await _singleGameSessionRepository.GetById(id).ConfigureAwait(false);
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
 
@@ -68,11 +78,65 @@ public class SingleGameSessionService
     {
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
         SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
-        if(gameSession is null)
+        if (gameSession is null)
         {
             return null;
         }
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
 
         return _mapper.Map<SingleGameSessionDto>(gameSession);
+    }
+
+    public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
+        return await _mainQuizCardService.GetCardDtoForSession(gameSession, cardIndex);
+    }
+
+    public async Task<QuizCardDtoAbstract> CreateNextCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
+
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
+        if (gameSession.IsFinished)
+        {
+            throw HandledExceptionFactory.Create("Game session is already finished");
+        }
+
+        gameSession.CurrentCardIndex++;
+        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
+        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
+        {
+            gameSession.IsFinished = true;
+        }
+
+        return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
+    }
+
+    public async Task PickAnswer(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
+
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
+        // make dto (session + answer)
     }
 }

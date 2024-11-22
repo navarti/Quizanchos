@@ -14,4 +14,9 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
     {
         return _dbSet.FirstOrDefaultAsync(feature => feature.QuizCategory.Id == categoryId && feature.QuizEntity.Id == entityId);
     }
+
+    public Task<FeatureFloat?> FindRandomByCategory(Guid categoryId)
+    {
+        return _dbSet.Where(feature => feature.QuizCategory.Id == categoryId).OrderBy(feature => Guid.NewGuid()).FirstOrDefaultAsync();
+    }
 }
