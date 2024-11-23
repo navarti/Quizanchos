@@ -16,11 +16,13 @@ public interface IEntityRepository<TKey, TEntity>
 
     Task<TEntity> GetById(TKey id);
 
+    Task<TEntity?> FindById(TKey id);
+
     Task<TEntity> Update(TEntity entity);
 
     Task<IEnumerable<TEntity>> GetByFilter(Expression<Func<TEntity, bool>> whereExpression);
 
     Task Delete(TEntity entity);
 
-    Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> whereExpression);
+    Task<TEntity?> FindFirstOrDefaultAsync(Expression<Func<TEntity, bool>> whereExpression);
 }
