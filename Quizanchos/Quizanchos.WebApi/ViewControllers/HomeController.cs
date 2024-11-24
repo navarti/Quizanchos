@@ -1,22 +1,32 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Quizanchos.ViewModels;
-
+using Quizanchos.WebApi.Dto;
+using Quizanchos.WebApi.Services;
 namespace Quizanchos.WebApi.ViewControllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    
+    private readonly QuizCategoryService _quizCategoryService;
+    
+    public HomeController(ILogger<HomeController> logger, QuizCategoryService quizCategoryService)
     {
         _logger = logger;
+        _quizCategoryService = quizCategoryService ?? throw new ArgumentNullException(nameof(quizCategoryService));
     }
 
     [HttpGet("/")]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
+        var viewModel = new HomeViewModel
+        {
+            QuizCategories = quizCategories
+        };
+
+        return View(viewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -41,4 +51,5 @@ public class HomeController : Controller
     {
         return View();
     }
+    
 }

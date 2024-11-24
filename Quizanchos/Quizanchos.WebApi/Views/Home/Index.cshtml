@@ -1,4 +1,5 @@
-﻿@{
+﻿@model HomeViewModel
+@{
     ViewData["Title"] = "Home";
 }
 
@@ -6,31 +7,21 @@
     <h1 class="quiz-title">Quizzes</h1>
     <p class="quiz-subtitle">Get your first 100 points on your first quiz!</p>
     <div class="quiz-cards">
-        <div class="quiz-card">
-            <img src="https://img.freepik.com/premium-photo/world-population-day-background-wallpaper-copy-space_931022-6883.jpg" alt="Population quiz" class="quiz-image">
-            <div class="quiz-info">
-                <div class="quiz-meta">
-                    <span class="quiz-date">15 Feb 2024</span>
-                    <span class="quiz-category">Cities</span>
-                    <span class="quiz-author">Adam Smith</span>
+        @foreach (var quiz in Model.QuizCategories)
+        {
+            <div class="quiz-card">
+                <img src="https://img.freepik.com/premium-photo/world-population-day-background-wallpaper-copy-space_931022-6883.jpg" alt="@quiz.Name" class="quiz-image">
+                <div class="quiz-info">
+                    <div class="quiz-meta">
+                        <span class="quiz-date">15 Feb 2024</span>
+                        <span class="quiz-category">@quiz.Name</span>
+                        <span class="quiz-author">Adam Smith</span>
+                    </div>
+                    <h2 class="quiz-name">Sample Quiz</h2>
+                    <p class="quiz-description">This is a sample description for a quiz...</p>
+                    <a href="/quiz/@quiz.Id" class="quiz-link">GO →</a>
                 </div>
-                <h2 class="quiz-name">Population quiz</h2>
-                <p class="quiz-description">Try to end this hard one quiz with population theme...</p>
-                <a href="#" class="quiz-link">GO →</a>
             </div>
-        </div>
-        <div class="quiz-card">
-            <img src="https://c4.wallpaperflare.com/wallpaper/186/969/174/audi-a6-car-audi-on-track-hd-wallpaper-preview.jpg" alt="Car quiz" class="quiz-image">
-            <div class="quiz-info">
-                <div class="quiz-meta">
-                    <span class="quiz-date">5 Jan 2024</span>
-                    <span class="quiz-category">Cars</span>
-                    <span class="quiz-author">Edward James</span>
-                </div>
-                <h2 class="quiz-name">Car quiz</h2>
-                <p class="quiz-description">Try your car knowledge and show your best result...</p>
-                <a href="#" class="quiz-link">GO →</a>
-            </div>
-        </div>
+        }
     </div>
 </div>
