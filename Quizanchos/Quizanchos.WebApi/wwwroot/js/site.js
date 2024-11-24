@@ -1,17 +1,25 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
     const burgerMenu = document.querySelector(".burger-menu");
     const navList = document.querySelector(".nav-list");
-
-    burgerMenu.addEventListener("click", function () {
-        navList.classList.toggle("active");
+    
+    burgerMenu?.addEventListener("click", function () {
+        navList?.classList.toggle("active");
     });
+    
+    const form = document.getElementById('signupForm');
+    const submitButton = document.getElementById('submitButton');
+    
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+    });
+    
+    submitButton.removeEventListener('click', handleSubmit); 
+    submitButton.addEventListener('click', handleSubmit);
 });
 
-document.getElementById('submitButton').addEventListener('click', async function () {
+async function handleSubmit(event) {
+    event.preventDefault(); 
+
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const repeatPassword = document.getElementById('repeatPassword');
@@ -32,15 +40,14 @@ document.getElementById('submitButton').addEventListener('click', async function
         isValid = false;
     }
 
-
     if (password.value.trim() !== repeatPassword.value.trim()) {
         showError('repeatPasswordError', 'Passwords do not match.');
         addErrorClass(repeatPassword);
         isValid = false;
     }
 
-
     if (!isValid) return;
+
     const data = {
         email: email.value.trim(),
         password: password.value.trim(),
@@ -56,27 +63,19 @@ document.getElementById('submitButton').addEventListener('click', async function
         });
 
         if (response.ok) {
-                showModal('Registration successful! Welcome to Quizanchos!', true);
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 2000);
-        } else {
-            const errorData = await response.json();
-            if (errorData.Message) {
-                showModal(errorData.Message); 
-            } else {
-                showModal('An unexpected error occurred. Please try again.');
-            }
+            showModal('Registration successful! Welcome to Quizanchos!', true);
+            setTimeout(() => {
+                window.location.href = "/";
+            }, 2000);
+            return;
         }
+        
+        const responseData = await response.json(); 
+        const errorMessage = responseData.Message || 'An unexpected error occurred.';
+        showModal(errorMessage);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Network error:', error);
         showModal('A network error occurred. Please try again later.');
     }
-});
-
-
-
-
-
-
+}
 
