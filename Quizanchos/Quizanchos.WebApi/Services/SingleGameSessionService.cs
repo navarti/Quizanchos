@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
@@ -42,7 +43,7 @@ public class SingleGameSessionService
 
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
 
-        SingleGameSession? existingGameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(user.Id).ConfigureAwait(false);
+        SingleGameSession? existingGameSession = await FindAliveSession(user.Id).ConfigureAwait(false);
         if (existingGameSession is not null)
         {
             throw HandledExceptionFactory.Create("There is already an active game session for this user.");
@@ -59,7 +60,8 @@ public class SingleGameSessionService
             CurrentCardIndex = -1,
             CardsCount = 5,
             GameLevel = baseSingleGameSessionDto.GameLevel,
-            SecondsPerCard = 10
+            SecondsPerCard = 60,
+            OptionCount = 2
         };
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
@@ -77,14 +79,12 @@ public class SingleGameSessionService
     public async Task<SingleGameSessionDto?> FindAliveSession(ClaimsPrincipal claimsPrincipal)
     {
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
-        if (gameSession is null)
+        SingleGameSession? aliveSession = await FindAliveSession(userId).ConfigureAwait(false);
+        if(aliveSession is null)
         {
             return null;
         }
-        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
-
-        return _mapper.Map<SingleGameSessionDto>(gameSession);
+        return _mapper.Map<SingleGameSessionDto>(aliveSession);
     }
 
     public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
@@ -116,19 +116,24 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.Create("Game session is already finished");
         }
 
+        if(gameSession.CurrentCardIndex != -1)
+        {
+            QuizCardAbstract currentCard = await _mainQuizCardService.GetCardForSession(gameSession, gameSession.CurrentCardIndex);
+            if (currentCard.OptionPicked is null)
+            {
+                throw HandledExceptionFactory.Create("You need to pick an option for the current card before requesting the next one.");
+            }
+        }
+
         gameSession.CurrentCardIndex++;
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
-        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
-        {
-            gameSession.IsFinished = true;
-        }
 
         return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
     }
 
-    public async Task PickAnswer(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    public async Task<QuizCardDtoAbstract> PickAnswerForSession(ClaimsPrincipal claimsPrincipal, AnswerDto answerDto)
     {
-        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(answerDto.Sessionid).ConfigureAwait(false);
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
 
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
@@ -137,6 +142,38 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.CreateForbiddenException();
         }
 
-        // make dto (session + answer)
+        if (gameSession.IsFinished)
+        {
+            throw HandledExceptionFactory.Create("Game session is already finished");
+        }
+
+        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > gameSession.OptionCount - 1)
+        {
+            throw HandledExceptionFactory.Create("Invalid option picked");
+        }
+
+        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
+        {
+            gameSession.IsFinished = true;
+        }
+        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
+
+        return await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
+    }
+
+    public async Task<SingleGameSession?> FindAliveSession(string userId)
+    {
+        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
+        if (gameSession is null)
+        {
+            return null;
+        }
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
+        if (gameSession.IsFinished)
+        {
+            return null;
+        }
+
+        return gameSession;
     }
 }

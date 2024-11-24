@@ -52,4 +52,12 @@ public class SingleGameSessionController : Controller
         QuizCardDtoAbstract card = await _singleGameSessionService.CreateNextCardForSession(User, sessionId);
         return Ok(card);
     }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> PickAnswerForSession(AnswerDto answerDto)
+    {
+        QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
+        return Ok(card);
+    }
 }

@@ -32,9 +32,19 @@ public class MainQuizCardService
 
     public async Task<QuizCardDtoAbstract> GetCardDtoForSession(SingleGameSession gameSession, int cardIndex)
     {
+        QuizCardAbstract card = await GetCardForSession(gameSession, cardIndex);
+        if (gameSession.IsFinished)
+        {
+            return MapQuizCardDtoWithAnswer(card);
+        }
+        return MapQuizCardDto(card);
+    }
+
+    public async Task<QuizCardAbstract> GetCardForSession(SingleGameSession gameSession, int cardIndex)
+    {
         QuizCardAbstract? card = await FindCardForSession(gameSession, cardIndex);
         _ = card ?? throw HandledExceptionFactory.Create($"Could not find card with index {cardIndex} for session {gameSession.Id}");
-        return MapQuizCardDto(card);
+        return card;
     }
 
     public async Task<QuizCardAbstract?> FindCardForSession(SingleGameSession gameSession, int cardIndex)
@@ -55,6 +65,13 @@ public class MainQuizCardService
         return MapQuizCardDto(card);
     }
 
+    public async Task<QuizCardDtoAbstract> PickAnswerForSession(SingleGameSession gameSession, int optionPicked)
+    {
+        IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
+        QuizCardAbstract card = await quizCardService.PickAnswerForSession(gameSession.Id, gameSession.CurrentCardIndex, optionPicked);
+        return MapQuizCardDtoWithAnswer(card);
+    }
+
     private IQuizCardService GetQuizCardService(FeatureType featureType)
     {
         return featureType switch
@@ -71,9 +88,22 @@ public class MainQuizCardService
         {
             // TODO: fix
             //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked ?? -1, quizCardFloat.CreationTime),
+            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked, quizCardFloat.CreationTime),
             //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
-            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked ?? -1, quizCardInt.CreationTime),
+            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked, quizCardInt.CreationTime),
+            _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
+        };
+    }
+
+    private QuizCardDtoAbstract MapQuizCardDtoWithAnswer(QuizCardAbstract quizCard)
+    {
+        return quizCard switch
+        {
+            // TODO: fix
+            //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
+            QuizCardFloat quizCardFloat => new QuizCardFloatWithAnswerDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked, quizCardFloat.CreationTime, quizCardFloat.CorrectOption),
+            //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
+            QuizCardInt quizCardInt => new QuizCardIntWithAnswerDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.CorrectOption),
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }
