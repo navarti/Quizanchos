@@ -43,7 +43,7 @@ public class SingleGameSessionService
 
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
 
-        SingleGameSession? existingGameSession = await _singleGameSessionRepository.FindAliveGameSessionForUser(user.Id).ConfigureAwait(false);
+        SingleGameSession? existingGameSession = await FindAliveSession(user.Id).ConfigureAwait(false);
         if (existingGameSession is not null)
         {
             throw HandledExceptionFactory.Create("There is already an active game session for this user.");
@@ -79,18 +79,12 @@ public class SingleGameSessionService
     public async Task<SingleGameSessionDto?> FindAliveSession(ClaimsPrincipal claimsPrincipal)
     {
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
-        if (gameSession is null)
+        SingleGameSession? aliveSession = await FindAliveSession(userId).ConfigureAwait(false);
+        if(aliveSession is null)
         {
             return null;
         }
-        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
-        if(gameSession.IsFinished)
-        {
-            return null;
-        }
-
-        return _mapper.Map<SingleGameSessionDto>(gameSession);
+        return _mapper.Map<SingleGameSessionDto>(aliveSession);
     }
 
     public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
@@ -133,10 +127,6 @@ public class SingleGameSessionService
 
         gameSession.CurrentCardIndex++;
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
-        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
-        {
-            gameSession.IsFinished = true;
-        }
 
         return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
     }
@@ -162,6 +152,28 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.Create("Invalid option picked");
         }
 
+        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
+        {
+            gameSession.IsFinished = true;
+        }
+        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
+
         return await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
+    }
+
+    public async Task<SingleGameSession?> FindAliveSession(string userId)
+    {
+        SingleGameSession? gameSession = await _singleGameSessionRepository.FindAliveGameSessionForUserIncluding(userId).ConfigureAwait(false);
+        if (gameSession is null)
+        {
+            return null;
+        }
+        await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
+        if (gameSession.IsFinished)
+        {
+            return null;
+        }
+
+        return gameSession;
     }
 }

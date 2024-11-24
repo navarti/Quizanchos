@@ -3,6 +3,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Services.Interfaces;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -25,13 +26,15 @@ public class QuizCardIntService : IQuizCardService
         FeatureInt? featureInt2 = await _featureIntRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
             ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later");
 
+        int correctOption = CorrectOptionPicker.PickCorrectOption([featureInt1, featureInt2]);
+
         QuizCardInt quizCardInt = new QuizCardInt
         {
             SingleGameSession = gameSession,
             CardIndex = gameSession.CurrentCardIndex,
             Option1 = featureInt1,
             Option2 = featureInt2,
-            CorrectOption = 0,
+            CorrectOption = correctOption,
             OptionPicked = null,
             CreationTime = DateTime.UtcNow
         };
