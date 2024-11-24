@@ -45,7 +45,8 @@ internal class DataUpdater : IDataUpdater
         quizCategory = new QuizCategory()
         {
             Name = data.CategoryName,
-            FeatureType = data.FeatureType
+            FeatureType = data.FeatureType,
+            ImageUrl = data.ImageUrl
         };
         
         return await _quizCategoryRepository.Create(quizCategory);

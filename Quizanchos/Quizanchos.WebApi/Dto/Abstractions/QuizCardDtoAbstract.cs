@@ -3,6 +3,6 @@
 public abstract record QuizCardDtoAbstract(
     Guid Id,
     int CardIndex,
-    int OptionPicked,
+    int? OptionPicked,
     DateTime CreationTime
 );

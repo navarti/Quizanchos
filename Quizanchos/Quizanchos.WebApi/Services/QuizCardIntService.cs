@@ -43,4 +43,9 @@ public class QuizCardIntService : IQuizCardService
     {
         return await _quizCardIntRepository.FindCardForSessionIncluding(gameSessionid, cardIndex);
     }
+
+    public async Task<QuizCardAbstract> PickAnswerForSession(Guid gameSessionid, int cardIndex, int optionPicked)
+    {
+        return await _quizCardIntRepository.PickAnswerForSession(gameSessionid, cardIndex, optionPicked);
+    }
 }

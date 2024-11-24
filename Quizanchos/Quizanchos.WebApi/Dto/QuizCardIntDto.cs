@@ -7,6 +7,6 @@ public record QuizCardIntDto(
     int CardIndex,
     int Option1,
     int Option2,
-    int OptionPicked,
+    int? OptionPicked,
     DateTime CreationTime
 ) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked, CreationTime);

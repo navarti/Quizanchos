@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
@@ -59,7 +60,8 @@ public class SingleGameSessionService
             CurrentCardIndex = -1,
             CardsCount = 5,
             GameLevel = baseSingleGameSessionDto.GameLevel,
-            SecondsPerCard = 10
+            SecondsPerCard = 60,
+            OptionCount = 2
         };
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
@@ -83,6 +85,10 @@ public class SingleGameSessionService
             return null;
         }
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
+        if(gameSession.IsFinished)
+        {
+            return null;
+        }
 
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
@@ -116,6 +122,15 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.Create("Game session is already finished");
         }
 
+        if(gameSession.CurrentCardIndex != -1)
+        {
+            QuizCardAbstract currentCard = await _mainQuizCardService.GetCardForSession(gameSession, gameSession.CurrentCardIndex);
+            if (currentCard.OptionPicked is null)
+            {
+                throw HandledExceptionFactory.Create("You need to pick an option for the current card before requesting the next one.");
+            }
+        }
+
         gameSession.CurrentCardIndex++;
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
         if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
@@ -126,9 +141,9 @@ public class SingleGameSessionService
         return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
     }
 
-    public async Task PickAnswer(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    public async Task<QuizCardDtoAbstract> PickAnswerForSession(ClaimsPrincipal claimsPrincipal, AnswerDto answerDto)
     {
-        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(answerDto.Sessionid).ConfigureAwait(false);
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
 
         string userId = _userRetrieverService.GetUserId(claimsPrincipal);
@@ -137,6 +152,16 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.CreateForbiddenException();
         }
 
-        // make dto (session + answer)
+        if (gameSession.IsFinished)
+        {
+            throw HandledExceptionFactory.Create("Game session is already finished");
+        }
+
+        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > gameSession.OptionCount - 1)
+        {
+            throw HandledExceptionFactory.Create("Invalid option picked");
+        }
+
+        return await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
     }
 }

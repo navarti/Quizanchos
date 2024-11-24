@@ -2,6 +2,7 @@
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
+using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Services.Interfaces;
 
 namespace Quizanchos.WebApi.Services;
@@ -42,5 +43,10 @@ public class QuizCardFloatService : IQuizCardService
     public async Task<QuizCardAbstract?> FindCardForSession(Guid gameSessionid, int cardIndex)
     {
         return await _quizCardFloatRepository.FindCardForSessionIncluding(gameSessionid, cardIndex);
+    }
+
+    public async Task<QuizCardAbstract> PickAnswerForSession(Guid gameSessionid, int cardIndex, int optionPicked)
+    {
+        return await _quizCardFloatRepository.PickAnswerForSession(gameSessionid, cardIndex, optionPicked);
     }
 }
