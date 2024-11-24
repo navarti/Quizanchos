@@ -1,21 +1,20 @@
-﻿document.getElementById('signinButton').addEventListener('click', async function (event) {
-    event.preventDefault(); 
+document.getElementById('signinAdminButton').addEventListener('click', async function (event) {
 
-    const email = document.getElementById('signinEmail');
-    const password = document.getElementById('signinPassword');
+    const email = document.getElementById('signinAdminEmail');
+    const password = document.getElementById('signinAdminPassword');
 
     clearErrors();
 
     let isValid = true;
-
+    
     if (!validateEmail(email.value.trim())) {
-        showError('signinEmailError', 'Please enter a valid email address.');
+        showError('signinAdminEmailError', 'Please enter a valid email address.');
         addErrorClass(email);
         isValid = false;
     }
-
+    
     if (!password.value.trim()) {
-        showError('signinPasswordError', 'Password cannot be empty.');
+        showError('signinAdminPasswordError', 'Password cannot be empty.');
         addErrorClass(password);
         isValid = false;
     }
@@ -39,12 +38,12 @@
         if (response.ok) {
             showModal('Sign in successful! Welcome back!', true);
             setTimeout(() => {
-                window.location.href = "/";
-            }, 2000); 
+                window.location.href = "/Admin";
+            }, 2000);
         } else {
             const errorData = await response.json();
             if (errorData.Message) {
-                showModal(errorData.Message); 
+                showModal(errorData.Message);
             } else {
                 showModal('An unexpected error occurred. Please try again.');
             }
