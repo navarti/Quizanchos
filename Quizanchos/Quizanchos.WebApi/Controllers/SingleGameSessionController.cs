@@ -39,6 +39,14 @@ public class SingleGameSessionController : Controller
 
     [HttpGet]
     [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetCurrentCardForSession(Guid sessionId)
+    {
+        QuizCardDtoAbstract card = await _singleGameSessionService.GetCurrentCardForSession(User, sessionId);
+        return Ok(card);
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> GetCardForSession(Guid sessionId, int cardIndex)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.GetCardForSession(User, sessionId, cardIndex);

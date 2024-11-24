@@ -88,9 +88,9 @@ public class MainQuizCardService
         {
             // TODO: fix
             //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked, quizCardFloat.CreationTime),
+            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.OptionPicked, quizCardFloat.CreationTime, quizCardFloat.Option1.QuizEntity.Id, quizCardFloat.Option2.QuizEntity.Id),
             //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
-            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked, quizCardInt.CreationTime),
+            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.Option1.QuizEntity.Id, quizCardInt.Option2.QuizEntity.Id),
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }
@@ -101,9 +101,13 @@ public class MainQuizCardService
         {
             // TODO: fix
             //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardFloat quizCardFloat => new QuizCardFloatWithAnswerDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value, quizCardFloat.OptionPicked, quizCardFloat.CreationTime, quizCardFloat.CorrectOption),
+            QuizCardFloat quizCardFloat => new QuizCardFloatWithAnswerDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.OptionPicked, quizCardFloat.CreationTime, quizCardFloat.Option1.QuizEntity.Id, quizCardFloat.Option2.QuizEntity.Id, 
+                quizCardFloat.CorrectOption, quizCardFloat.Option1.Value.Value, quizCardFloat.Option2.Value.Value),
+
             //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
-            QuizCardInt quizCardInt => new QuizCardIntWithAnswerDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.CorrectOption),
+            QuizCardInt quizCardInt => new QuizCardIntWithAnswerDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.Option1.QuizEntity.Id, quizCardInt.Option2.QuizEntity.Id,
+                quizCardInt.CorrectOption, quizCardInt.Option1.Value.Value, quizCardInt.Option2.Value.Value),
+            
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }

@@ -5,8 +5,8 @@ namespace Quizanchos.WebApi.Dto;
 public record QuizCardFloatDto(
     Guid Id,
     int CardIndex,
-    float Option1,
-    float Option2,
     int? OptionPicked,
-    DateTime CreationTime
-) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked, CreationTime);
+    DateTime CreationTime,
+    Guid Entity1Id,
+    Guid Entity2Id
+) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked, CreationTime, Entity1Id, Entity2Id);

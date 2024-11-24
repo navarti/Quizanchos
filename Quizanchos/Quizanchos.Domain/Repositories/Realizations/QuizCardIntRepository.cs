@@ -15,7 +15,9 @@ public class QuizCardIntRepository : EntityRepositoryBase<Guid, QuizCardInt>, IQ
     {
         return await _dbSet
             .Include(q => q.Option1)
+                .ThenInclude(f => f.QuizEntity)
             .Include(q => q.Option2)
+                .ThenInclude(f => f.QuizEntity)
             .FirstOrDefaultAsync(q => q.SingleGameSession.Id == gameSessionid && q.CardIndex == cardIndex);
     }
 
