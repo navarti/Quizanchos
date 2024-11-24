@@ -64,6 +64,8 @@ public class SingleGameSessionService
             OptionCount = 2
         };
 
+        await CreateNextCardForSession(gameSession).ConfigureAwait(false);
+
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
 
         return _mapper.Map<SingleGameSessionDto>(gameSession);
@@ -111,24 +113,7 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.CreateForbiddenException();
         }
 
-        if (gameSession.IsFinished)
-        {
-            throw HandledExceptionFactory.Create("Game session is already finished");
-        }
-
-        if(gameSession.CurrentCardIndex != -1)
-        {
-            QuizCardAbstract currentCard = await _mainQuizCardService.GetCardForSession(gameSession, gameSession.CurrentCardIndex);
-            if (currentCard.OptionPicked is null)
-            {
-                throw HandledExceptionFactory.Create("You need to pick an option for the current card before requesting the next one.");
-            }
-        }
-
-        gameSession.CurrentCardIndex++;
-        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
-
-        return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
+        return await CreateNextCardForSession(gameSession).ConfigureAwait(false);
     }
 
     public async Task<QuizCardDtoAbstract> PickAnswerForSession(ClaimsPrincipal claimsPrincipal, AnswerDto answerDto)
@@ -175,5 +160,27 @@ public class SingleGameSessionService
         }
 
         return gameSession;
+    }
+
+    private async Task<QuizCardDtoAbstract> CreateNextCardForSession(SingleGameSession gameSession)
+    {
+        if (gameSession.IsFinished)
+        {
+            throw HandledExceptionFactory.Create("Game session is already finished");
+        }
+
+        if (gameSession.CurrentCardIndex != -1)
+        {
+            QuizCardAbstract currentCard = await _mainQuizCardService.GetCardForSession(gameSession, gameSession.CurrentCardIndex);
+            if (currentCard.OptionPicked is null)
+            {
+                throw HandledExceptionFactory.Create("You need to pick an option for the current card before requesting the next one.");
+            }
+        }
+
+        gameSession.CurrentCardIndex++;
+        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
+
+        return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
     }
 }
