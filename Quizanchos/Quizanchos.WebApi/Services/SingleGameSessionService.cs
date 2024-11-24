@@ -64,9 +64,11 @@ public class SingleGameSessionService
             OptionCount = 2
         };
 
+        gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
+
         await CreateNextCardForSession(gameSession).ConfigureAwait(false);
 
-        gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
+        gameSession = await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
 
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
@@ -87,6 +89,19 @@ public class SingleGameSessionService
             return null;
         }
         return _mapper.Map<SingleGameSessionDto>(aliveSession);
+    }
+
+    public async Task<QuizCardDtoAbstract> GetCurrentCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid)
+    {
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(sessionid).ConfigureAwait(false);
+
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
+        return await _mainQuizCardService.GetCardDtoForSession(gameSession, gameSession.CurrentCardIndex);
     }
 
     public async Task<QuizCardDtoAbstract> GetCardForSession(ClaimsPrincipal claimsPrincipal, Guid sessionid, int cardIndex)
@@ -113,7 +128,11 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.CreateForbiddenException();
         }
 
-        return await CreateNextCardForSession(gameSession).ConfigureAwait(false);
+        QuizCardDtoAbstract cardCreated = await CreateNextCardForSession(gameSession).ConfigureAwait(false);
+
+        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
+
+        return cardCreated;
     }
 
     public async Task<QuizCardDtoAbstract> PickAnswerForSession(ClaimsPrincipal claimsPrincipal, AnswerDto answerDto)
@@ -179,7 +198,6 @@ public class SingleGameSessionService
         }
 
         gameSession.CurrentCardIndex++;
-        await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
 
         return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
     }
