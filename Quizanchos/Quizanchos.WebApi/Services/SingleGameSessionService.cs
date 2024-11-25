@@ -58,10 +58,10 @@ public class SingleGameSessionService
             IsTerminatedByTime = false,
             Score = 0,
             CurrentCardIndex = -1,
-            CardsCount = 5,
+            CardsCount = baseSingleGameSessionDto.CardsCount,
             GameLevel = baseSingleGameSessionDto.GameLevel,
-            SecondsPerCard = 5,
-            OptionCount = 2
+            SecondsPerCard = baseSingleGameSessionDto.SecondPerCard,
+            OptionCount = baseSingleGameSessionDto.OptionCount
         };
 
         gameSession = await _singleGameSessionRepository.Create(gameSession).ConfigureAwait(false);
@@ -73,9 +73,15 @@ public class SingleGameSessionService
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
 
-    public async Task<SingleGameSessionDto> GetById(Guid id)
+    public async Task<SingleGameSessionDto> GetById(ClaimsPrincipal claimsPrincipal, Guid id)
     {
         SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(id).ConfigureAwait(false);
+        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != userId)
+        {
+            throw HandledExceptionFactory.CreateForbiddenException();
+        }
+
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
@@ -151,12 +157,12 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.Create("Game session is already finished");
         }
 
-        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > gameSession.OptionCount - 1)
+        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > (int)gameSession.OptionCount - 1)
         {
             throw HandledExceptionFactory.Create("Invalid option picked");
         }
 
-        if (gameSession.CurrentCardIndex == gameSession.CardsCount - 1)
+        if (gameSession.CurrentCardIndex == (int)gameSession.CardsCount - 1)
         {
             gameSession.IsFinished = true;
         }
@@ -200,5 +206,5 @@ public class SingleGameSessionService
         gameSession.CurrentCardIndex++;
 
         return await _mainQuizCardService.CreateNextCardForSession(gameSession).ConfigureAwait(false);
-    }
+    }   
 }
