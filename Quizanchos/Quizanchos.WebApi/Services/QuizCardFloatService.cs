@@ -3,6 +3,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Services.Interfaces;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -25,21 +26,29 @@ public class QuizCardFloatService : IQuizCardService
         FeatureFloat? featureFloat2 = await _featureFloatRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
             ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later");
 
+        int correctOption = CorrectOptionPicker.PickCorrectOption([featureFloat1, featureFloat2]);
+
         QuizCardFloat quizCardFloat = new QuizCardFloat
         {
             SingleGameSession = gameSession,
             CardIndex = gameSession.CurrentCardIndex,
             Option1 = featureFloat1,
             Option2 = featureFloat2,
-            CorrectOption = 0,
-            OptionPicked = null
+            CorrectOption = correctOption,
+            OptionPicked = null,
+            CreationTime = DateTime.UtcNow
         };
 
         return await _quizCardFloatRepository.Create(quizCardFloat);
     }
 
-    public async Task<QuizCardAbstract> GetCardForSession(Guid gameSessionid, int cardIndex)
+    public async Task<QuizCardAbstract?> FindCardForSession(Guid gameSessionid, int cardIndex)
     {
-        return await _quizCardFloatRepository.GetCardForSession(gameSessionid, cardIndex);
+        return await _quizCardFloatRepository.FindCardForSessionIncluding(gameSessionid, cardIndex);
+    }
+
+    public async Task<QuizCardAbstract> PickAnswerForSession(Guid gameSessionid, int cardIndex, int optionPicked)
+    {
+        return await _quizCardFloatRepository.PickAnswerForSession(gameSessionid, cardIndex, optionPicked);
     }
 }

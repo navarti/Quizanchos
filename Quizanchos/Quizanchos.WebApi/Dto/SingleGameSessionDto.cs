@@ -2,7 +2,7 @@
 
 namespace Quizanchos.WebApi.Dto;
 
-public record BaseSingleGameSessionDto(Guid QuizCategoryId, GameLevel GameLevel);
+public record BaseSingleGameSessionDto(Guid QuizCategoryId, GameLevel GameLevel, CardCountEnum CardsCount, SecondsPerCardEnum SecondPerCard, OptionCountEnum OptionCount);
 
 public record SingleGameSessionDto(
     Guid Id, 
@@ -13,5 +13,8 @@ public record SingleGameSessionDto(
     int CurrentCardIndex,
     int Score,
     bool IsFinished,
-    int CardsCount
-) : BaseSingleGameSessionDto(QuizCategoryId, GameLevel);
+    bool IsTerminatedByTime,
+    CardCountEnum CardsCount,
+    SecondsPerCardEnum SecondPerCard,
+    OptionCountEnum OptionCount
+) : BaseSingleGameSessionDto(QuizCategoryId, GameLevel, CardsCount, SecondPerCard, OptionCount);

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizanchos.Domain;
 
@@ -11,9 +12,11 @@ using Quizanchos.Domain;
 namespace Quizanchos.Migrations.Migrations
 {
     [DbContext(typeof(QuizDbContext))]
-    partial class QuizDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241122211955_ChangedSessionAndCard")]
+    partial class ChangedSessionAndCard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,10 +299,6 @@ namespace Quizanchos.Migrations.Migrations
                     b.Property<int>("FeatureType")
                         .HasColumnType("int");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -351,9 +350,6 @@ namespace Quizanchos.Migrations.Migrations
 
                     b.Property<bool>("IsTerminatedByTime")
                         .HasColumnType("bit");
-
-                    b.Property<int>("OptionCount")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("QuizCategoryId")
                         .HasColumnType("uniqueidentifier");

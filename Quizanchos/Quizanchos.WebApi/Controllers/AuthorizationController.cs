@@ -21,14 +21,14 @@ public class AuthorizationController : Controller
     public async Task<IActionResult> SignIn([FromBody] LoginModelDto loginModelDto)
     {
         await _authorizationService.SignIn(loginModelDto);
-        return Ok();
+        return Ok(new { redirectUrl = "/" });
     }
 
     [HttpPost]
     public async Task<IActionResult> SignUp([FromBody] RegisterModelDto registerModelDto)
     {
         await _authorizationService.RegisterUser(registerModelDto);
-        return Ok();
+        return Ok(new { redirectUrl = "/" });
     }
 
     [HttpPost]
