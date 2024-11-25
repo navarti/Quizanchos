@@ -27,6 +27,14 @@ public class SingleGameSessionController : Controller
 
     [HttpGet]
     [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetById(Guid sessionId)
+    {
+        SingleGameSessionDto singleGameSession = await _singleGameSessionService.GetById(User, sessionId);
+        return Ok(singleGameSession);
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> GetAliveSession()
     {
         SingleGameSessionDto? singleGameSession = await _singleGameSessionService.FindAliveSession(User);
