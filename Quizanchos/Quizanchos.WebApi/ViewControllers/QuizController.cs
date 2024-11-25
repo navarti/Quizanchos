@@ -22,33 +22,17 @@ public class QuizController : Controller
     {
         var viewModel = new QuizCategoryViewModel()
         {
-            QuizCategoryName = await GetQuizCategoryName(quizcategoryid)
+            QuizCategoryName = await GetQuizCategoryName(quizcategoryid),
+            CategoryId = quizcategoryid
         };
         return View(viewModel);
     }
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> SingleGameSession(Guid id)
     {
-
+        SingleGameSessionDto singleGameSessionDto = await _singleGameSessionService.GetById(User,id);
         
-        SingleGameSessionDto singleGameSessionDto = await _singleGameSessionService.GetById(id);
-        
-        var viewModel = new SingleGameSessionViewModel
-        {
-            Id = singleGameSessionDto.Id,
-            UserId = singleGameSessionDto.UserId,
-            CreationTime = singleGameSessionDto.CreationTime,
-            CurrentCardIndex = singleGameSessionDto.CurrentCardIndex,
-            Score = singleGameSessionDto.Score,
-            IsFinished = singleGameSessionDto.IsFinished,
-            IsTerminatedByTime = singleGameSessionDto.IsTerminatedByTime,
-            CardsCount = singleGameSessionDto.CardsCount,
-            SecondsPerCard = singleGameSessionDto.SecondPerCard,
-            QuizCategoryId = singleGameSessionDto.QuizCategoryId,
-            QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId), 
-            GameLevel = singleGameSessionDto.GameLevel.ToString() 
-        };
-        return View(viewModel);
+       return View();
 
     }
     private async Task<string> GetQuizCategoryName(Guid quizCategoryId)

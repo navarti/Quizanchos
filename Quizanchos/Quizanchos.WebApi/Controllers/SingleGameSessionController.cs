@@ -95,11 +95,5 @@ public class SingleGameSessionController : Controller
         QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
         return Ok(card);
     }
-    [HttpGet]
-    [Authorize(QuizPolicy.User)]
-    public async Task<IActionResult> GetBYid(Guid sessionId)
-    {
-        var card = await _singleGameSessionService.GetById(sessionId);
-        return Ok(card);
-    }
+    
 }
