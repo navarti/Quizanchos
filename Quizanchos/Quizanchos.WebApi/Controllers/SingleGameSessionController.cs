@@ -22,24 +22,6 @@ public class SingleGameSessionController : Controller
     [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> Create([FromBody] BaseSingleGameSessionDto baseSingleGameSessionDto)
     {
-        if (baseSingleGameSessionDto == null)
-        {
-            return BadRequest(new { message = "Request body is null or malformed." });
-        }
-
-        if (baseSingleGameSessionDto.QuizCategoryId == Guid.Empty)
-        {
-            return BadRequest(new { message = "QuizCategoryId is invalid or missing." });
-        }
-
-        if (!Enum.IsDefined(typeof(GameLevel), baseSingleGameSessionDto.GameLevel))
-        {
-            return BadRequest(new { message = "GameLevel is invalid or missing." });
-        }
-
-        Console.WriteLine($"QuizCategoryId: {baseSingleGameSessionDto.QuizCategoryId}");
-        Console.WriteLine($"GameLevel: {baseSingleGameSessionDto.GameLevel}");
-
         SingleGameSessionDto singleGameSession = await _singleGameSessionService.Create(baseSingleGameSessionDto, User);
         return Ok(singleGameSession);
     }
@@ -95,5 +77,4 @@ public class SingleGameSessionController : Controller
         QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
         return Ok(card);
     }
-    
 }
