@@ -79,3 +79,53 @@ async function handleSubmit(event) {
     }
 }
 
+// document.addEventListener("DOMContentLoaded", function () {
+//     document.querySelectorAll(".quiz-link").forEach((link) => {
+//         link.addEventListener("click", async function (event) {
+//             event.preventDefault(); // Prevent default link behavior
+//
+//             const categoryId = this.getAttribute("data-category-id");
+//
+//             if (!categoryId) {
+//                 alert("Category ID is missing.");
+//                 return;
+//             }
+//            
+//             this.setAttribute("disabled", "true");
+//
+//             try {
+//                 const data = {
+//                     quizCategoryId: categoryId,
+//                 };
+//
+//                 const response = await fetch("/Quiz/Setup/", {
+//                     method: "POST",
+//                     headers: {
+//                         "Content-Type": "application/json",
+//                     },
+//                     body: JSON.stringify(data),
+//                 });
+//
+//                 if (response.ok) {
+//                     const responseData = await response.json();
+//                     if (responseData && responseData.id) {
+//                         window.location.href = `/Quiz/${responseData.id}`;
+//                     } else {
+//                         alert("Unexpected response format. Please try again.");
+//                     }
+//                 } else {
+//                     const errorData = await response.json();
+//                     alert(errorData.message || "An error occurred. Please try again.");
+//                 }
+//             } catch (error) {
+//                 console.error("Error:", error);
+//                 alert("A network error occurred. Please try again later.");
+//             } finally {
+//                 // Re-enable the link after the operation is complete
+//                 this.removeAttribute("disabled");
+//             }
+//         });
+//     });
+// });
+
+

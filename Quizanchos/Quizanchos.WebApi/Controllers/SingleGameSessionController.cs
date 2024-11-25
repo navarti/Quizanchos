@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quizanchos.Common.Enums;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
@@ -21,6 +22,24 @@ public class SingleGameSessionController : Controller
     [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> Create([FromBody] BaseSingleGameSessionDto baseSingleGameSessionDto)
     {
+        if (baseSingleGameSessionDto == null)
+        {
+            return BadRequest(new { message = "Request body is null or malformed." });
+        }
+
+        if (baseSingleGameSessionDto.QuizCategoryId == Guid.Empty)
+        {
+            return BadRequest(new { message = "QuizCategoryId is invalid or missing." });
+        }
+
+        if (!Enum.IsDefined(typeof(GameLevel), baseSingleGameSessionDto.GameLevel))
+        {
+            return BadRequest(new { message = "GameLevel is invalid or missing." });
+        }
+
+        Console.WriteLine($"QuizCategoryId: {baseSingleGameSessionDto.QuizCategoryId}");
+        Console.WriteLine($"GameLevel: {baseSingleGameSessionDto.GameLevel}");
+
         SingleGameSessionDto singleGameSession = await _singleGameSessionService.Create(baseSingleGameSessionDto, User);
         return Ok(singleGameSession);
     }
@@ -66,6 +85,13 @@ public class SingleGameSessionController : Controller
     public async Task<IActionResult> PickAnswerForSession(AnswerDto answerDto)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
+        return Ok(card);
+    }
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetBYid(Guid sessionId)
+    {
+        var card = await _singleGameSessionService.GetById(sessionId);
         return Ok(card);
     }
 }

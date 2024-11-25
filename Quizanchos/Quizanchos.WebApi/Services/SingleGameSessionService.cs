@@ -60,7 +60,7 @@ public class SingleGameSessionService
             CurrentCardIndex = -1,
             CardsCount = 5,
             GameLevel = baseSingleGameSessionDto.GameLevel,
-            SecondsPerCard = 60,
+            SecondsPerCard = 5,
             OptionCount = 2
         };
 
@@ -75,7 +75,7 @@ public class SingleGameSessionService
 
     public async Task<SingleGameSessionDto> GetById(Guid id)
     {
-        SingleGameSession gameSession = await _singleGameSessionRepository.GetById(id).ConfigureAwait(false);
+        SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(id).ConfigureAwait(false);
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
         return _mapper.Map<SingleGameSessionDto>(gameSession);
     }
