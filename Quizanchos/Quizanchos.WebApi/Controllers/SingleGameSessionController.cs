@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quizanchos.Common.Enums;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
@@ -22,6 +23,14 @@ public class SingleGameSessionController : Controller
     public async Task<IActionResult> Create([FromBody] BaseSingleGameSessionDto baseSingleGameSessionDto)
     {
         SingleGameSessionDto singleGameSession = await _singleGameSessionService.Create(baseSingleGameSessionDto, User);
+        return Ok(singleGameSession);
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetById(Guid sessionId)
+    {
+        SingleGameSessionDto singleGameSession = await _singleGameSessionService.GetById(User, sessionId);
         return Ok(singleGameSession);
     }
 
