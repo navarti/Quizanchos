@@ -17,6 +17,10 @@ public class FeatureIntRepository : EntityRepositoryBase<Guid, FeatureInt>, IFea
 
     public Task<FeatureInt?> FindRandomByCategory(Guid categoryId)
     {
-        return _dbSet.Where(feature => feature.QuizCategory.Id == categoryId).OrderBy(feature => Guid.NewGuid()).FirstOrDefaultAsync();
+        return _dbSet
+            .Include(feature => feature.QuizEntity)
+            .Where(feature => feature.QuizCategory.Id == categoryId)
+            .OrderBy(feature => Guid.NewGuid())
+            .FirstOrDefaultAsync();
     }
 }

@@ -23,7 +23,7 @@ public class SessionTerminatorService
             return;
         }
 
-        if(!HasExpiredTime(card.CreationTime, 10))
+        if(!HasExpiredTime(card.CreationTime, (int)gameSession.SecondsPerCard))
         {
             return;
         }

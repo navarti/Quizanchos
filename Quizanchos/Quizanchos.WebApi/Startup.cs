@@ -112,6 +112,7 @@ public static class Startup
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<QuizAuthorizationService>(); 
+        services.AddTransient<UserProfileService>(); 
 
         services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
 
@@ -123,6 +124,7 @@ public static class Startup
         services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
         services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
 
+        services.AddSingleton<LockerService>();
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();
         services.AddTransient<QuizCardFloatService>();

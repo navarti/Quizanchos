@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quizanchos.Common.Enums;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
@@ -27,6 +28,14 @@ public class SingleGameSessionController : Controller
 
     [HttpGet]
     [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetById(Guid sessionId)
+    {
+        SingleGameSessionDto singleGameSession = await _singleGameSessionService.GetById(User, sessionId);
+        return Ok(singleGameSession);
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> GetAliveSession()
     {
         SingleGameSessionDto? singleGameSession = await _singleGameSessionService.FindAliveSession(User);
@@ -35,6 +44,14 @@ public class SingleGameSessionController : Controller
             return NotFound();
         }
         return Ok(singleGameSession);
+    }
+
+    [HttpGet]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> GetCurrentCardForSession(Guid sessionId)
+    {
+        QuizCardDtoAbstract card = await _singleGameSessionService.GetCurrentCardForSession(User, sessionId);
+        return Ok(card);
     }
 
     [HttpGet]
@@ -50,6 +67,14 @@ public class SingleGameSessionController : Controller
     public async Task<IActionResult> CreateNextCardForSession(Guid sessionId)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.CreateNextCardForSession(User, sessionId);
+        return Ok(card);
+    }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> PickAnswerForSession(AnswerDto answerDto)
+    {
+        QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
         return Ok(card);
     }
 }

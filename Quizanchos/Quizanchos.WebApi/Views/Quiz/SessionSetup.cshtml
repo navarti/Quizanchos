@@ -1,0 +1,74 @@
+@model QuizCategoryViewModel
+@{
+    ViewData["Title"] = "Quiz Page";
+}
+@using Quizanchos.Common.Enums;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/quiz.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container game-session-container">
+    <div class="header">
+        <h1 class="game-title">@Model.QuizCategoryName</h1>
+        <p class="game-subtitle">Customize your quest below!</p>
+    </div>
+
+    <form id="gameSettingsForm" class="game-settings-form">
+        <div class="form-group">
+            <label for="gameLevel">Game Level:</label>
+            <select id="gameLevel" name="gameLevel" class="form-control">
+                @foreach (var level in Enum.GetValues(typeof(GameLevel)))
+                {
+                    <option value="@((int)level)">@level</option>
+                }
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="cardsCount">Number of Cards:</label>
+            <select id="cardsCount" name="cardsCount" class="form-control">
+                @foreach (var value in Enum.GetValues(typeof(CardCountEnum)))
+                {
+                    <option value="@((int)value)">@value</option>
+                }
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="secondsPerCard">Time per Card (seconds):</label>
+            <select id="secondsPerCard" name="secondsPerCard" class="form-control">
+                @foreach (var value in Enum.GetValues(typeof(SecondsPerCardEnum)))
+                {
+                    <option value="@((int)value)">@value</option>
+                }
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="optionCount">Number of Options per Card:</label>
+            <select id="optionCount" name="optionCount" class="form-control">
+                @foreach (var value in Enum.GetValues(typeof(OptionCountEnum)))
+                {
+                    <option value="@((int)value)">@value</option>
+                }
+            </select>
+        </div>
+        
+        <div class="action-buttons">
+            <button type="button" id="startQuestButton" class="btn btn-primary" data-category-id="@Model.CategoryId">Start Quest</button>
+            <a href="/" class="btn btn-secondary">Back to Quizzes</a>
+        </div>
+    </form>
+</div>
+
+<script src="/js/common.js" asp-append-version="true"></script>
+<script src="/js/site.js"></script>
+</body>
+</html>
+

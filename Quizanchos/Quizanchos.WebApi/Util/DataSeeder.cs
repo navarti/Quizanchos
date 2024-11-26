@@ -49,8 +49,7 @@ public static class DataSeeder
 
         owner = new ApplicationUser
         {
-            // TODO: make normal username
-            UserName = Guid.NewGuid().ToString(),
+            UserName = ownerEmail,
             Email = ownerEmail,
         };
 
