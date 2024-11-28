@@ -282,27 +282,27 @@ body::after {
     letter-spacing: 1px; /* Add some spacing for a cleaner look */
 }
 .timeline-container {
-    width: 100%; /* Полная ширина */
-    height: 10px; /* Высота линии */
-    background: rgba(200, 200, 200, 0.3); /* Серый фон, чтобы линия была видна */
-    border-radius: 5px; /* Скругленные края */
+    width: 100%;
+    height: 10px;
+    background: rgba(200, 200, 200, 0.3);
+    border-radius: 5px;
     overflow: hidden;
     position: relative;
 }
 
 .timeline {
-    width: 100%; /* Линия всегда полная по ширине */
+    width: 0%; /* Начинаем с 0% */
     height: 100%;
     background: linear-gradient(
             to right,
-            rgba(255, 223, 0, 1) 0%, /* Жёлтый */
-            rgba(255, 223, 0, 0) 0% /* Прозрачный */
-    ); /* Начинается с полностью прозрачного */
-    border-radius: 5px; /* Скругленные углы */
+            rgba(255, 223, 0, 1) 0%,
+            rgba(255, 223, 0, 0) 100%
+    );
+    border-radius: 5px;
     position: absolute;
     top: 0;
     left: 0;
-    transition: background 0.1s linear; /* Плавное заполнение */
+    transition: width 0.1s linear; /* Добавляем анимацию ширины */
 }
 .pick-your-answer {
     text-align: center;

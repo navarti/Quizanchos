@@ -1699,7 +1699,7 @@
 	<a href="/quizzes" class="back-button">Back to Quizzes</a> <!-- Кнопка вынесена за форму -->
 	<div class="quiz-header">
 		<p class="question-info">Question: @Model.CurrentCardIndex / @Model.TotalCards</p>
-		<div class="timeline-container" data-creation-time="@Model.CreationTime"
+		<div class="timeline-container" data-creation-time="@Model.CreationTime.ToString("yyyy-MM-ddTHH:mm:ssZ")"
 		     data-seconds-per-card="@Model.SecondsPerCard">
 			<div class="timeline"></div>
 		</div>
@@ -1720,6 +1720,7 @@
 		</div>
 	</div>
 </main>
+
 @* <script src="/js/common.js" asp-append-version="true"></script> *@
 <script src="/js/quiz.js" asp-append-version="true"></script>
 </body>

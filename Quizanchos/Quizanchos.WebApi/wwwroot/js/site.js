@@ -83,25 +83,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const startQuestButton = document.getElementById("startQuestButton");
 
     startQuestButton.addEventListener("click", async function (event) {
-        event.preventDefault(); 
-        
+        event.preventDefault();
+
         const categoryId = this.getAttribute("data-category-id");
 
         if (!categoryId) {
             alert("Quiz Category ID is missing.");
             return;
         }
-        
+
         const gameLevel = document.getElementById("gameLevel").value;
         const cardsCount = document.getElementById("cardsCount").value;
-        const secondsPerCard = document.getElementById("secondsPerCard").value;
+        const secondPerCard = document.getElementById("secondsPerCard").value;
         const optionCount = document.getElementById("optionCount").value;
-        
+
         const data = {
             quizCategoryId: categoryId,
-            gameLevel: parseInt(gameLevel, 10), 
+            gameLevel: parseInt(gameLevel, 10),
             cardsCount: parseInt(cardsCount, 10),
-            secondsPerCard: parseInt(secondsPerCard, 10),
+            SecondPerCard: parseInt(secondPerCard, 10),
             optionCount: parseInt(optionCount, 10),
         };
 
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data), 
+                body: JSON.stringify(data),
             });
 
             if (response.ok) {
@@ -131,6 +131,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
 
 
 
