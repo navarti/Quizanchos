@@ -1695,8 +1695,8 @@
 </svg>
     
 </div>
-<main class="quiz-container">
-	<a href="/quizzes" class="back-button">Back to Quizzes</a> <!-- Кнопка вынесена за форму -->
+<main class="quiz-container" data-session-id="@Model.SessionId">
+	<a href="/quizzes" class="back-button">Back to Quizzes</a>
 	<div class="quiz-header">
 		<p class="question-info">Question: @Model.CurrentCardIndex / @Model.TotalCards</p>
 		<div class="timeline-container" data-creation-time="@Model.CreationTime.ToString("yyyy-MM-ddTHH:mm:ssZ")"
@@ -1719,9 +1719,32 @@
 			}
 		</div>
 	</div>
+	<div id="errorModal" class="modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<img src="https://cdn-icons-png.flaticon.com/256/9933/9933748.png" alt="Alert Icon" class="modal-icon" />
+				<h2>Oops! Time's Up!</h2>
+			</div>
+			<p id="modalErrorText">What’s next? Your call!</p>
+			<div class="modal-buttons">
+				<button id="continueQuiz" class="continue-btn">Continue Quiz</button>
+				<button id="returnToMenu" class="return-menu-btn">Return to Main Menu</button>
+			</div>
+		</div>
+	</div>
+	@if (Model.CurrentCardIndex == Model.TotalCards)
+	{
+		<div id="finalStatsModal" class="modal">
+			<div class="modal-content">
+				<h2>Quiz Complete!</h2>
+				<p>Your Score: @Model.Score / @Model.TotalCards</p>
+				<p>Thank you for participating!</p>
+				<button id="returnToMenu">Return to Main Menu</button>
+			</div>
+		</div>
+	}
 </main>
-
-@* <script src="/js/common.js" asp-append-version="true"></script> *@
+<script src="/js/common.js" asp-append-version="true"></script>
 <script src="/js/quiz.js" asp-append-version="true"></script>
 </body>
 </html>

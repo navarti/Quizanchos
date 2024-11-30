@@ -185,7 +185,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 200%; /* Увеличенная высота для плавного движения */
-    background: linear-gradient(to bottom, rgba(46, 204, 113, 0.6), rgba(46, 204, 113, 0));
+    background: linear-gradient(to bottom, rgba(241, 196, 15, 0.6), rgba(241, 196, 15, 0));
     transition: all 0.5s ease;
     z-index: 1;
     opacity: 0; /* Невидимо в начале */
@@ -199,7 +199,7 @@ body::after {
 }
 
 .quiz-option:hover {
-    background: rgba(46, 204, 113, 0.5); /* Меняем базовый цвет при наведении */
+    background: rgba(255, 223, 0, 0.5); /* Меняем базовый цвет при наведении */
 }
 
 .quiz-option p {
@@ -284,7 +284,7 @@ body::after {
 .timeline-container {
     width: 100%;
     height: 10px;
-    background: rgba(200, 200, 200, 0.3);
+    background: rgba(200, 200, 200, 0.3); /* Полупрозрачный серый фон */
     border-radius: 5px;
     overflow: hidden;
     position: relative;
@@ -295,14 +295,14 @@ body::after {
     height: 100%;
     background: linear-gradient(
             to right,
-            rgba(255, 223, 0, 1) 0%,
-            rgba(255, 223, 0, 0) 100%
+            #ffe066 0%, /* Жёлтый */
+            #ffc107 50%, /* Оранжевый */
+            #ff8c00 100% /* Более насыщенный оранжевый */
     );
     border-radius: 5px;
     position: absolute;
     top: 0;
     left: 0;
-    transition: width 0.1s linear; /* Добавляем анимацию ширины */
 }
 .pick-your-answer {
     text-align: center;
@@ -310,36 +310,27 @@ body::after {
     z-index: 2; /* Чтобы быть выше остальных элементов */
 }
 
-
 .pick-your-answer h3 {
-    font-size: 1.8rem;
-    color: #ffffff;
+    font-size: 1.8rem; /* Slightly larger than the question-info for emphasis */
+    color: #ffe066; /* Matches the warm yellow color */
     font-weight: bold;
     text-align: center;
-    animation: pulse 2s infinite ease-in-out; /* Анимация пульсации */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-    0 0 20px rgba(255, 255, 255, 0.6),
-    0 0 30px rgba(255, 255, 255, 0.4);
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7); /* Same shadow as question-info */
+    letter-spacing: 1px;
+    animation: fadeGlow 3s infinite ease-in-out; /* Subtle glowing animation */
 }
 
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 255, 255, 0.6),
-        0 0 30px rgba(255, 255, 255, 0.4);
+/* Animation for smooth fading glow effect */
+@keyframes fadeGlow {
+    0%, 100% {
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7),
+        0 0 10px rgba(255, 224, 102, 0.5),
+        0 0 20px rgba(255, 224, 102, 0.3);
     }
     50% {
-        transform: scale(1.1);
-        text-shadow: 0 0 15px rgba(255, 255, 255, 1),
-        0 0 25px rgba(255, 255, 255, 0.8),
-        0 0 35px rgba(255, 255, 255, 0.6);
-    }
-    100% {
-        transform: scale(1);
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-        0 0 20px rgba(255, 255, 255, 0.6),
-        0 0 30px rgba(255, 255, 255, 0.4);
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7),
+        0 0 15px rgba(255, 224, 102, 0.7),
+        0 0 25px rgba(255, 224, 102, 0.5);
     }
 }
 
@@ -349,6 +340,117 @@ body::after {
     font-size: 2rem; /* Опционально - изменяем размер шрифта */
     color: #fff; /* Белый цвет для читаемости */
     text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); /* Тень для текста */
+}
+
+
+
+.modal {
+    display: none; /* Скрываем окно по умолчанию */
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Тёмный полупрозрачный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Содержимое модального окна */
+.modal-content {
+    background: linear-gradient(135deg, #ffe3e3, #ffabab); /* Градиентный фон */
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+    color: #4a4a4a;
+    font-family: 'Arial', sans-serif;
+    width: 80%;
+    max-width: 400px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Заголовок */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    color: #4a4a4a;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+/* SVG-иконка */
+.modal-icon {
+    width: 50px;
+    height: 50px;
+}
+
+/* Текст сообщения */
+#modalErrorText {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #4a4a4a; /* Цвет текста */
+}
+
+/* Контейнер для кнопок */
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+}
+
+/* Кнопка "Continue Quiz" */
+.continue-btn {
+    background: #78c800; /* Зелёный цвет */
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.continue-btn:hover {
+    background: #5ca000;
+    transform: scale(1.05);
+}
+
+/* Кнопка "Return to Main Menu" */
+.return-menu-btn {
+    background: #ffe066; /* Жёлтый цвет */
+    color: #4a4a4a; /* Тёмный текст для контраста */
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.return-menu-btn:hover {
+    background: #ffd54f;
+    transform: scale(1.05);
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 

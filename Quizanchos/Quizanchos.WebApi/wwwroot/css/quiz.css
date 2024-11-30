@@ -152,7 +152,7 @@ footer a:hover {
 }
 
 .option {
-    flex: 1 1 calc(50% - 10px); /* Автоматически подстраивает ширину */
+    flex: 1 1 calc(50% - 10px); 
     background-color: #007bff;
     color: #fff;
     padding: 10px;
@@ -174,4 +174,45 @@ footer a:hover {
 .action-buttons .btn {
     padding: 10px 20px;
     font-size: 1rem;
+}
+
+.modal {
+    display: none; /* Скрываем модальное окно по умолчанию */
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #ffffff; /* Светлый фон для контента */
+    margin: 20% auto; /* Центрирование */
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.close {
+    color: #888;
+    font-size: 24px;
+    font-weight: bold;
+    float: right;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #000;
+}
+
+#modalErrorText {
+    font-size: 1.2rem;
+    color: #333; 
+    margin-top: 10px;
 }

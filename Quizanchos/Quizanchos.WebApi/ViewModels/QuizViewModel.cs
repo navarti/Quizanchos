@@ -10,6 +10,7 @@ namespace Quizanchos.ViewModels
         public int SecondsPerCard { get; set; }
         public int OptionCount { get; set; }
         
+        public int Score { get; set; } 
         public Guid CategoryId { get; set; }
         public string QuizCategoryName { get; set; }
         

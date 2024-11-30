@@ -61,12 +61,13 @@ public class QuizController : Controller
         
         var viewModel = new QuizViewModel
         {
-            CurrentCardIndex = singleGameSessionDto.CurrentCardIndex,
+            CurrentCardIndex = singleGameSessionDto.CurrentCardIndex + 1 ,
             TotalCards = (int)singleGameSessionDto.CardsCount,
             SessionId = singleGameSessionDto.Id,
-            CreationTime = singleGameSessionDto.CreationTime,
+            CreationTime = quizCardDto.CreationTime,
             SecondsPerCard = (int)singleGameSessionDto.SecondPerCard,
             OptionCount = options.Count,
+            Score = singleGameSessionDto.Score,
             CategoryId = singleGameSessionDto.QuizCategoryId,
             QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId),
             Options = options

@@ -72,7 +72,7 @@ public class SingleGameSessionController : Controller
 
     [HttpPost]
     [Authorize(QuizPolicy.User)]
-    public async Task<IActionResult> PickAnswerForSession(AnswerDto answerDto)
+    public async Task<IActionResult> PickAnswerForSession([FromBody] AnswerDto answerDto)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
         return Ok(card);
