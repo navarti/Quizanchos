@@ -21,6 +21,7 @@ public class QuizController : Controller
         _quizCategoryService = quizCategoryService ?? throw new ArgumentNullException(nameof(quizCategoryService));
         _QuizEntityService = quizEntityService;
     }
+
     [HttpGet("Setup/{quizcategoryid:guid}")]
     public async Task<IActionResult> SessionSetup(Guid quizcategoryid)
     {
@@ -31,6 +32,7 @@ public class QuizController : Controller
         };
         return View(viewModel);
     }
+
     [HttpGet("{sessionId:guid}")]
     public async Task<IActionResult> SingleGameSession(Guid sessionId)
     {

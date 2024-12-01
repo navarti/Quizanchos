@@ -7,7 +7,6 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
 using Quizanchos.WebApi.Services.HelperServices;
 using System.Security.Claims;
-using Quizanchos.Common.Enums;
 
 namespace Quizanchos.WebApi.Services;
 
