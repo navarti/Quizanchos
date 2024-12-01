@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
 using Quizanchos.ViewModels;
+using Quizanchos.WebApi.Dto.Abstractions;
+
 namespace Quizanchos.WebApi.ViewControllers;
 
 [Route("Quiz")]
@@ -10,13 +12,16 @@ public class QuizController : Controller
     private readonly SingleGameSessionService _singleGameSessionService;
     private readonly ILogger<QuizController> _logger;
     private readonly QuizCategoryService _quizCategoryService;
+    private readonly QuizEntityService _QuizEntityService;
 
-    public QuizController(SingleGameSessionService singleGameSessionService, ILogger<QuizController>? logger, QuizCategoryService quizCategoryService)
+    public QuizController(SingleGameSessionService singleGameSessionService, ILogger<QuizController>? logger, QuizCategoryService quizCategoryService,QuizEntityService quizEntityService)
     {
         _singleGameSessionService = singleGameSessionService;
         _logger = logger;
         _quizCategoryService = quizCategoryService ?? throw new ArgumentNullException(nameof(quizCategoryService));
+        _QuizEntityService = quizEntityService;
     }
+
     [HttpGet("Setup/{quizcategoryid:guid}")]
     public async Task<IActionResult> SessionSetup(Guid quizcategoryid)
     {
@@ -27,12 +32,51 @@ public class QuizController : Controller
         };
         return View(viewModel);
     }
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> SingleGameSession(Guid id)
+
+    [HttpGet("{sessionId:guid}")]
+    public async Task<IActionResult> SingleGameSession(Guid sessionId)
     {
-        SingleGameSessionDto singleGameSessionDto = await _singleGameSessionService.GetById(User,id);
+        SingleGameSessionDto singleGameSessionDto = await _singleGameSessionService.GetById(User,sessionId);
         
-       return View();
+        QuizCardDtoAbstract quizCardDto = await _singleGameSessionService.GetCurrentCardForSession(User, sessionId);
+
+        var options = new List<QuizOptionViewModel>();
+        for (int i = 1; i <= (int)singleGameSessionDto.OptionCount; i++)
+        {
+            var propertyName = $"Entity{i}Id";
+            var propertyInfo = quizCardDto.GetType().GetProperty(propertyName);
+
+            if (propertyInfo != null)
+            {
+                var entityId = propertyInfo.GetValue(quizCardDto) as Guid?;
+                if (entityId.HasValue)
+                {
+                    var entity = await _QuizEntityService.GetById(entityId.Value);
+                    options.Add(new QuizOptionViewModel
+                    {
+                        Id = entity.Id,
+                        Name = entity.Name
+                    });
+                }
+            }
+        }
+        
+        var viewModel = new QuizViewModel
+        {
+            CurrentCardIndex = singleGameSessionDto.CurrentCardIndex + 1 ,
+            TotalCards = (int)singleGameSessionDto.CardsCount,
+            SessionId = singleGameSessionDto.Id,
+            CreationTime = quizCardDto.CreationTime,
+            SecondsPerCard = (int)singleGameSessionDto.SecondPerCard,
+            OptionCount = options.Count,
+            Score = singleGameSessionDto.Score,
+            CategoryId = singleGameSessionDto.QuizCategoryId,
+            QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId),
+            Options = options
+        };
+
+        
+       return View(viewModel);
 
     }
     private async Task<string> GetQuizCategoryName(Guid quizCategoryId)

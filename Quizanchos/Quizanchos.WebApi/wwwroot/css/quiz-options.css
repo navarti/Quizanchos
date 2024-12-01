@@ -1,0 +1,524 @@
+
+body {
+    background: -moz-linear-gradient(45deg, #02e1ba 0%, #26c9f2 29%, #d911f2 66%, #ffa079 100%);
+    background: -webkit-linear-gradient(45deg, #02e1ba 0%,#26c9f2 29%,#d911f2 66%,#ffa079 100%);
+    background: linear-gradient(45deg, #02e1ba 0%,#26c9f2 29%,#d911f2 66%,#ffa079 100%);
+    background-size: 400% 400%;
+    -webkit-animation: Gradient 15s ease infinite;
+    -moz-animation: Gradient 15s ease infinite;
+    animation: Gradient 15s ease infinite;
+    min-height: calc(100vh - 2rem);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-evenly;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before,
+body::after {
+    content: "";
+    width: 70vmax;
+    height: 70vmax;
+    position: absolute;
+    background: rgba(255, 255, 255, 0.07);
+    left: -20vmin;
+    top: -20vmin;
+    animation: morph 15s linear infinite alternate, spin 20s linear infinite;
+    z-index: 1;
+    will-change: border-radius, transform;
+    transform-origin: 30% 30%;
+    pointer-events: none;
+}
+
+body::after {
+    width: 70vmin;
+    height: 70vmin;
+    left: auto;
+    right: -10vmin;
+    top: auto;
+    bottom: 0;
+    animation: morph 10s linear infinite alternate, spin 26s linear infinite reverse;
+    transform-origin: 10% 10%;
+}
+
+@-webkit-keyframes Gradient {
+    0% {
+        background-position: 0 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0 50%
+    }
+}
+
+@-moz-keyframes Gradient {
+    0% {
+        background-position: 0 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0 50%
+    }
+}
+
+@keyframes Gradient {
+    0% {
+        background-position: 0 50%
+    }
+    50% {
+        background-position: 100% 50%
+    }
+    100% {
+        background-position: 0 50%
+    }
+}
+
+@keyframes morph {
+    0% {
+        border-radius: 40% 60% 60% 40% / 70% 30% 70% 30%; }
+    100% {
+        border-radius: 40% 60%; }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(1turn);
+    }
+}
+.st0{display:none;}
+.st1{display:inline;}
+.st2{opacity:0.29;}
+.st3{fill:#FFFFFF;}
+.st4{clip-path:url(#SVGID_2_);fill:#FFFFFF;}
+.st5{clip-path:url(#SVGID_4_);}
+.st6{clip-path:url(#SVGID_6_);}
+.st7{clip-path:url(#SVGID_8_);}
+.st8{clip-path:url(#SVGID_10_);}
+.st9{fill:none;}
+.st10{clip-path:url(#SVGID_12_);}
+.st11{opacity:0.7;}
+.st12{clip-path:url(#SVGID_14_);}
+.st13{opacity:0.2;}
+.st14{clip-path:url(#SVGID_16_);}
+.st15{opacity:0.3;fill:#FFFFFF;enable-background:new    ;}
+
+.quiz-header {
+    position: absolute; /* Фиксируем header поверх остальных элементов */
+    top: 10px; /* Отступ от верхнего края */
+    left: 50%;
+    transform: translateX(-50%); /* Центруем по горизонтали */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 20px;
+    z-index: 10; /* Поверх формы */
+    width: 90%; /* Ширина */
+    max-width: 800px; /* Максимальная ширина */
+    background: none; /* Убираем фон */
+}
+
+.quiz-container {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Высота контейнера */
+    padding-top: 100px; /* Добавляем отступ сверху для учета header */
+    box-sizing: border-box;
+}
+
+.quiz-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 900px;
+    height: 500px;
+    background: url('https://static.scientificamerican.com/sciam/cache/file/63CCF2B0-1E10-4583-9D4EDAA0569200D1_source.jpg') no-repeat center center / cover;
+    border-radius: 20px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.quiz-options {
+    display: flex;
+    width: 100%;
+    height: 100%; /* Варианты занимают всю высоту */
+}
+
+.quiz-option {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background: rgba(128, 0, 128, 0.5); /* Фиолетовый полупрозрачный фон для ответа */
+    cursor: pointer;
+    transition: background-color 0.5s ease; /* Плавный переход цвета */
+    height: 100%; /* Опции занимают полную высоту */
+}
+
+.quiz-option:nth-child(2) {
+    background: rgba(135, 206, 235, 0.5); /* Нежно-голубой для второго ответа */
+}
+
+/* Анимация плавного свечения сверху */
+.quiz-option::before {
+    content: "";
+    position: absolute;
+    top: -100%; /* Начинается выше блока */
+    left: 0;
+    width: 100%;
+    height: 200%; /* Увеличенная высота для плавного движения */
+    background: linear-gradient(to bottom, rgba(241, 196, 15, 0.6), rgba(241, 196, 15, 0));
+    transition: all 0.5s ease;
+    z-index: 1;
+    opacity: 0; /* Невидимо в начале */
+    transform: translateY(-100%); /* Начало вне блока */
+}
+
+.quiz-option:hover::before {
+    opacity: 1; /* Делается видимым */
+    transform: translateY(0); /* Перемещается внутрь блока */
+    animation: gradient-slide 1.5s ease-in-out forwards; /* Однократное движение */
+}
+
+.quiz-option:hover {
+    background: rgba(255, 223, 0, 0.5); /* Меняем базовый цвет при наведении */
+}
+
+.quiz-option p {
+    position: relative;
+    z-index: 10; /* Текст выше всего */
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7); /* Тень для читабельности текста */
+}
+
+/* Ключевые кадры для плавного движения градиента */
+@keyframes gradient-slide {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translateY(50%);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animated-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Размещаем SVG за контентом */
+}
+
+.back-button {
+    position: absolute;
+    top: 10px; /* Отступ от верхнего края формы */
+    left: 10px; /* Отступ от левого края формы */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: transparent; /* Прозрачный фон */
+    border: none;
+    color: #fff; /* Белый цвет текста */
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.back-button:hover {
+    opacity: 0.8;
+    transform: scale(1.05); /* Лёгкое увеличение при наведении */
+}
+
+.back-button::before {
+    content: "←"; /* Стрелка */
+    font-size: 1.2rem;
+    margin-right: 5px; /* Отступ между стрелкой и текстом */
+}
+
+.quiz-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px; /* Отступ от формы */
+    padding: 10px 20px;
+}
+
+.question-info {
+    font-size: 1.5rem; /* Slightly larger text for emphasis */
+    color: #ffe066; /* A warm yellow for contrast against dark backgrounds */
+    margin-bottom: 15px;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7); /* Deeper shadow for better readability */
+    font-weight: bold; /* Make the text bold */
+    text-align: center; /* Center-align the text */
+    letter-spacing: 1px; /* Add some spacing for a cleaner look */
+}
+.timeline-container {
+    width: 100%;
+    height: 10px;
+    background: rgba(200, 200, 200, 0.3); /* Полупрозрачный серый фон */
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.timeline {
+    width: 0%; /* Начинаем с 0% */
+    height: 100%;
+    background: linear-gradient(
+            to right,
+            #ffe066 0%, /* Жёлтый */
+            #ffc107 50%, /* Оранжевый */
+            #ff8c00 100% /* Более насыщенный оранжевый */
+    );
+    border-radius: 5px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.pick-your-answer {
+    text-align: center;
+    margin: 20px 0; /* Отступ сверху и снизу */
+    z-index: 2; /* Чтобы быть выше остальных элементов */
+}
+
+.pick-your-answer h3 {
+    font-size: 1.8rem; /* Slightly larger than the question-info for emphasis */
+    color: #ffe066; /* Matches the warm yellow color */
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7); /* Same shadow as question-info */
+    letter-spacing: 1px;
+    animation: fadeGlow 3s infinite ease-in-out; /* Subtle glowing animation */
+}
+
+/* Animation for smooth fading glow effect */
+@keyframes fadeGlow {
+    0%, 100% {
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7),
+        0 0 10px rgba(255, 224, 102, 0.5),
+        0 0 20px rgba(255, 224, 102, 0.3);
+    }
+    50% {
+        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7),
+        0 0 15px rgba(255, 224, 102, 0.7),
+        0 0 25px rgba(255, 224, 102, 0.5);
+    }
+}
+
+.quiz-form h2 {
+    margin-bottom: 1px; /* Добавляем отступ снизу */
+    text-align: center; /* Центрируем текст */
+    font-size: 2rem; /* Опционально - изменяем размер шрифта */
+    color: #fff; /* Белый цвет для читаемости */
+    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); /* Тень для текста */
+}
+
+
+
+.modal {
+    display: none; /* Скрываем окно по умолчанию */
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Тёмный полупрозрачный фон */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Содержимое модального окна */
+.modal-content {
+    background: linear-gradient(135deg, #ffe3e3, #ffabab); /* Градиентный фон */
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+    color: #4a4a4a;
+    font-family: 'Arial', sans-serif;
+    width: 80%;
+    max-width: 400px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Заголовок */
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.modal-header h2 {
+    color: #4a4a4a;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+/* SVG-иконка */
+.modal-icon {
+    width: 50px;
+    height: 50px;
+}
+
+/* Текст сообщения */
+#modalErrorText {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: #4a4a4a; /* Цвет текста */
+}
+
+/* Контейнер для кнопок */
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    gap: 15px;
+}
+
+/* Кнопка "Continue Quiz" */
+.continue-btn {
+    background: #78c800; /* Зелёный цвет */
+    color: white;
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.continue-btn:hover {
+    background: #5ca000;
+    transform: scale(1.05);
+}
+
+/* Кнопка "Return to Main Menu" */
+.return-menu-btn {
+    background: #ffe066; /* Жёлтый цвет */
+    color: #4a4a4a; /* Тёмный текст для контраста */
+    font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.return-menu-btn:hover {
+    background: #ffd54f;
+    transform: scale(1.05);
+}
+
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
