@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
@@ -18,6 +19,7 @@ public class SingleGameSessionService
     private readonly UserRetrieverService _userRetrieverService;
     private readonly MainQuizCardService _mainQuizCardService;
     private readonly SessionTerminatorService _sessionTerminatorService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public SingleGameSessionService(
         IMapper mapper,
@@ -25,7 +27,8 @@ public class SingleGameSessionService
         IQuizCategoryRepository quizCategoryRepository,
         UserRetrieverService userRetrieverService,
         MainQuizCardService mainQuizCardService,
-        SessionTerminatorService sessionTerminatorService)
+        SessionTerminatorService sessionTerminatorService,
+        UserManager<ApplicationUser> userManager)
     {
         _mapper = mapper;
         _singleGameSessionRepository = singleGameSessionRepository;
@@ -33,6 +36,7 @@ public class SingleGameSessionService
         _userRetrieverService = userRetrieverService;
         _mainQuizCardService = mainQuizCardService;
         _sessionTerminatorService = sessionTerminatorService;
+        _userManager = userManager;
     }
 
     public async Task<SingleGameSessionDto> Create(BaseSingleGameSessionDto baseSingleGameSessionDto, ClaimsPrincipal claimsPrincipal)
@@ -165,6 +169,13 @@ public class SingleGameSessionService
         if (gameSession.CurrentCardIndex == (int)gameSession.CardsCount - 1)
         {
             gameSession.IsFinished = true;
+
+            await _userManager.FindByIdAsync(userId).ContinueWith(async task =>
+            {
+                ApplicationUser user = task.Result;
+                user.Score += gameSession.Score;
+                await _userManager.UpdateAsync(user);
+            });
         }
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
 
