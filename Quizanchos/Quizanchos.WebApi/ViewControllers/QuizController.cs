@@ -39,30 +39,10 @@ public class QuizController : Controller
     public async Task<IActionResult> SingleGameSession(Guid sessionId)
     {
         SingleGameSessionDto singleGameSessionDto = await _singleGameSessionService.GetById(User,sessionId);
-        
         QuizCardDtoAbstract quizCardDto = await _singleGameSessionService.GetCurrentCardForSession(User, sessionId);
 
-        var options = new List<QuizOptionViewModel>();
-        for (int i = 1; i <= (int)singleGameSessionDto.OptionCount; i++)
-        {
-            var propertyName = $"Entity{i}Id";
-            var propertyInfo = quizCardDto.GetType().GetProperty(propertyName);
+        QuizOptionViewModel[] options = await GetQuizOptionViewModel(quizCardDto.EntitiesId);
 
-            if (propertyInfo != null)
-            {
-                var entityId = propertyInfo.GetValue(quizCardDto) as Guid?;
-                if (entityId.HasValue)
-                {
-                    var entity = await _QuizEntityService.GetById(entityId.Value);
-                    options.Add(new QuizOptionViewModel
-                    {
-                        Id = entity.Id,
-                        Name = entity.Name
-                    });
-                }
-            }
-        }
-        
         var viewModel = new QuizViewModel
         {
             CurrentCardIndex = singleGameSessionDto.CurrentCardIndex + 1 ,
@@ -70,17 +50,33 @@ public class QuizController : Controller
             SessionId = singleGameSessionDto.Id,
             CreationTime = quizCardDto.CreationTime,
             SecondsPerCard = (int)singleGameSessionDto.SecondPerCard,
-            OptionCount = options.Count,
+            OptionCount = (int)singleGameSessionDto.OptionCount,
             Score = singleGameSessionDto.Score,
             CategoryId = singleGameSessionDto.QuizCategoryId,
             QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId),
             Options = options
         };
-
         
-       return View(viewModel);
-
+        return View(viewModel);
     }
+
+    private async Task<QuizOptionViewModel[]> GetQuizOptionViewModel(Guid[] entitiesId)
+    {
+        List<QuizOptionViewModel> options = new();
+
+        foreach(Guid id in entitiesId)
+        {
+            var entity = await _QuizEntityService.GetById(id);
+            options.Add(new QuizOptionViewModel
+            {
+                Id = entity.Id,
+                Name = entity.Name
+            });
+        }
+
+        return options.ToArray();
+    }
+
     private async Task<string> GetQuizCategoryName(Guid quizCategoryId)
     {
         var quizCategory = await _quizCategoryService.GetById(quizCategoryId);

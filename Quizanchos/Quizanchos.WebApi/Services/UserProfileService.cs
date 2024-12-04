@@ -18,10 +18,10 @@ public class UserProfileService
         _userRetrieverService = userRetrieverService;
     }
 
-    public async Task<ApplicationUserDto> GetUserInfo(ClaimsPrincipal claimsPrincipal)
+    public async Task<FullApplicationUserDto> GetUserInfo(ClaimsPrincipal claimsPrincipal)
     {
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
-        return new ApplicationUserDto(user.Email, user.UserName, user.AvatarUrl);
+        return new FullApplicationUserDto(user.Email, user.UserName, user.AvatarUrl, user.Score);
     }
 
     public async Task UpdateNickname(ClaimsPrincipal claimsPrincipal, string nickNameToUpdate)

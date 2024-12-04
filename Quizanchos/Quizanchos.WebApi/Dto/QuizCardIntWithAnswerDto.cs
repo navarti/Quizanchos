@@ -5,9 +5,7 @@ public record QuizCardIntWithAnswerDto(
     int CardIndex,
     int? OptionPicked,
     DateTime CreationTime,
-    Guid Entity1Id,
-    Guid Entity2Id,
+    Guid[] EntitiesId,
     int CorrectOption,
-    int Option1Value,
-    int Option2Value
-) : QuizCardIntDto(Id, CardIndex, OptionPicked, CreationTime, Entity1Id, Entity2Id);
+    int[] OptionValues
+) : QuizCardIntDto(Id, CardIndex, OptionPicked, CreationTime, EntitiesId);

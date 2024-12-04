@@ -20,20 +20,20 @@ public class QuizCardFloatService : IQuizCardService
 
     public async Task<QuizCardAbstract> CreateCardForSession(SingleGameSession gameSession)
     {
-        FeatureFloat? featureFloat1 = await _featureFloatRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
-            ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later");
+        List<FeatureFloat> featureFloats = new List<FeatureFloat>();
+        for (int i = 0; i < gameSession.OptionCountInt; i++)
+        {
+            featureFloats.Add(await _featureFloatRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
+                ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later"));
+        }
 
-        FeatureFloat? featureFloat2 = await _featureFloatRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
-            ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later");
-
-        int correctOption = CorrectOptionPicker.PickCorrectOption([featureFloat1, featureFloat2]);
+        int correctOption = CorrectOptionPicker.PickCorrectOption(featureFloats);
 
         QuizCardFloat quizCardFloat = new QuizCardFloat
         {
             SingleGameSession = gameSession,
             CardIndex = gameSession.CurrentCardIndex,
-            Option1 = featureFloat1,
-            Option2 = featureFloat2,
+            Options = featureFloats,
             CorrectOption = correctOption,
             OptionPicked = null,
             CreationTime = DateTime.UtcNow
@@ -47,8 +47,9 @@ public class QuizCardFloatService : IQuizCardService
         return await _quizCardFloatRepository.FindCardForSessionIncluding(gameSessionid, cardIndex);
     }
 
-    public async Task<QuizCardAbstract> PickAnswerForSession(Guid gameSessionid, int cardIndex, int optionPicked)
+    public async Task<(QuizCardAbstract QuizCard, bool IsCorrect)> PickAnswerForSession(Guid gameSessionid, int cardIndex, int optionPicked)
     {
-        return await _quizCardFloatRepository.PickAnswerForSession(gameSessionid, cardIndex, optionPicked);
+        QuizCardFloat? quizCard = await _quizCardFloatRepository.PickAnswerForSession(gameSessionid, cardIndex, optionPicked);
+        return (quizCard, quizCard.CorrectOption == optionPicked);
     }
 }
