@@ -34,6 +34,14 @@ public class UserProfileController : Controller
 
     [HttpPost]
     [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> UpdateAvatar(IFormFile formFile)
+    {
+        await _userProfileService.UpdateAvatar(User, formFile);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> UpdateNickname(string nickname)
     {
         await _userProfileService.UpdateNickname(User, nickname);
