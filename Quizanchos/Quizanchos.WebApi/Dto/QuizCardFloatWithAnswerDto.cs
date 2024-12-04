@@ -5,9 +5,7 @@ public record QuizCardFloatWithAnswerDto(
     int CardIndex,
     int? OptionPicked,
     DateTime CreationTime,
-    Guid Entity1Id,
-    Guid Entity2Id,
+    Guid[] EntitiesId,
     int CorrectOption,
-    float Option1Value,
-    float Option2Value
-) : QuizCardFloatDto(Id, CardIndex, OptionPicked, CreationTime, Entity1Id, Entity2Id);
+    float[] OptionValues
+) : QuizCardFloatDto(Id, CardIndex, OptionPicked, CreationTime, EntitiesId);

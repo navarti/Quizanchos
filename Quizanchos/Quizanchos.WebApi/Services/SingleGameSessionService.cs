@@ -168,7 +168,15 @@ public class SingleGameSessionService
         }
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
 
-        return await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
+        (QuizCardDtoAbstract QuizCard, bool IsCorrect) result = await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
+
+        if(result.IsCorrect)
+        {
+            gameSession.Score++;
+        }
+        await _singleGameSessionRepository.Update(gameSession);
+
+        return result.QuizCard;
     }
 
     public async Task<SingleGameSession?> FindAliveSession(string userId)

@@ -18,7 +18,7 @@ namespace Quizanchos.ViewModels
         
         public int TotalCards { get; set; }
         
-        public List<QuizOptionViewModel> Options { get; set; } = new List<QuizOptionViewModel>();
+        public QuizOptionViewModel[] Options { get; set; } = Array.Empty<QuizOptionViewModel>();
     }
 
     public class QuizOptionViewModel
