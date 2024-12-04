@@ -113,6 +113,7 @@ public static class Startup
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<QuizAuthorizationService>(); 
         services.AddTransient<UserProfileService>(); 
+        services.AddTransient<LeaderBoardService>(); 
 
         services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
 

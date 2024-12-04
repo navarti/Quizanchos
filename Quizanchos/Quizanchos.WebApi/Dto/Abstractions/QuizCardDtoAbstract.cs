@@ -5,6 +5,5 @@ public abstract record QuizCardDtoAbstract(
     int CardIndex,
     int? OptionPicked,
     DateTime CreationTime,
-    Guid Entity1Id,
-    Guid Entity2Id
+    Guid[] EntitiesId
 );

@@ -13,12 +13,9 @@ public class QuizCardFloatRepository : EntityRepositoryBase<Guid, QuizCardFloat>
 
     public async Task<QuizCardFloat?> FindCardForSessionIncluding(Guid gameSessionid, int cardIndex)
     {
-        return await _dbSet
-            .Include(q => q.Option1)
-                .ThenInclude(f => f.QuizEntity)
-            .Include(q => q.Option2)
-                .ThenInclude(f => f.QuizEntity)
+        QuizCardFloat? quizCardFloat = await _dbContext.QuizCardFloats
             .FirstOrDefaultAsync(q => q.SingleGameSession.Id == gameSessionid && q.CardIndex == cardIndex);
+        return quizCardFloat;
     }
 
     public async Task<QuizCardFloat> PickAnswerForSession(Guid gameSessionid, int cardIndex, int optionPicked)
