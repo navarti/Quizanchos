@@ -23,7 +23,7 @@ public class ProfileController : Controller
     [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> Profile()
     {
-        ApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
+        FullApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
         return View(userDto); 
     }
 
