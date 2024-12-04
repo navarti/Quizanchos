@@ -150,8 +150,8 @@ public class SingleGameSessionService
         SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(answerDto.Sessionid).ConfigureAwait(false);
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
 
-        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        if (gameSession.ApplicationUser.Id != userId)
+        ApplicationUser? user = await _userRetrieverService.GetUserByClaims(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != user.Id)
         {
             throw HandledExceptionFactory.CreateForbiddenException();
         }
@@ -161,21 +161,17 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.Create("Game session is already finished");
         }
 
-        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > (int)gameSession.OptionCount - 1)
+        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > gameSession.OptionCountInt - 1)
         {
             throw HandledExceptionFactory.Create("Invalid option picked");
         }
 
-        if (gameSession.CurrentCardIndex == (int)gameSession.CardsCount - 1)
+        if (gameSession.CurrentCardIndex == gameSession.CardsCountInt - 1)
         {
             gameSession.IsFinished = true;
 
-            await _userManager.FindByIdAsync(userId).ContinueWith(async task =>
-            {
-                ApplicationUser user = task.Result;
-                user.Score += gameSession.Score;
-                await _userManager.UpdateAsync(user);
-            });
+            user.Score += gameSession.Score;
+            await _userManager.UpdateAsync(user);
         }
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
 
