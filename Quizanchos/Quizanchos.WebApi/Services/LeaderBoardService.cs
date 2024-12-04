@@ -17,7 +17,7 @@ public class LeaderBoardService
     public async Task<ApplicationUserListDto> GetLeaderBoardAsync(int take, int skip)
     {
         List<ApplicationUser> users = await _userManager.Users
-            .OrderBy(u => u.Score)
+            .OrderByDescending(u => u.Score)
             .Skip(skip)
             .Take(take)
             .ToListAsync();
