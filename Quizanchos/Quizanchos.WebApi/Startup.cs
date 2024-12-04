@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CloudinaryDotNet;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
@@ -94,6 +96,7 @@ public static class Startup
     public static void AddApplicationServices(this WebApplicationBuilder builder)
     {
         IServiceCollection services = builder.Services;
+        ConfigurationManager configuration = builder.Configuration;
 
         services.AddControllersWithViews();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -105,6 +108,16 @@ public static class Startup
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
                 ?? throw CriticalExceptionFactory.CreateConfigException("DefaultConnection"));
+        });
+
+        services.AddSingleton<ICloudinary>(serviceProvider =>
+        {
+            Account account = new Account(
+                configuration["Cloudinary:CloudName"],
+                configuration["Cloudinary:ApiKey"],
+                configuration["Cloudinary:ApiSecret"]
+            );
+            return new Cloudinary(account);
         });
 
         services.AddAutoMapper(typeof(MappingProfile));
