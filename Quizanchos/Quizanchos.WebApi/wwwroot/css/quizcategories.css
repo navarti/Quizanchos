@@ -1,0 +1,152 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    min-height: 100vh;
+}
+.container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+.filter-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+.filter-btn.active {
+    background: #6b21a8;
+}
+.category {
+    background-image: url('https://static.scientificamerican.com/sciam/cache/file/63CCF2B0-1E10-4583-9D4EDAA0569200D1_source.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.category::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+.category-content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+}
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+.category-title {
+    font-size: 2rem;
+    margin: 0;
+}
+.meta {
+    display: flex;
+    gap: 1rem;
+    color: #d4c0ff;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+.description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.stat {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+}
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+.btn-primary {
+    background: #6b21a8;
+    color: white;
+}
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.page-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.page-info {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    color: white;
+}
