@@ -1,0 +1,314 @@
+@model HomeViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Categories</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .filters {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .filter-btn.active {
+            background: #6b21a8;
+        }
+        .category {
+            background-image: url('https://static.scientificamerican.com/sciam/cache/file/63CCF2B0-1E10-4583-9D4EDAA0569200D1_source.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .category-content {
+            position: relative;
+            z-index: 1;
+            padding: 2rem;
+        }
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .category-title {
+            font-size: 2rem;
+            margin: 0;
+        }
+        .meta {
+            display: flex;
+            gap: 1rem;
+            color: #d4c0ff;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: #6b21a8;
+            color: white;
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .page-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .page-info {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="country">Countries</button>
+            <button class="filter-btn" data-category="cars">Cars</button>
+            <button class="filter-btn" data-category="country-area">Country Area</button>
+            <button class="filter-btn" data-category="country-population">Country Population</button>
+        </div>
+
+        <div id="categories"></div>
+
+        <div class="pagination">
+            <button class="page-btn" id="prevPage" onclick="changePage(-1)">Previous</button>
+            <span class="page-info" id="pageInfo"></span>
+            <button class="page-btn" id="nextPage" onclick="changePage(1)">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const categories = [
+            {
+                id: "1",
+                name: "Country Area Quiz",
+                type: "country-area",
+                authorName: "Adam Smith",
+                creationDate: new Date("2024-02-15"),
+                description: "Test your knowledge about countries and their geographical areas. Learn interesting facts about the largest and smallest countries in the world.",
+                totalAttempts: 1500,
+                averageScore: 85,
+                completionRate: 75
+            },
+            {
+                id: "2",
+                name: "Population Challenge",
+                type: "country-population",
+                authorName: "Adam Smith",
+                creationDate: new Date("2024-02-15"),
+                description: "Challenge yourself with questions about world population statistics and demographics. Compare different countries and their population trends.",
+                totalAttempts: 1200,
+                averageScore: 78,
+                completionRate: 82
+            }
+        ];
+
+        let currentPage = 1;
+        const itemsPerPage = 2;
+        let currentFilter = 'all';
+
+        function filterCategories(type) {
+            currentFilter = type;
+            currentPage = 1;
+            renderCategories();
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.category === type) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function renderCategories() {
+            const categoriesContainer = document.getElementById('categories');
+            categoriesContainer.innerHTML = '';
+
+            let filteredCategories = categories;
+            if (currentFilter !== 'all') {
+                filteredCategories = categories.filter(cat => cat.type === currentFilter);
+            }
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const categoriesToShow = filteredCategories.slice(startIndex, endIndex);
+
+            categoriesToShow.forEach(category => {
+                const categoryElement = document.createElement('div');
+                categoryElement.className = 'category';
+                categoryElement.innerHTML = `
+                    <div class="category-content">
+                        <div class="category-header">
+                            <h2 class="category-title">${category.name}</h2>
+                        </div>
+                        <div class="meta">
+                            <span>${category.creationDate.toLocaleDateString()}</span>
+                            <span>${category.type}</span>
+                            <span>${category.authorName}</span>
+                        </div>
+                        <p class="description">${category.description}</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">${category.totalAttempts}</div>
+                                <div>Total Attempts</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${category.averageScore}%</div>
+                                <div>Average Score</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">${category.completionRate}%</div>
+                                <div>Completion Rate</div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a href="#" class="btn btn-primary" onclick="startQuiz('${category.id}')">
+                                GO
+                                <span>→</span>
+                            </a>
+                            <a href="/leaderboard/${category.id}" class="btn btn-secondary">
+                                Leaderboard
+                                <span>📊</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                categoriesContainer.appendChild(categoryElement);
+            });
+
+            updatePagination(filteredCategories.length);
+        }
+
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+        }
+
+        function changePage(delta) {
+            const filteredCategories = currentFilter === 'all' 
+                ? categories 
+                : categories.filter(cat => cat.type === currentFilter);
+            const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+            currentPage = Math.max(1, Math.min(currentPage + delta, totalPages));
+            renderCategories();
+        }
+
+        function startQuiz(categoryId) {
+            console.log(`Starting quiz: ${categoryId}`);
+            // Implement quiz start logic here
+        }
+
+        // Add event listeners for filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => filterCategories(btn.dataset.category));
+        });
+
+        // Initial render
+        renderCategories();
+    </script>
+</body>
+</html>

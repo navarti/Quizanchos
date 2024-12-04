@@ -2,7 +2,11 @@
 @{
     ViewData["Title"] = "Home";
 }
-
+<div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+</div>
 <div class="quiz-section">
     <h1 class="quiz-title">Quizzes</h1>
     <p class="quiz-subtitle">Get your first 100 points on your first quiz!</p>
@@ -13,9 +17,9 @@
                 <img src="https://static.scientificamerican.com/sciam/cache/file/63CCF2B0-1E10-4583-9D4EDAA0569200D1_source.jpg" alt="@quiz.Name" class="quiz-image">
                 <div class="quiz-info">
                     <div class="quiz-meta">
-                        <span class="quiz-date">15 Feb 2024</span>
-                        <span class="quiz-category">@quiz.Name</span>
-                        <span class="quiz-author">Adam Smith</span>
+                        <span class="shrink-text quiz-date">15 Feb 2024</span>
+                        <span class="shrink-text quiz-category">@quiz.Name</span>
+                        <span class="shrink-text quiz-author">Adam Smith</span>
                     </div>
                     <h2 class="quiz-name">Sample Quiz</h2>
                     <p class="quiz-description">This is a sample description for a quiz...</p>
