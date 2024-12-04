@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Quizanchos.ViewModels;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
+using Microsoft.AspNetCore.Authentication;
 namespace Quizanchos.WebApi.ViewControllers;
 
 public class HomeController : Controller
@@ -25,7 +26,6 @@ public class HomeController : Controller
         {
             QuizCategories = quizCategories
         };
-
         return View(viewModel);
     }
 
@@ -50,6 +50,24 @@ public class HomeController : Controller
     public IActionResult Signin()
     {
         return View();
+    }
+    
+    [HttpGet("/QuizCategories")]
+    public async Task<IActionResult> QuizCategories()
+    {
+        List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
+        var viewModel = new HomeViewModel
+        {
+            QuizCategories = quizCategories
+        };
+        return View(viewModel);
+    }
+    
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync();
+        
+        return RedirectToAction("Index", "Home");
     }
     
 }

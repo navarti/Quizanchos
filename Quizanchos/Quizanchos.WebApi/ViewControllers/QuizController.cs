@@ -3,6 +3,7 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
 using Quizanchos.ViewModels;
 using Quizanchos.WebApi.Dto.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Quizanchos.WebApi.ViewControllers;
 
@@ -23,6 +24,7 @@ public class QuizController : Controller
     }
 
     [HttpGet("Setup/{quizcategoryid:guid}")]
+    [Authorize(Roles = "User")]
     public async Task<IActionResult> SessionSetup(Guid quizcategoryid)
     {
         var viewModel = new QuizCategoryViewModel()

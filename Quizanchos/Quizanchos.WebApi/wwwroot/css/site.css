@@ -1,4 +1,73 @@
-﻿.navbar {
+﻿body {
+    margin: auto;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow: auto;
+    background: linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%);
+    animation: gradient 15s ease infinite;
+    background-size: 400% 400%;
+    background-attachment: fixed;
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%;
+    }
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.wave {
+    background: rgb(255 255 255 / 25%);
+    border-radius: 1000% 1000% 0 0;
+    position: fixed;
+    width: 200%;
+    height: 12em;
+    animation: wave 10s -3s linear infinite;
+    transform: translate3d(0, 0, 0);
+    opacity: 0.8;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.wave:nth-of-type(2) {
+    bottom: -1.25em;
+    animation: wave 18s linear reverse infinite;
+    opacity: 0.8;
+}
+
+.wave:nth-of-type(3) {
+    bottom: -2.5em;
+    animation: wave 20s -1s reverse infinite;
+    opacity: 0.9;
+}
+
+@keyframes wave {
+    2% {
+        transform: translateX(-2%);
+    }
+
+    25% {
+        transform: translateX(-25%);
+    }
+
+    50% {
+        transform: translateX(-50%);
+    }
+
+    75% {
+        transform: translateX(-25%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+.navbar {
     background-color: #f3e8ff;
     padding: 10px 15px;
     display: flex;
@@ -204,40 +273,70 @@
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
+    padding: 20px;
 }
 
 .quiz-card {
+    background: #fff; /* Белый фон для лучшей читаемости */
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
     width: 300px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .quiz-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .quiz-image {
     width: 100%;
     height: 150px;
     object-fit: cover;
+    border-bottom: 1px solid #ddd;
 }
 
 .quiz-info {
     padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
     font-size: 14px;
     color: #888;
-    display: flex;
-    gap: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    align-items: center; /* Выравнивание текста по вертикали */
 }
 
+.quiz-meta span {
+    flex: 1; /* Равномерное распределение пространства */
+    min-width: 0;
+    text-align: center;
+    font-size: clamp(10px, 1.5vw, 14px); /* Динамический размер текста */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.quiz-meta span:hover {
+    text-overflow: clip; /* Убирает многоточие при наведении */
+}
+
+
 .quiz-name {
-    font-size: 18px;
+    font-size: 20px;
+    font-weight: bold;
     color: #333;
     margin: 10px 0;
 }
@@ -245,6 +344,12 @@
 .quiz-description {
     color: #666;
     font-size: 14px;
+    margin-bottom: auto; 
+    display: -webkit-box;
+    -webkit-line-clamp: 3; 
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .quiz-link {
@@ -253,11 +358,13 @@
     color: #6c63ff;
     font-weight: bold;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, transform 0.3s ease;
+    align-self: flex-start;
 }
 
 .quiz-link:hover {
     color: #463bff;
+    transform: scale(1.05);
 }
 
 .registration-form {
@@ -414,6 +521,8 @@
     text-align: center;
     margin-bottom: 20px;
 }
+
+
 
 .google-signup-btn {
     display: flex;
@@ -754,3 +863,4 @@ body {
     .signin-footer a:hover {
         text-decoration: underline;
     }
+    

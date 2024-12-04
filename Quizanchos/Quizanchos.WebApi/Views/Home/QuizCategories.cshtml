@@ -1,0 +1,113 @@
+@model HomeViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Categories</title>
+    <link rel="stylesheet" href="/css/quizcategories.css">
+</head>
+<body>
+    <div class="container">
+        <div class="filters">
+            <button class="filter-btn active" data-category="all">All</button>
+            @foreach (var category in Model.QuizCategories)
+            {
+                <button class="filter-btn" data-category="@category.Name.ToLower().Replace(" ", "-")">@category.Name</button>
+            }
+        </div>
+
+        <div id="categories">
+            @foreach (var category in Model.QuizCategories)
+            {
+                <div class="category">
+                    <div class="category-content">
+                        <div class="category-header">
+                            <h2 class="category-title">@category.Name Quiz</h2>
+                        </div>
+                        <div class="meta">
+                            <span>@category.CreationDate.ToShortDateString()</span>
+                            <span>@category.Name</span>
+                            <span>@category.AuthorName</span>
+                        </div>
+                        <p class="description">Challenge yourself with questions about world population statistics and demographics. Compare different countries and their population trends.</p>
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-value">1200</div>
+                                <div>Total Attempts</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">32%</div>
+                                <div>Average Score</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-value">55%</div>
+                                <div>Completion Rate</div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <a href="#" class="btn btn-primary" onclick="startQuiz('@category.Id')">
+                                GO
+                                <span>→</span>
+                            </a>
+                            <a href="/leaderboard/@category.Id" class="btn btn-secondary">
+                                Leaderboard
+                                <span>📊</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn" id="prevPage" onclick="changePage(-1)">Previous</button>
+            <span class="page-info" id="pageInfo"></span>
+            <button class="page-btn" id="nextPage" onclick="changePage(1)">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const itemsPerPage = 2;
+        let currentFilter = 'all';
+
+        function renderCategories() {
+            const categories = document.querySelectorAll('#categories .category');
+
+            categories.forEach(category => {
+                const type = category.getAttribute('data-category');
+                category.style.display = (currentFilter === 'all' || type === currentFilter) ? 'block' : 'none';
+            });
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            const visibleCategories = Array.from(document.querySelectorAll('#categories .category'))
+                .filter(cat => cat.style.display !== 'none');
+
+            const totalPages = Math.ceil(visibleCategories.length / itemsPerPage);
+
+            const pageInfo = document.getElementById('pageInfo');
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        }
+
+        renderCategories();
+
+
+        function startQuiz(categoryId) {
+            console.log(`Starting quiz: ${categoryId}`);
+            // Implement quiz start logic here
+        }
+
+        // Add event listeners for filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => filterCategories(btn.dataset.category));
+        });
+
+        // Initial render
+        renderCategories();
+    </script>
+</body>
+</html>

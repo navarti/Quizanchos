@@ -5,9 +5,9 @@ function hideModalOnStart() {
     modal.style.display = 'none';
 }
 
-function initializeTimeline(creationTime, secondsPerCard, timeline) {
+function initializeTimeline(creationTime, secondsPerCard, timeline, currentCardIndex, totalCards) {
     if (activeTimeline) {
-        cancelAnimationFrame(activeTimeline); // Прерываем предыдущий таймер
+        cancelAnimationFrame(activeTimeline);
         activeTimeline = null;
     }
 
@@ -15,7 +15,6 @@ function initializeTimeline(creationTime, secondsPerCard, timeline) {
 
     hideModalOnStart();
 
-    // Сбрасываем ширину линии
     timeline.style.width = "0%";
 
     const currentTime = new Date();
@@ -24,15 +23,15 @@ function initializeTimeline(creationTime, secondsPerCard, timeline) {
 
     if (remainingTime > 0) {
         activeTimeline = requestAnimationFrame(() =>
-            updateTimeline(creationTime, secondsPerCard, timeline)
+            updateTimeline(creationTime, secondsPerCard, timeline, currentCardIndex, totalCards)
         );
     } else {
         console.warn("Timeline started with 0 remaining time.");
-        showEndOfTimeModal();
+        showEndOfTimeModal(currentCardIndex, totalCards); 
     }
 }
 
-function updateTimeline(creationTime, secondsPerCard, timeline) {
+function updateTimeline(creationTime, secondsPerCard, timeline, currentCardIndex, totalCards) {
     const currentTime = new Date();
     const elapsedTime = (currentTime - creationTime) / 1000;
     const remainingTime = Math.max(secondsPerCard - elapsedTime, 0);
@@ -42,35 +41,67 @@ function updateTimeline(creationTime, secondsPerCard, timeline) {
 
     if (remainingTime > 0) {
         activeTimeline = requestAnimationFrame(() =>
-            updateTimeline(creationTime, secondsPerCard, timeline)
+            updateTimeline(creationTime, secondsPerCard, timeline, currentCardIndex, totalCards)
         );
     } else {
         console.warn("Time's up, showing modal.");
-        showEndOfTimeModal();
+        showEndOfTimeModal(currentCardIndex, totalCards); 
     }
 }
 
-function showFinalStatsModal(score) {
-    const modal = document.getElementById('finalStatsModal');
-    const scoreElement = modal.querySelector('strong');
-    scoreElement.textContent = score; 
-    modal.style.display = 'flex';
 
+function showFinalStatsModal() {
+    const modal = document.getElementById('finalStatsModal');
+    
+    const score = modal.getAttribute('data-score');
+    const totalCards = modal.getAttribute('data-total');
+
+    const scoreElement = document.getElementById('scoreDisplay');
+    const totalCardsElement = document.getElementById('totalCardsDisplay');
+    
+    scoreElement.textContent = score;
+    totalCardsElement.textContent = totalCards;
+    
+    modal.style.display = 'flex';
+    
     document.getElementById('goToResults').addEventListener('click', () => {
-        window.location.href = "/"; 
+        window.location.href = "/";
     });
 }
+function stopTimeline() {
+    if (activeTimeline) {
+        cancelAnimationFrame(activeTimeline); 
+        activeTimeline = null; 
+        console.log('Timeline stopped');
+    }
+}
+function showEndOfTimeModal(currentCardIndex, totalCards) {
+    if (currentCardIndex === totalCards) {
+        console.log("Time's up on the last question. Showing results...");
+        stopTimeline();
+        showFinalStatsModal(); 
+        return;
+    }
 
-
-function showEndOfTimeModal() {
     const modal = document.getElementById('errorModal');
     const modalText = document.getElementById('modalErrorText');
     modalText.innerHTML = "Oops! Time's Up!<br>What’s next? Your call!";
     modal.style.display = 'flex';
 
-    document.getElementById('continueQuiz').addEventListener('click', () => {
-        modal.style.display = 'none';
-        console.log("Continuing the quiz...");
+    document.getElementById('restartQuiz').addEventListener('click', () => {
+        const quizContainer = document.getElementById('quiz-header');
+        if (!quizContainer) {
+            console.error('Quiz container not found!');
+            return;
+        }
+
+        const categoryId = quizContainer.getAttribute('data-category-id');
+        if (!categoryId) {
+            console.error('Category ID is missing or invalid');
+            return;
+        }
+
+        redirectwithPreloader(`/Quiz/Setup/${categoryId}`);
     });
 
     document.getElementById('returnToMenu').addEventListener('click', () => {
@@ -78,12 +109,35 @@ function showEndOfTimeModal() {
     });
 }
 
+function showPreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.style.display = 'flex';
+    }
+}
+
+function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (preloader) {
+        preloader.style.display = 'none';
+    }
+}
+
+function redirectwithPreloader(url) {
+    showPreloader();
+    setTimeout(() => {
+        window.location.href = url;
+    }, 200);
+};
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     let activeTimeline = null;
     const timelineContainer = document.querySelector('.timeline-container');
     const timeline = timelineContainer.querySelector('.timeline');
     const mainContainer = document.querySelector('.quiz-container');
+    const questionInfoElement = document.querySelector('.question-info');
 
     if (!timelineContainer || !mainContainer) {
         console.error("Timeline or quiz container not found.");
@@ -93,18 +147,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const sessionId = mainContainer.getAttribute('data-session-id');
     const creationTime = new Date(timelineContainer.getAttribute('data-creation-time'));
     const secondsPerCard = parseInt(timelineContainer.getAttribute('data-seconds-per-card'), 10);
-    const currentCardIndex = parseInt(timelineContainer.getAttribute('data-current-card-index'), 10);
-    const totalCards = parseInt(timelineContainer.getAttribute('data-total-cards'), 10);
+    const currentCardIndex = parseInt(questionInfoElement.dataset.current, 10);
+    const totalCards = parseInt(questionInfoElement.dataset.total, 10);
 
-    initializeTimeline(creationTime, secondsPerCard, timeline);
+    console.log('Current Card Index:', currentCardIndex);
+    console.log('Total Cards:', totalCards);
+
+    initializeTimeline(creationTime, secondsPerCard, timeline,currentCardIndex,totalCards);
 
     const options = document.querySelectorAll('.quiz-option');
     let isAnswerSubmitted = false;
 
     options.forEach((option, index) => {
         option.addEventListener('click', async () => {
-            if (isAnswerSubmitted) return;
+            if (isAnswerSubmitted) return; 
             isAnswerSubmitted = true;
+
+            stopTimeline(); 
 
             const selectedOption = index;
             const url = '/SingleGameSession/PickAnswerForSession';
@@ -116,16 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = {
                 SessionId: sessionId,
-                OptionPicked: selectedOption
+                OptionPicked: selectedOption,
             };
 
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(data),
                 });
 
                 if (response.ok) {
@@ -145,34 +204,34 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
 
-                    setTimeout(async () => {
-                        if (currentCardIndex === totalCards - 1 ) {
-                            showFinalStatsModal(result.score); 
-                            return;
+                    // Проверяем, последний ли вопрос
+                    if (currentCardIndex === totalCards) {
+                        setTimeout(() => {
+                            showFinalStatsModal(); 
+                        }, 2000); 
+                        return;
+                    }
+                    
+                    const createNextCardUrl = `/SingleGameSession/CreateNextCardForSession?sessionId=${sessionId}`;
+
+                    try {
+                        const nextCardResponse = await fetch(createNextCardUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                        });
+
+                        if (nextCardResponse.ok) {
+                            const nextResult = await nextCardResponse.json();
+                            console.log('Next card created:', nextResult);
+                            redirectwithPreloader(`/Quiz/${sessionId}`);
+                        } else {
+                            console.error('Error creating next card:', nextCardResponse.status, nextCardResponse.statusText);
                         }
-
-                        const createNextCardUrl = `/SingleGameSession/CreateNextCardForSession?sessionId=${sessionId}`;
-
-                        try {
-                            const nextCardResponse = await fetch(createNextCardUrl, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-
-                            if (nextCardResponse.ok) {
-                                const nextResult = await nextCardResponse.json();
-                                console.log('Next card created:', nextResult);
-
-                                window.location.href = `/Quiz/${sessionId}`;
-                            } else {
-                                console.error('Error creating next card:', nextCardResponse.status, nextCardResponse.statusText);
-                            }
-                        } catch (error) {
-                            console.error('Fetch error for next card:', error);
-                        }
-                    }, 3000);
+                    } catch (error) {
+                        console.error('Fetch error for next card:', error);
+                    }
                 } else {
                     console.error('Error:', response.status, response.statusText);
                 }
@@ -182,3 +241,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
