@@ -132,7 +132,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
+function redirectToCategory(category) {
+    window.location.href = `/QuizCategories?filter=${category}`;
+}
 
 
 

@@ -1,6 +1,7 @@
-﻿body {
+﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+body {
     margin: auto;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Poppins', sans-serif;
     overflow: auto;
     background: linear-gradient(315deg, rgba(101,0,94,1) 3%, rgba(60,132,206,1) 38%, rgba(48,238,226,1) 68%, rgba(255,25,25,1) 98%);
     animation: gradient 15s ease infinite;
@@ -320,19 +321,22 @@
 }
 
 .quiz-meta span {
-    flex: 1; /* Равномерное распределение пространства */
+    flex: 1; 
     min-width: 0;
     text-align: center;
-    font-size: clamp(10px, 1.5vw, 14px); /* Динамический размер текста */
+    font-size: clamp(10px, 1.5vw, 14px); 
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
 .quiz-meta span:hover {
-    text-overflow: clip; /* Убирает многоточие при наведении */
+    text-overflow: clip; 
 }
-
+.quiz-meta .quiz-category:hover {
+    text-decoration: underline; 
+    color: #6b21a8; 
+}
 
 .quiz-name {
     font-size: 20px;

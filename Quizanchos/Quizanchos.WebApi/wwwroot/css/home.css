@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #8B5CF6;
+    --primary-dark: #7C3AED;
+    --background: #F3F4F6;
+    --card-bg: rgba(255, 255, 255, 0.95);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(45deg, #4F46E5, #7C3AED);
+    color: #333;
+    min-height: 100vh;
+}
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.hero-section {
+    text-align: center;
+    color: white;
+    margin-bottom: 3rem;
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+}
+
+.featured-quizzes {
+    width: 90%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Две колонки */
+    gap: 2rem; /* Отступ между карточками */
+}
+
+.quiz-card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s;
+    width: 100%; /* Карточка займет всю ширину своей колонки */
+    height: auto; /* Позволит адаптироваться к содержимому */
+}
+
+.quiz-image {
+    height: 300px; /* Высота изображения */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden; /* Чтобы затемняющий слой не выходил за пределы карточки */
+}
+
+.quiz-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Затемнение черным цветом с прозрачностью */
+    z-index: 1; /* Помещаем затемняющий слой выше изображения */
+}
+
+.quiz-card:hover {
+    transform: translateY(-5px);
+}
+
+.quiz-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    color: white;
+    z-index: 2; /* Контент выше затемнения */
+}
+
+.quiz-header h2,
+.quiz-meta,
+.quiz-btn {
+    z-index: 3; /* Гарантированно выше слоя затемнения */
+    position: relative; /* Убеждаемся, что они не пересекаются с затемнением */
+}
+.quiz-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    color: white; /* Убедимся, что текст белый */
+    opacity: 1; /* Убедимся, что затемнение не уменьшает видимость */
+    z-index: 2; /* Убедимся, что она выше слоя затемнения */
+    position: relative; /* Чтобы оставаться над затемняющим слоем */
+}
+.quiz-btn {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+}
+
+.quiz-btn:hover {
+    background: var(--primary-dark);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.sessions-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+}
+
+.sessions-list {
+    margin-top: 1rem;
+}
+
+.session-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.session-item:last-child {
+    border-bottom: none;
+}
+
+.join-btn {
+    background: var(--primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.join-btn:hover {
+    background: var(--primary-dark);
+}
+
+.leaderboards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.leaderboard-card {
+    background: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 1rem;
+}
+
+.leaderboard-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.rank {
+    font-weight: bold;
+    color: var(--primary);
+}
+
+.points {
+    color: var(--primary);
+}
+
+
+

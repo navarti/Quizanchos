@@ -77,7 +77,7 @@ public class QuizController : Controller
         return options.ToArray();
     }
 
-    private async Task<string> GetQuizCategoryName(Guid quizCategoryId)
+    public async Task<string> GetQuizCategoryName(Guid quizCategoryId)
     {
         var quizCategory = await _quizCategoryService.GetById(quizCategoryId);
         return quizCategory?.Name ?? "Unknown Category";

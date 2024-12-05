@@ -11,9 +11,13 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     
     private readonly QuizCategoryService _quizCategoryService;
+    private readonly SingleGameSessionService _singleGameSessionService;
+    private readonly LeaderBoardService _leaderBoardService;
     
-    public HomeController(ILogger<HomeController> logger, QuizCategoryService quizCategoryService)
+    public HomeController(SingleGameSessionService singleGameSessionService,LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService)
     {
+        _singleGameSessionService = singleGameSessionService;
+        _leaderBoardService = leaderBoardService;
         _logger = logger;
         _quizCategoryService = quizCategoryService ?? throw new ArgumentNullException(nameof(quizCategoryService));
     }
@@ -22,9 +26,25 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
+        SingleGameSessionDto? singleGameSession = null;
+        string quizName = "Unknown Category";
+
+        // Проверяем, авторизован ли пользователь
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            singleGameSession = await _singleGameSessionService.FindAliveSession(User);
+
+            if (singleGameSession != null)
+            {
+                var quizCategory = await _quizCategoryService.GetById(singleGameSession.QuizCategoryId);
+                quizName = quizCategory?.Name + " Quiz" ?? "Unknown Category";
+            }
+        }
         var viewModel = new HomeViewModel
         {
-            QuizCategories = quizCategories
+            QuizCategories = quizCategories,
+            ActiveSession = singleGameSession,
+            QuizName = quizName
         };
         return View(viewModel);
     }
@@ -34,7 +54,25 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    
+    [HttpGet("/Leaderboard")]
+    public async Task<IActionResult> Leaderboard()
+    {
+        var leaderBoardResult = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
+        var users = leaderBoardResult.Users.ToList(); 
+        var currentUserName = User.Identity?.Name ?? "Guest"; 
 
+        var viewModel = new HomeViewModel
+        {
+            Users = users,
+            CurrentUserName = currentUserName
+        };
+
+        return View(viewModel);
+
+    }
+
+    
     [HttpGet("/FAQ")]
     public IActionResult Faq()
     {

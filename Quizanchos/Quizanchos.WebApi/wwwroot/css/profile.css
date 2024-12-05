@@ -90,7 +90,9 @@ body {
 }
 
 .info-label {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     font-weight: 500;
     margin-bottom: 0.5rem;
     color: #4B5563;
@@ -120,8 +122,14 @@ body {
     border: none;
     color: var(--primary);
     cursor: pointer;
-    margin-left: 0.5rem;
     font-size: 1rem;
+    font-weight: 500;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.edit-button:hover {
+    color: var(--primary-dark);
 }
 
 .save-button {
@@ -139,6 +147,12 @@ body {
 
 .save-button:hover {
     background: var(--primary-dark);
+}
+.info-value[readonly],
+.info-value.readonly {
+    background-color: #F3F4F6; /* Light gray background */
+    color: #9CA3AF; /* Dimmed text color */
+    cursor: not-allowed; /* Indicates the field is non-editable */
 }
 
 .stats-section {
