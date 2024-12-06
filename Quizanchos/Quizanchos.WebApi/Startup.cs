@@ -1,6 +1,7 @@
 ﻿using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
@@ -10,6 +11,7 @@ using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Services.HelperServices;
+using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi;
@@ -110,6 +112,18 @@ public static class Startup
                 ?? throw CriticalExceptionFactory.CreateConfigException("DefaultConnection"));
         });
 
+        services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
+
+        services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
+        services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
+        services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
+        services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
+        services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
+        services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
+        services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
+
+        services.AddAutoMapper(typeof(MappingProfile));
+
         services.AddSingleton<ICloudinary>(serviceProvider =>
         {
             Account account = new Account(
@@ -120,23 +134,17 @@ public static class Startup
             return new Cloudinary(account);
         });
 
-        services.AddAutoMapper(typeof(MappingProfile));
+        services.AddSingleton<ContainerService>();
 
+        AddEmailConfirmation(builder);
+
+        services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<QuizAuthorizationService>(); 
         services.AddTransient<UserProfileService>(); 
         services.AddTransient<LeaderBoardService>(); 
 
-        services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
-
-        services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
-        services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
-        services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
-        services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
-        services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
-        services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
-        services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
 
         services.AddSingleton<LockerService>();
         services.AddTransient<QuizEntityService>();
@@ -155,5 +163,25 @@ public static class Startup
             IServiceProvider services = scope.ServiceProvider;
             await DataSeeder.SeedDatabase(services, configuration);
         }
+    }
+
+    private static void AddEmailConfirmation(WebApplicationBuilder builder)
+    {
+        IServiceCollection services = builder.Services;
+        ConfigurationManager configuration = builder.Configuration;
+
+        if (configuration["EmailConfirmation:ShouldUse"] == "0")
+        {
+            services.AddTransient<IUserRegistrationService, DefaultUserRegistrationService>();
+            return;
+        }
+
+        services.AddFluentEmail(configuration["EmailConfirmation:MailGun:FromEmail"], configuration["EmailConfirmation:MailGun:FromName"])
+            .AddMailGunSender(configuration["EmailConfirmation:MailGun:Domain"], configuration["EmailConfirmation:MailGun:ApiKey"]);
+
+        services.AddTransient<EmailSenderService>();
+        services.AddTransient<DefaultUserRegistrationService>();
+        services.AddTransient<EmailConfirmationUserRegistrationService>();
+        services.AddTransient<IUserRegistrationService, EmailConfirmationUserRegistrationService>();
     }
 }

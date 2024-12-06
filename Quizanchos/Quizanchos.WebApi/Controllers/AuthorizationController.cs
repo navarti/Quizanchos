@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.Other;
 
 namespace Quizanchos.WebApi.Controllers;
 
@@ -27,8 +28,8 @@ public class AuthorizationController : Controller
     [HttpPost]
     public async Task<IActionResult> SignUp([FromBody] RegisterModelDto registerModelDto)
     {
-        await _authorizationService.RegisterUser(registerModelDto);
-        return Ok();
+        RegisterUserResult result = await _authorizationService.RegisterUser(registerModelDto);
+        return Ok(result);
     }
 
     [HttpPost]
