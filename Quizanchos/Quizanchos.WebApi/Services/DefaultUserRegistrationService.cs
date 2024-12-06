@@ -3,6 +3,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 using Quizanchos.WebApi.Services.Other;
+using Quizanchos.Common.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -19,6 +20,12 @@ public class DefaultUserRegistrationService : IUserRegistrationService
 
     public async Task<RegisterUserResult> RegisterUser(ApplicationUser user, string password, string roleName)
     {
+        ApplicationUser? existingUser = await _userManager.FindByEmailAsync(user.Email);
+        if (existingUser is not null)
+        {
+            throw HandledExceptionFactory.Create("The user with this email exists");
+        }
+
         IdentityResult result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded)
         {

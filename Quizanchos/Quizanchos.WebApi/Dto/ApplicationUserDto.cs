@@ -2,4 +2,10 @@
 
 public record ApplicationUserDto(string UserName, string AvatarUrl, int Score);
 
-public record ApplicationUserListDto(List<ApplicationUserDto> Users);
+public record FullApplicationUserDto(string Email, string UserName, string AvatarUrl, int Score)
+    : ApplicationUserDto(UserName, AvatarUrl, Score);
+
+public record ApplicationUserInLeaderBoardDto(string UserName, string AvatarUrl, int Score, int Position)
+    : ApplicationUserDto(UserName, AvatarUrl, Score);
+
+public record ApplicationUserInLeaderBoardListDto(List<ApplicationUserInLeaderBoardDto> Users);
