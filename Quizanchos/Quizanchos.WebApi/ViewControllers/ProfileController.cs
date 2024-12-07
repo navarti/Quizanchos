@@ -29,9 +29,10 @@ public class ProfileController : Controller
 
     [HttpPost("Logout")]
     [Authorize]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
-        HttpContext.SignOutAsync();
+        HttpContext.Session.Clear(); 
+        await HttpContext.SignOutAsync("Cookies"); 
         return RedirectToAction("Index", "Home");
     }
 }

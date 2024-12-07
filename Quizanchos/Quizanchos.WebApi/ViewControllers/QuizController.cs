@@ -54,7 +54,8 @@ public class QuizController : Controller
             Score = singleGameSessionDto.Score,
             CategoryId = singleGameSessionDto.QuizCategoryId,
             QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId),
-            Options = options
+            Options = options,
+            ImageUrl = await GetQuizImageUrl(singleGameSessionDto.QuizCategoryId)
         };
         
         return View(viewModel);
@@ -81,6 +82,11 @@ public class QuizController : Controller
     {
         var quizCategory = await _quizCategoryService.GetById(quizCategoryId);
         return quizCategory?.Name ?? "Unknown Category";
+    }
+    public async Task<string> GetQuizImageUrl(Guid quizCategoryId)
+    {
+        var quizCategory = await _quizCategoryService.GetById(quizCategoryId);
+        return quizCategory?.ImageUrl ?? "Unknown Image";
     }
 }
 

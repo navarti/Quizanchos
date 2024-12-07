@@ -29,7 +29,8 @@ public class HomeController : Controller
         SingleGameSessionDto? singleGameSession = null;
         string quizName = "Unknown Category";
 
-        // Проверяем, авторизован ли пользователь
+        var leaderBoardResult = await _leaderBoardService.GetLeaderBoardAsync(take: 3, skip: 0); 
+        var users = leaderBoardResult.Users.ToList(); 
         if (User.Identity?.IsAuthenticated == true)
         {
             singleGameSession = await _singleGameSessionService.FindAliveSession(User);
@@ -44,7 +45,8 @@ public class HomeController : Controller
         {
             QuizCategories = quizCategories,
             ActiveSession = singleGameSession,
-            QuizName = quizName
+            QuizName = quizName,
+            Users = users
         };
         return View(viewModel);
     }
@@ -79,6 +81,13 @@ public class HomeController : Controller
         return View();
     }
     
+    [HttpGet("/Contact")]
+    public IActionResult Contact()
+    {
+        return View();
+    }
+
+    
     [HttpGet("/Signup")]
     public IActionResult Signup()
     {
@@ -99,13 +108,6 @@ public class HomeController : Controller
             QuizCategories = quizCategories
         };
         return View(viewModel);
-    }
-    
-    public async Task<IActionResult> Logout()
-    {
-        await HttpContext.SignOutAsync();
-        
-        return RedirectToAction("Index", "Home");
     }
     
 }

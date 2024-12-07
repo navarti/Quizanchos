@@ -1,4 +1,10 @@
 ﻿@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+:root {
+    --primary-color: #8B5CF6;
+    --background-color: #F3F4F6;
+    --text-color: #1F2937;
+    --section-bg-color: #FFFFFF;
+}
 body {
     margin: auto;
     font-family: 'Poppins', sans-serif;
@@ -8,7 +14,6 @@ body {
     background-size: 400% 400%;
     background-attachment: fixed;
 }
-
 @keyframes gradient {
     0% {
         background-position: 0% 0%;
@@ -252,125 +257,6 @@ body {
 
 }
 
-.quiz-section {
-    padding: 20px;
-}
-
-.quiz-title {
-    font-size: 32px;
-    font-weight: bold;
-    text-align: center;
-    color: #6c63ff;
-}
-
-.quiz-subtitle {
-    text-align: center;
-    color: #555;
-    margin-bottom: 30px;
-}
-
-.quiz-cards {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding: 20px;
-}
-
-.quiz-card {
-    background: #fff; /* Белый фон для лучшей читаемости */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    width: 300px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.quiz-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.quiz-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-bottom: 1px solid #ddd;
-}
-
-.quiz-info {
-    padding: 15px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.quiz-meta {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 14px;
-    color: #888;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    align-items: center; /* Выравнивание текста по вертикали */
-}
-
-.quiz-meta span {
-    flex: 1; 
-    min-width: 0;
-    text-align: center;
-    font-size: clamp(10px, 1.5vw, 14px); 
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
-.quiz-meta span:hover {
-    text-overflow: clip; 
-}
-.quiz-meta .quiz-category:hover {
-    text-decoration: underline; 
-    color: #6b21a8; 
-}
-
-.quiz-name {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
-    margin: 10px 0;
-}
-
-.quiz-description {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: auto; 
-    display: -webkit-box;
-    -webkit-line-clamp: 3; 
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.quiz-link {
-    display: inline-block;
-    margin-top: 10px;
-    color: #6c63ff;
-    font-weight: bold;
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-    align-self: flex-start;
-}
-
-.quiz-link:hover {
-    color: #463bff;
-    transform: scale(1.05);
-}
-
 .registration-form {
     display: flex;
     flex-direction: column;
@@ -441,8 +327,7 @@ body {
     display: flex;
     justify-content: center; 
     align-items: center;   
-    min-height: calc(100vh - 80px); 
-    background-color: #ffffff; 
+    min-height: 100vh;
     padding: 20px;
 }
 
@@ -460,6 +345,7 @@ body {
     font-size: 1.8rem;
     color: #333333;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .signup-form p {
@@ -467,6 +353,7 @@ body {
     color: #666666;
     margin-bottom: 20px;
     line-height: 1.5;
+    text-align: center;
 }
 
 .signup-form .form-group {
@@ -729,12 +616,6 @@ body {
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
 
-body {
-    background-color: #ffffff; 
-    margin: 0;
-    font-family: Arial, sans-serif;
-}
-
 .signin-page {
     display: flex;
     justify-content: center;
@@ -782,6 +663,184 @@ body {
     .google-signin-btn img {
         margin-right: 10px;
     }
+
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.welcome-text {
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.about-section {
+    background-color: var(--section-bg-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.about-section:hover {
+    transform: translateY(-5px);
+}
+
+.about-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.contact-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.contact-link:hover {
+    text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.contact-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+.contact-title {
+    color: #6a3093;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.contact-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-label {
+    display: block;
+    color: #6a3093;
+    margin-bottom: 8px;
+}
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+.form-submit {
+    width: 100%;
+    padding: 12px;
+    background: #6a3093;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.form-submit:hover {
+    background: #8a4baf;
+}
+.email-info {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+.email-link {
+    color: #6a3093;
+    text-decoration: none;
+}
+.email-link:hover {
+    text-decoration: underline;
+}
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+
+    .auth-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-text {
+        font-size: 1.2rem;
+    }
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    .about-container {
+        padding: 1rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .welcome-text {
+        font-size: 1rem;
+    }
+
+    .about-section {
+        padding: 1rem;
+    }
+}
 
 
 .separator {

@@ -78,7 +78,9 @@ async function handleSubmit(event) {
         showModal('A network error occurred. Please try again later.');
     }
 }
-
+function redirectToCategory(category) {
+    window.location.href = `/QuizCategories?filter=${category}`;
+}
 document.addEventListener("DOMContentLoaded", function () {
     const startQuestButton = document.getElementById("startQuestButton");
 
@@ -132,9 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function redirectToCategory(category) {
-    window.location.href = `/QuizCategories?filter=${category}`;
-}
 
 
 

@@ -153,17 +153,17 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Current Card Index:', currentCardIndex);
     console.log('Total Cards:', totalCards);
 
-    initializeTimeline(creationTime, secondsPerCard, timeline,currentCardIndex,totalCards);
+    initializeTimeline(creationTime, secondsPerCard, timeline, currentCardIndex, totalCards);
 
     const options = document.querySelectorAll('.quiz-option');
     let isAnswerSubmitted = false;
 
     options.forEach((option, index) => {
         option.addEventListener('click', async () => {
-            if (isAnswerSubmitted) return; 
+            if (isAnswerSubmitted) return;
             isAnswerSubmitted = true;
 
-            stopTimeline(); 
+            stopTimeline();
 
             const selectedOption = index;
             const url = '/SingleGameSession/PickAnswerForSession';
@@ -189,29 +189,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     const result = await response.json();
-                    console.log('Response:', result);
-                    const correctOption = result.correctOption;
 
-                    options.forEach((opt, idx) => {
-                        if (idx === correctOption) {
-                            opt.style.background = "linear-gradient(to bottom, rgba(46, 204, 113, 0.8), rgba(46, 204, 113, 0.6))";
-                            opt.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.8)";
-                            opt.style.border = "2px solid rgba(46, 204, 113, 1)";
+                    const optionValues = result.optionValues;
+                    const entitiesId = result.entitiesId;
+                    const correctOption = result.correctOption; 
+                    const optionElements = document.querySelectorAll(".quiz-option");
+
+                    if (optionValues.length !== entitiesId.length) {
+                        console.error("Mismatch between optionValues and entitiesId lengths");
+                        return;
+                    }
+
+                    optionElements.forEach((optionElement, index) => {
+                        const valueContainer = document.createElement("div");
+                        valueContainer.className = "quiz-option-content";
+
+                        const nameText = optionElement.querySelector(".quiz-option-text");
+                        const valueText = document.createElement("p");
+
+                        valueText.className = "quiz-value-text";
+                        valueText.textContent = optionValues[index];
+
+                        valueContainer.appendChild(nameText);
+                        valueContainer.appendChild(valueText);
+
+                        optionElement.innerHTML = "";
+                        optionElement.appendChild(valueContainer);
+                        
+                        if (index === correctOption) {
+                            optionElement.classList.add('correct-option');
                         } else {
-                            opt.style.background = "linear-gradient(to bottom, rgba(231, 76, 60, 0.8), rgba(231, 76, 60, 0.6))";
-                            opt.style.boxShadow = "0 0 10px rgba(231, 76, 60, 0.8)";
-                            opt.style.border = "2px solid rgba(231, 76, 60, 1)";
+                            optionElement.classList.add('incorrect-option');
                         }
                     });
 
-                    // Проверяем, последний ли вопрос
                     if (currentCardIndex === totalCards) {
                         setTimeout(() => {
-                            showFinalStatsModal(); 
+                            showFinalStatsModal();
                         }, 2000); 
                         return;
                     }
-                    
+
                     const createNextCardUrl = `/SingleGameSession/CreateNextCardForSession?sessionId=${sessionId}`;
 
                     try {
@@ -225,7 +243,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (nextCardResponse.ok) {
                             const nextResult = await nextCardResponse.json();
                             console.log('Next card created:', nextResult);
-                            redirectwithPreloader(`/Quiz/${sessionId}`);
+                            setTimeout(() => {
+                                redirectwithPreloader(`/Quiz/${sessionId}`);
+                            }, 2000); // Delay to allow users to see the highlighted options
                         } else {
                             console.error('Error creating next card:', nextCardResponse.status, nextCardResponse.statusText);
                         }
@@ -241,4 +261,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
 

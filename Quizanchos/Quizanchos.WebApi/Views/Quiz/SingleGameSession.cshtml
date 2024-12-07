@@ -1711,12 +1711,12 @@
 			<h3>What`s country has the biggest GDP per capita?</h3>
 		</div>
 	</div>
-	<div class="quiz-form">
-		<div class="quiz-options">
+	<div class="quiz-form" style="--background-url: url('@Model.ImageUrl');">
+		<div class="quiz-options" data-option-count="@Model.OptionCount">
 			@for (var i = 0; i < @Model.OptionCount; i++)
 			{
 				var option = Model.Options[i];
-				<div class="quiz-option" style="--bg-color: @(i % 2 == 0 ? "#f1c40f" : "#3498db");" data-id="@option.Id">
+				<div class="quiz-option" style="--bg-color: @(i % 6 == 0 ? "#7B61FF" : i % 6 == 1 ? "#4FC3F7" : i % 6 == 2 ? "#FFA500" : i % 6 == 3 ? "#F48FB1" : i % 6 == 4 ? "#CE93D8" : "#80CBC4");" data-id="@option.Id">
 					<p class="quiz-option-text">@option.Name</p>
 				</div>
 			}

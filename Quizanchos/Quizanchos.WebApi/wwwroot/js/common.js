@@ -31,7 +31,7 @@ function clearErrors() {
 function showModal(message, isSuccess = false) {
     const modal = document.getElementById('errorModal');
     const modalText = document.getElementById('modalErrorText');
-    modalText.innerHTML = message;
+    modalText.textContent = message; 
 
     if (isSuccess) {
         modal.classList.add('success');
@@ -51,10 +51,8 @@ function hideModal() {
     modal.style.display = 'none';
 }
 
-// Закрытие модального окна при нажатии на кнопку
 document.getElementById('closeModal').addEventListener('click', hideModal);
 
-// Закрытие модального окна при клике вне области окна
 window.addEventListener('click', function (event) {
     const modal = document.getElementById('errorModal');
     if (event.target === modal) {
