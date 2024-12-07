@@ -98,3 +98,27 @@ async function saveChanges(fieldId) {
         console.error("Error saving changes:", error);
     }
 }
+
+function deleteCookie(name) {
+    document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
+}
+
+function logout() {
+    deleteCookie('Identity.External');
+    deleteCookie('QAuth');
+
+    fetch('/Account/Logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    })
+        .then(response => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error during logout:', error);
+            alert('An error occurred. Please try again.');
+        });
+}

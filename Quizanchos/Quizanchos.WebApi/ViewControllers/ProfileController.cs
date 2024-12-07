@@ -29,10 +29,12 @@ public class ProfileController : Controller
 
     [HttpPost("Logout")]
     [Authorize]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        HttpContext.Session.Clear(); 
-        await HttpContext.SignOutAsync("Cookies"); 
-        return RedirectToAction("Index", "Home");
+        Response.Cookies.Delete("Identity.External");
+        Response.Cookies.Delete("QAuth");
+        await HttpContext.SignOutAsync("Cookies");
+        return Ok();
     }
 }

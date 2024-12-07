@@ -29,8 +29,7 @@ public class HomeController : Controller
         SingleGameSessionDto? singleGameSession = null;
         string quizName = "Unknown Category";
 
-        var leaderBoardResult = await _leaderBoardService.GetLeaderBoardAsync(take: 3, skip: 0); 
-        var users = leaderBoardResult.Users.ToList(); 
+        var users = await _leaderBoardService.GetLeaderBoardAsync(take: 3, skip: 0); 
         if (User.Identity?.IsAuthenticated == true)
         {
             singleGameSession = await _singleGameSessionService.FindAliveSession(User);
@@ -46,7 +45,7 @@ public class HomeController : Controller
             QuizCategories = quizCategories,
             ActiveSession = singleGameSession,
             QuizName = quizName,
-            Users = users
+            Users = users.ToList()
         };
         return View(viewModel);
     }
@@ -60,13 +59,12 @@ public class HomeController : Controller
     [HttpGet("/Leaderboard")]
     public async Task<IActionResult> Leaderboard()
     {
-        var leaderBoardResult = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
-        var users = leaderBoardResult.Users.ToList(); 
+        var users = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
         var currentUserName = User.Identity?.Name ?? "Guest"; 
 
         var viewModel = new HomeViewModel
         {
-            Users = users,
+            Users = users.ToList(),
             CurrentUserName = currentUserName
         };
 

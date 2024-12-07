@@ -13,3 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
 });
 
+document.getElementById("leaderboard-card").addEventListener("click", function () {
+    window.location.href = "/leaderboard";
+});

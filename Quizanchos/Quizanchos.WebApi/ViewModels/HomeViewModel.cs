@@ -12,7 +12,7 @@ public class HomeViewModel
         : "N/A";
     public int Score => ActiveSession?.Score ?? 0;
     
-    public List<ApplicationUserDto> Users { get; set; } = new List<ApplicationUserDto>();
+    public List<ApplicationUserInLeaderBoardDto> Users { get; set; } = new List<ApplicationUserInLeaderBoardDto>();
     
     public string CurrentUserName { get; set; }
 }

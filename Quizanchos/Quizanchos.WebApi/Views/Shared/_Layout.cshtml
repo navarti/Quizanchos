@@ -33,7 +33,7 @@
                         <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">
                         <span>Profile</span>
                     </a>
-                    <a href="/Account/Logout" class="btn-logout">Logout</a>
+                <a href="javascript:void(0);" class="btn-logout" onclick="logout()">Logout</a>
                 }
                 else
                 {
@@ -55,8 +55,6 @@
     </div>
 </footer>
 
-<script src="/js/jquery.min.js"></script>
-<script src="/js/bootstrap.bundle.min.js"></script>
 <script src="js/common.js" asp-append-version="true"></script>
 <script src="js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)

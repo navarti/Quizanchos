@@ -23,7 +23,7 @@
         </div>
 
         <div class="leaderboard">
-            @foreach (var user in Model.Users.Select((user, index) => new { User = user, Rank = index + 1 }))
+            @foreach (var user in Model.Users.Select(user => new { User = user, Rank = user.Position }))
             {
                 <div class="leaderboard-item @(Model.CurrentUserName == user.User.UserName ? "current-user" : "")">
                     <div class="rank">@user.Rank</div>

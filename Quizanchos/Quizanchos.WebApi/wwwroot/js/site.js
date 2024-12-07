@@ -63,10 +63,18 @@ async function handleSubmit(event) {
         });
 
         if (response.ok) {
-            showModal('Registration successful! Welcome to Quizanchos!', true);
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 2000);
+            const responseData = await response.json(); 
+
+            if (responseData === 1) { 
+                showModal('Please check your email and confirm your account.', true);
+            } else if (responseData === 0) { 
+                showModal('Registration successful! Welcome to Quizanchos!', true);
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 2000);
+            } else { 
+                showModal('Unexpected response from the server. Please try again.');
+            }
             return;
         }
         
@@ -81,6 +89,7 @@ async function handleSubmit(event) {
 function redirectToCategory(category) {
     window.location.href = `/QuizCategories?filter=${category}`;
 }
+
 document.addEventListener("DOMContentLoaded", function () {
     const startQuestButton = document.getElementById("startQuestButton");
 
@@ -133,6 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
 
 
 
