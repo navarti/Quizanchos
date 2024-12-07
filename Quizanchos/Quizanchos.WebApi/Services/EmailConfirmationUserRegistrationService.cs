@@ -1,7 +1,8 @@
 ﻿using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
+using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Services.Interfaces;
-using Quizanchos.WebApi.Services.Other;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -14,6 +15,8 @@ public class EmailConfirmationUserRegistrationService : IUserRegistrationService
         public string RoleName { get; set; }
         public DateTime RequestedTime { get; set; }
     }
+
+    private const int CodeLength = 6;
 
     private readonly EmailSenderService _emailSenderService;
     private readonly DefaultUserRegistrationService _defaultUserRegistrationService;
@@ -28,7 +31,7 @@ public class EmailConfirmationUserRegistrationService : IUserRegistrationService
 
     public async Task<RegisterUserResult> RegisterUser(ApplicationUser user, string password, string roleName)
     {
-        Guid id = Guid.NewGuid();
+        string code = StringGenerator.GenerateRandomString(_containerService.Random, CodeLength);
         UserData userData = new()
         {
             User = user,
@@ -37,24 +40,24 @@ public class EmailConfirmationUserRegistrationService : IUserRegistrationService
             RequestedTime = DateTime.Now
         };
 
-        _containerService.PendingUsersDictionary.Add(id, userData);
+        _containerService.PendingUsersDictionary.Add(code, userData);
 
         string title = "Confirm your email";
-        string content = $"<a href='https://localhost:7020/EmailConfirmation/ConfirmEmail/{id}'>Click here to confirm your email</a>";
+        string content = $"Your code to confirm email: {code}";
 
-        await _emailSenderService.SendHtmlEmailAsync(user.Email, title, content);
+        await _emailSenderService.SendEmailAsync(user.Email, title, content);
 
         return RegisterUserResult.PendingConfirmation;
     }
 
-    public async Task ConfirmEmail(Guid guid)
+    public async Task ConfirmEmail(string code)
     {
-        if (!_containerService.PendingUsersDictionary.TryGetValue(guid, out UserData userData))
+        if (!_containerService.PendingUsersDictionary.TryGetValue(code, out UserData userData))
         {
-            throw HandledExceptionFactory.Create("The application with this id does not exist");
+            throw HandledExceptionFactory.Create("The application with this code does not exist");
         }
 
-        _containerService.PendingUsersDictionary.Remove(guid);
+        _containerService.PendingUsersDictionary.Remove(code);
 
         if (DateTime.Now - userData.RequestedTime > TimeSpan.FromHours(1))
         {
