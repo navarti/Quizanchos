@@ -2,7 +2,7 @@
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Services.Interfaces;
-using Quizanchos.WebApi.Services.Other;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -11,7 +11,6 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
     public class UserData
     {
         public string UserId { get; set; }
-        public DateTime RequestedTime { get; set; }
         public string Password { get; set; }
     }
 
@@ -36,7 +35,6 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
         {
             UserId = user.Id,
             Password = newPassword,
-            RequestedTime = DateTime.Now
         };
 
         _containerService.PendingPasswordDictionary.Add(code, userData);
@@ -57,11 +55,6 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
         }
 
         _containerService.PendingPasswordDictionary.Remove(code);
-
-        if (DateTime.Now - userData.RequestedTime > TimeSpan.FromHours(1))
-        {
-            throw HandledExceptionFactory.Create("The confirmation link has expired");
-        }
 
         ApplicationUser? user = await _userManager.FindByIdAsync(userData.UserId);
         _ = user ?? throw HandledExceptionFactory.Create("User not found");

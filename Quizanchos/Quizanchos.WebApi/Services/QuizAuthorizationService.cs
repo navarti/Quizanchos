@@ -4,7 +4,7 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.Common.Util;
 using Quizanchos.WebApi.Services.Interfaces;
-using Quizanchos.WebApi.Services.Other;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services;
 

@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Services.Other;
+﻿namespace Quizanchos.WebApi.Util;
 
 public enum RegisterUserResult
 {

@@ -1,13 +1,12 @@
 ﻿using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Constants;
+using Quizanchos.WebApi.Controllers;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Services.HelperServices;
@@ -66,9 +65,9 @@ public static class Startup
         .AddCookie()
         .AddGoogle(googleOptions =>
         {
-            googleOptions.ClientId = configuration["Auth:Google:ClientId"] 
+            googleOptions.ClientId = configuration.GetOption("Auth:Google:ClientId") 
                 ?? throw CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientId");
-            googleOptions.ClientSecret = configuration["Auth:Google:ClientSecret"] 
+            googleOptions.ClientSecret = configuration.GetOption("Auth:Google:ClientSecret") 
                 ?? throw CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientSecret");
         });
 
@@ -80,7 +79,7 @@ public static class Startup
             {
                 Name = "QAuth",
             };
-            if (!int.TryParse(configuration["Auth:Cookie:TokenValidityInMinutes"], out int tokenValidityInMinutes))
+            if (!int.TryParse(configuration.GetOption("Auth:Cookie:TokenValidityInMinutes"), out int tokenValidityInMinutes))
             {
                 throw CriticalExceptionFactory.CreateConfigException("Auth:Cookie:TokenValidityInMinutes");
             }
@@ -99,12 +98,6 @@ public static class Startup
     {
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
-
-        services.AddControllersWithViews();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        services.AddEndpointsApiExplorer();
-
-        services.AddSwaggerGen();
 
         services.AddDbContext<QuizDbContext>(options =>
         {
@@ -127,16 +120,16 @@ public static class Startup
         services.AddSingleton<ICloudinary>(serviceProvider =>
         {
             Account account = new Account(
-                configuration["Cloudinary:CloudName"],
-                configuration["Cloudinary:ApiKey"],
-                configuration["Cloudinary:ApiSecret"]
+                configuration.GetOption("Cloudinary:CloudName"),
+                configuration.GetOption("Cloudinary:ApiKey"),
+                configuration.GetOption("Cloudinary:ApiSecret")
             );
             return new Cloudinary(account);
         });
 
         services.AddSingleton<ContainerService>();
 
-        AddEmailConfirmation(builder);
+        AddControllers(builder);
 
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
@@ -144,7 +137,6 @@ public static class Startup
         services.AddTransient<QuizAuthorizationService>(); 
         services.AddTransient<UserProfileService>(); 
         services.AddTransient<LeaderBoardService>(); 
-
 
         services.AddSingleton<LockerService>();
         services.AddTransient<QuizEntityService>();
@@ -154,6 +146,10 @@ public static class Startup
         services.AddTransient<MainQuizCardService>();
         services.AddTransient<SessionTerminatorService>();
         services.AddTransient<SingleGameSessionService>();
+
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
     }
 
     public async static Task SeedData(this WebApplication app, ConfigurationManager configuration)
@@ -165,20 +161,24 @@ public static class Startup
         }
     }
 
-    private static void AddEmailConfirmation(WebApplicationBuilder builder)
+    private static void AddControllers(WebApplicationBuilder builder)
     {
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
 
-        if (configuration["EmailConfirmation:ShouldUse"] == "0")
+        if (configuration.GetOption("EmailConfirmation:ShouldUse") == "0")
         {
             services.AddTransient<IUserPasswordUpdaterService, DummyPasswordUpdaterService>();
             services.AddTransient<IUserRegistrationService, DefaultUserRegistrationService>();
+            services.AddControllersWithViews(options =>
+            {
+                options.Conventions.Add(new SkipControllerConvention(typeof(EmailConfirmationController)));
+            });
             return;
         }
 
-        services.AddFluentEmail(configuration["EmailConfirmation:MailGun:FromEmail"], configuration["EmailConfirmation:MailGun:FromName"])
-            .AddMailGunSender(configuration["EmailConfirmation:MailGun:Domain"], configuration["EmailConfirmation:MailGun:ApiKey"]);
+        services.AddFluentEmail(configuration.GetOption("EmailConfirmation:MailGun:FromEmail"), configuration.GetOption("EmailConfirmation:MailGun:FromName"))
+            .AddMailGunSender(configuration.GetOption("EmailConfirmation:MailGun:Domain"), configuration.GetOption("EmailConfirmation:MailGun:ApiKey"));
 
         services.AddTransient<EmailSenderService>();
         services.AddTransient<DefaultUserRegistrationService>();
@@ -186,5 +186,7 @@ public static class Startup
         services.AddTransient<EmailConfirmationPasswordUpdaterService>();
         services.AddTransient<IUserPasswordUpdaterService, EmailConfirmationPasswordUpdaterService>();
         services.AddTransient<IUserRegistrationService, EmailConfirmationUserRegistrationService>();
+
+        services.AddControllersWithViews();
     }
 }

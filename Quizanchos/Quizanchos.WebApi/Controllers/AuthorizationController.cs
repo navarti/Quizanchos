@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
-using Quizanchos.WebApi.Services.Other;
+using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Controllers;
 
