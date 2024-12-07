@@ -5,7 +5,6 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 
-
 namespace Quizanchos.WebApi.Services;
 
 public class QuizCategoryService
@@ -59,7 +58,3 @@ public class QuizCategoryService
         await _quizCategoryRepository.Delete(quizCategory);
     }
 }
-
-
-
-

@@ -4,7 +4,6 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
@@ -62,14 +61,14 @@ public class MainQuizCardService
     {
         IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
         QuizCardAbstract card = await quizCardService.CreateCardForSession(gameSession);
-        return MapQuizCardDto(card);
+        return quizCardService.MapQuizCardDto(card);
     }
 
     public async Task<(QuizCardDtoAbstract QuizCardDto, bool IsCorrect)> PickAnswerForSession(SingleGameSession gameSession, int optionPicked)
     {
         IQuizCardService quizCardService = GetQuizCardService(gameSession.QuizCategory.FeatureType);
         (QuizCardAbstract QuizCard, bool IsCorrect) result = await quizCardService.PickAnswerForSession(gameSession.Id, gameSession.CurrentCardIndex, optionPicked);
-        return (MapQuizCardDtoWithAnswer(result.QuizCard), result.IsCorrect);
+        return (quizCardService.MapQuizCardDtoWithAnswer(result.QuizCard), result.IsCorrect);
     }
 
     private IQuizCardService GetQuizCardService(FeatureType featureType)
@@ -82,16 +81,12 @@ public class MainQuizCardService
         };
     }
 
-    // TODO: move these 2 methods to services
     private QuizCardDtoAbstract MapQuizCardDto(QuizCardAbstract quizCard)
     {
         return quizCard switch
         {
-            // TODO: fix
-            //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardFloat quizCardFloat => new QuizCardFloatDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.OptionPicked, quizCardFloat.CreationTime, quizCardFloat.Options.Select(o => o.QuizEntity.Id).ToArray()),
-            //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
-            QuizCardInt quizCardInt => new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.Options.Select(o => o.QuizEntity.Id).ToArray()),
+            QuizCardFloat quizCardFloat => _featureFloatService.MapQuizCardDto(quizCard),
+            QuizCardInt quizCardInt => _featureIntService.MapQuizCardDto(quizCard),
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }
@@ -100,15 +95,8 @@ public class MainQuizCardService
     {
         return quizCard switch
         {
-            // TODO: fix
-            //QuizCardFloat quizCardFloat => _mapper.Map<QuizCardFloatDto>(quizCardFloat),
-            QuizCardFloat quizCardFloat => new QuizCardFloatWithAnswerDto(quizCardFloat.Id, quizCardFloat.CardIndex, quizCardFloat.OptionPicked, quizCardFloat.CreationTime, quizCardFloat.Options.Select(o => o.QuizEntity.Id).ToArray(), 
-                quizCardFloat.CorrectOption, quizCardFloat.Options.Select(o => o.Value.Value).ToArray()),
-
-            //QuizCardInt quizCardInt => _mapper.Map<QuizCardIntDto>(quizCardInt),
-            QuizCardInt quizCardInt => new QuizCardIntWithAnswerDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.Options.Select(o => o.QuizEntity.Id).ToArray(),
-                quizCardInt.CorrectOption, quizCardInt.Options.Select(o => o.Value.Value).ToArray()),
-
+            QuizCardFloat quizCardFloat => _featureFloatService.MapQuizCardDtoWithAnswer(quizCard),
+            QuizCardInt quizCardInt => _featureIntService.MapQuizCardDtoWithAnswer(quizCard),
             _ => throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}")
         };
     }

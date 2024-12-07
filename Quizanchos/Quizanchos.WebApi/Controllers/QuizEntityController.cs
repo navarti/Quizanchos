@@ -32,9 +32,9 @@ public class QuizEntityController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(string name, int take, int skip)
     {
-        List<QuizEntityDto> quizEntityDtos = await _quizEntityService.GetAll();
+        List<QuizEntityDto> quizEntityDtos = await _quizEntityService.GetAll(name, take, skip);
         return Ok(quizEntityDtos);
     }
 
