@@ -7,5 +7,3 @@ public record FullApplicationUserDto(string Email, string UserName, string Avata
 
 public record ApplicationUserInLeaderBoardDto(string UserName, string AvatarUrl, int Score, int Position)
     : ApplicationUserDto(UserName, AvatarUrl, Score);
-
-public record ApplicationUserInLeaderBoardListDto(List<ApplicationUserInLeaderBoardDto> Users);

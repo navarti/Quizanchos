@@ -17,14 +17,14 @@ public class LeaderBoardController : Controller
     [HttpGet]
     public async Task<IActionResult> GetLeaderBoardAsync(int take, int skip)
     {
-        ApplicationUserInLeaderBoardListDto result = await _leaderBoardService.GetLeaderBoardAsync(take, skip);
+        IEnumerable<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip);
         return Ok(result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetUserPositionAsync()
     {
-        ApplicationUserInLeaderBoardListDto result = await _leaderBoardService.GetUserPositionAsync(User);
+        ApplicationUserInLeaderBoardDto result = await _leaderBoardService.GetUserPositionAsync(User);
         return Ok(result);
     }
 }
