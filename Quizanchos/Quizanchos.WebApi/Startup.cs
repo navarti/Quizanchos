@@ -172,6 +172,7 @@ public static class Startup
 
         if (configuration["EmailConfirmation:ShouldUse"] == "0")
         {
+            services.AddTransient<IUserPasswordUpdaterService, DummyPasswordUpdaterService>();
             services.AddTransient<IUserRegistrationService, DefaultUserRegistrationService>();
             return;
         }
@@ -182,6 +183,8 @@ public static class Startup
         services.AddTransient<EmailSenderService>();
         services.AddTransient<DefaultUserRegistrationService>();
         services.AddTransient<EmailConfirmationUserRegistrationService>();
+        services.AddTransient<EmailConfirmationPasswordUpdaterService>();
+        services.AddTransient<IUserPasswordUpdaterService, EmailConfirmationPasswordUpdaterService>();
         services.AddTransient<IUserRegistrationService, EmailConfirmationUserRegistrationService>();
     }
 }

@@ -32,7 +32,7 @@ public class LeaderBoardService
             .Take(take)
             .ToListAsync();
 
-        return users.Select((user, position) => new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position));
+        return users.Select((user, position) => new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1));
     }
 
     public async Task<ApplicationUserInLeaderBoardDto> GetUserPositionAsync(ClaimsPrincipal claimsPrincipal)
@@ -44,6 +44,6 @@ public class LeaderBoardService
 
         int position = users.FindIndex(u => u.Id == user.Id);
 
-        return new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position);
+        return new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1);
     }
 }

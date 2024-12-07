@@ -39,4 +39,12 @@ public class AuthorizationController : Controller
         await _authorizationService.RegisterAdmin(registerModelDto);
         return Ok();
     }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.Admin)]
+    public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordModelDto passwordModelDto)
+    {
+        await _authorizationService.UpdatePassword(passwordModelDto);
+        return Ok();
+    }
 }
