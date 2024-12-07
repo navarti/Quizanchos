@@ -43,13 +43,7 @@ public class QuizAuthorizationService
     {
         _ = registerModelDto ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto));
 
-        ApplicationUser? user = await _userManager.FindByEmailAsync(registerModelDto.Email);
-        if (user is not null)
-        {
-            throw HandledExceptionFactory.Create("The user with this email exists");
-        }
-
-        user = new ApplicationUser
+        ApplicationUser user = new ApplicationUser
         {
             UserName = registerModelDto.Email,
             Email = registerModelDto.Email,

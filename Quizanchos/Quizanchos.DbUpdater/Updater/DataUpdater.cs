@@ -45,6 +45,7 @@ internal class DataUpdater : IDataUpdater
         quizCategory = new QuizCategory()
         {
             Name = data.CategoryName,
+            QuestionToDisplay = data.QuestionToDisplay,
             FeatureType = data.FeatureType,
             ImageUrl = data.ImageUrl
         };
