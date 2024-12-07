@@ -18,12 +18,5 @@ public class MappingProfile : Profile
             .ConstructUsing(src => new SingleGameSessionDto(src.Id, src.QuizCategory.Id, src.GameLevel, src.ApplicationUser.Id.ToString(), 
                 src.CreationTime, src.CurrentCardIndex, src.Score, src.IsFinished, src.IsTerminatedByTime, src.CardsCount, src.SecondsPerCard,
                 src.OptionCount));
-
-        // TODO: fix
-        //CreateMap<QuizCardFloat, QuizCardFloatDto>()
-        //    .ConstructUsing(src => new QuizCardFloatDto(src.Id, src.CardIndex, src.Option1.Value.Value, src.Option2.Value.Value, src.OptionPicked ?? -1, src.CreationTime));
-
-        //CreateMap<QuizCardInt, QuizCardIntDto>()
-        //    .ConstructUsing(src => new QuizCardIntDto(src.Id, src.CardIndex, src.Option1.Value.Value, src.Option2.Value.Value, src.OptionPicked ?? -1, src.CreationTime));
     }
 }

@@ -2,7 +2,6 @@
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
-using Quizanchos.WebApi.Services.Other;
 using Quizanchos.Common.Util;
 
 namespace Quizanchos.WebApi.Services;
