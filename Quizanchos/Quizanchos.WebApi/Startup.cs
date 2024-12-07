@@ -1,4 +1,5 @@
-﻿using CloudinaryDotNet;
+﻿using AutoMapper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain;
@@ -141,6 +142,8 @@ public static class Startup
         services.AddSingleton<LockerService>();
         services.AddTransient<QuizEntityService>();
         services.AddTransient<QuizCategoryService>();
+        services.AddTransient<FeatureIntService>();
+        services.AddTransient<FeatureFloatService>();
         services.AddTransient<QuizCardFloatService>();
         services.AddTransient<QuizCardIntService>();
         services.AddTransient<MainQuizCardService>();

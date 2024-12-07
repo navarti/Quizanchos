@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services.HelperServices;
+using Quizanchos.WebApi.Util;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;
@@ -21,10 +21,7 @@ public class LeaderBoardService
 
     public async Task<IEnumerable<ApplicationUserInLeaderBoardDto>> GetLeaderBoardAsync(int take, int skip)
     {
-        if (take <= 0 || skip < 0)
-        {
-            throw HandledExceptionFactory.Create("The take must be > 0 and skip must be >= 0");
-        }
+        SkipTakeValidator.Validate(skip, take);
 
         List<ApplicationUser> users = await _userManager.Users
             .OrderByDescending(u => u.Score)
