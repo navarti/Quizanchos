@@ -27,9 +27,11 @@ public class QuizController : Controller
     [Authorize(Roles = "User")]
     public async Task<IActionResult> SessionSetup(Guid quizcategoryid)
     {
+        var quizCategory = await _quizCategoryService.GetById(quizcategoryid);
+
         var viewModel = new QuizCategoryViewModel()
         {
-            QuizCategoryName = await GetQuizCategoryName(quizcategoryid),
+            QuizCategoryName = quizCategory?.Name ?? "Unknown Category",
             CategoryId = quizcategoryid
         };
         return View(viewModel);
@@ -43,6 +45,8 @@ public class QuizController : Controller
 
         QuizOptionViewModel[] options = await GetQuizOptionViewModel(quizCardDto.EntitiesId);
 
+        var quizCategory = await _quizCategoryService.GetById(singleGameSessionDto.QuizCategoryId);
+
         var viewModel = new QuizViewModel
         {
             CurrentCardIndex = singleGameSessionDto.CurrentCardIndex + 1 ,
@@ -53,9 +57,9 @@ public class QuizController : Controller
             OptionCount = (int)singleGameSessionDto.OptionCount,
             Score = singleGameSessionDto.Score,
             CategoryId = singleGameSessionDto.QuizCategoryId,
-            QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId),
+            QuizCategoryName = quizCategory?.Name ?? "Unknown Category",
             Options = options,
-            ImageUrl = await GetQuizImageUrl(singleGameSessionDto.QuizCategoryId)
+            ImageUrl = quizCategory?.ImageUrl ?? "Unknown Image"
         };
         
         return View(viewModel);
@@ -77,16 +81,4 @@ public class QuizController : Controller
 
         return options.ToArray();
     }
-
-    public async Task<string> GetQuizCategoryName(Guid quizCategoryId)
-    {
-        var quizCategory = await _quizCategoryService.GetById(quizCategoryId);
-        return quizCategory?.Name ?? "Unknown Category";
-    }
-    public async Task<string> GetQuizImageUrl(Guid quizCategoryId)
-    {
-        var quizCategory = await _quizCategoryService.GetById(quizCategoryId);
-        return quizCategory?.ImageUrl ?? "Unknown Image";
-    }
 }
-
