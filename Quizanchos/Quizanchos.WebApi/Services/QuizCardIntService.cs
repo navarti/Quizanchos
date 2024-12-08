@@ -3,6 +3,8 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Repositories.Realizations;
+using Quizanchos.WebApi.Dto.Abstractions;
+using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
@@ -52,5 +54,26 @@ public class QuizCardIntService : IQuizCardService
     {
         QuizCardInt? quizCard = await _quizCardIntRepository.PickAnswerForSession(gameSessionid, cardIndex, optionPicked);
         return (quizCard, quizCard.CorrectOption == optionPicked);
+    }
+
+    public QuizCardDtoAbstract MapQuizCardDto(QuizCardAbstract quizCard)
+    {
+        if(quizCard is not QuizCardInt quizCardInt)
+        {
+            throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}");
+        }
+
+        return new QuizCardIntDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.Options.Select(o => o.QuizEntity.Id).ToArray());
+    }
+
+    public QuizCardDtoAbstract MapQuizCardDtoWithAnswer(QuizCardAbstract quizCard)
+    {
+        if (quizCard is not QuizCardInt quizCardInt)
+        {
+            throw CriticalExceptionFactory.Create($"Unrecognised {nameof(QuizCardAbstract)}: {quizCard}");
+        }
+
+        return new QuizCardIntWithAnswerDto(quizCardInt.Id, quizCardInt.CardIndex, quizCardInt.OptionPicked, quizCardInt.CreationTime, quizCardInt.Options.Select(o => o.QuizEntity.Id).ToArray(),
+                quizCardInt.CorrectOption, quizCardInt.Options.Select(o => o.Value.Value).ToArray());
     }
 }

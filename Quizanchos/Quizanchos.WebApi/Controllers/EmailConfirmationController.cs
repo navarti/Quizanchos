@@ -9,16 +9,25 @@ namespace Quizanchos.WebApi.Controllers;
 public class EmailConfirmationController : Controller
 {
     private readonly EmailConfirmationUserRegistrationService _emailConfirmationUserRegistrationService;
+    private readonly EmailConfirmationPasswordUpdaterService _emailConfirmationPasswordUpdaterService;
 
-    public EmailConfirmationController(EmailConfirmationUserRegistrationService emailConfirmationUserRegistrationService)
+    public EmailConfirmationController(EmailConfirmationUserRegistrationService emailConfirmationUserRegistrationService, EmailConfirmationPasswordUpdaterService emailConfirmationPasswordUpdaterService)
     {
         _emailConfirmationUserRegistrationService = emailConfirmationUserRegistrationService;
+        _emailConfirmationPasswordUpdaterService = emailConfirmationPasswordUpdaterService;
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> ConfirmEmail(Guid id)
+    [HttpPost]
+    public async Task<IActionResult> ConfirmEmail(string code)
     {
-        await _emailConfirmationUserRegistrationService.ConfirmEmail(id);
-        return Redirect("/");
+        await _emailConfirmationUserRegistrationService.ConfirmEmail(code);
+        return Ok();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ConfirmPassword(string code)
+    {
+        await _emailConfirmationPasswordUpdaterService.ConfirmEmail(code);
+        return Ok();
     }
 }
