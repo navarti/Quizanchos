@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Services.HelperServices;
+﻿namespace Quizanchos.WebApi.Util;
 
 public static class StringGenerator
 {

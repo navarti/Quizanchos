@@ -1,7 +1,7 @@
-﻿using AutoMapper;
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
@@ -10,7 +10,6 @@ using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Controllers;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
-using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
@@ -149,6 +148,18 @@ public static class Startup
         services.AddTransient<MainQuizCardService>();
         services.AddTransient<SessionTerminatorService>();
         services.AddTransient<SingleGameSessionService>();
+
+        services.AddQuartz(q =>
+        {
+            var jobKey = new JobKey("MonthlyTask");
+            q.AddJob<LeadersUpdaterJob>(opts => opts.WithIdentity(jobKey));
+            q.AddTrigger(opts => opts
+                .ForJob(jobKey)
+                .WithIdentity("MonthlyTaskTrigger")
+                .WithCronSchedule("0 0 0 1 * ?"));
+        });
+
+        services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         services.AddEndpointsApiExplorer();

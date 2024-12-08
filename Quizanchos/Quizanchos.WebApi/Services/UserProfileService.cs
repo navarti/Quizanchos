@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.HelperServices;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Util;
 using System.Security.Claims;
 
@@ -19,17 +18,22 @@ public class LeaderBoardService
         _userRetrieverService = userRetrieverService;
     }
 
-    public async Task<IEnumerable<ApplicationUserInLeaderBoardDto>> GetLeaderBoardAsync(int take, int skip)
+    public async Task<List<ApplicationUserInLeaderBoardDto>> GetLeaderBoardAsync(int take, int skip)
+    {
+        return (await GetAppUsesLeaderBoardAsync(take, skip))
+            .Select((user, position) => new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1))
+            .ToList();
+    }
+
+    public async Task<List<ApplicationUser>> GetAppUsesLeaderBoardAsync(int take, int skip)
     {
         SkipTakeValidator.Validate(skip, take);
 
-        List<ApplicationUser> users = await _userManager.Users
+        return await _userManager.Users
             .OrderByDescending(u => u.Score)
             .Skip(skip)
             .Take(take)
             .ToListAsync();
-
-        return users.Select((user, position) => new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1));
     }
 
     public async Task<ApplicationUserInLeaderBoardDto> GetUserPositionAsync(ClaimsPrincipal claimsPrincipal)
