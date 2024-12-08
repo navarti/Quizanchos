@@ -47,14 +47,41 @@
                 <button type="button" id="submitButton" class="btn btn-primary">Submit</button>
             </form>
 
-            <div id="errorModal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <span class="close-btn" id="closeModal">&times;</span>
-                    <h2 id="modalHeader">Notification</h2>
-                    <p id="modalErrorText"></p>
-                </div>
+        <div id="errorModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-btn" id="closeModal">&times;</span>
+                <h2 id="modalHeader">Notification</h2>
+                <p id="modalErrorText"></p>
             </div>
+        </div>
+        <div id="verifyModal" class="verify-modal">
+            <div class="verify-modal-content">
+                <button class="modal-close" onclick="closeVerifyModal()">&times;</button>
+                <h2>Verify your email</h2>
+                <p>We've sent a verification code to your email address.<br>Please enter it below to continue.</p>
 
+                <div class="input-container">
+                    <svg class="mail-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    <input type="text" placeholder="Enter verification code" maxlength="6">
+                </div>
+
+                <div class="resend-container">
+                    <p>Didn't receive the code?</p>
+                    <button class="resend-btn">Resend</button>
+                </div>
+
+                <button class="verify-btn">Verify Email</button>
+
+                <p class="terms-text">
+                    By signing up, you accept our
+                    <a href="#" class="terms-link">Terms and Conditions</a> and
+                    <a href="#" class="terms-link">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
         
         <div class="signup-footer">
             By signing up, you accept our <a href="/terms">Terms and Conditions</a> and <a href="/privacy">Privacy Policy</a>.

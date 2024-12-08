@@ -63,10 +63,78 @@ async function handleSubmit(event) {
         });
 
         if (response.ok) {
-            const responseData = await response.json(); 
+            const responseData = await response.json();
 
-            if (responseData === 1) { 
-                showModal('Please check your email and confirm your account.', true);
+            if (responseData === 1) {
+                openVerifyModal();
+                const verifyForm = document.getElementById('verify-form');
+                if (verifyForm) {
+                    verifyForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const codeInput = verifyForm.querySelector('input[type="text"]');
+                        if (codeInput && codeInput.value.length === 6) {
+                            const code = codeInput.value;
+
+                            fetch('/EmailConfirmation/ConfirmEmail', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ code: code })
+                            })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        alert('Code verified successfully!');
+                                        closeVerifyModal();
+                                    } else {
+                                        alert('Invalid code. Please try again.');
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error:', error);
+                                    alert('An error occurred. Please try again later.');
+                                });
+                        } else {
+                            alert('Please enter a valid 6-digit code');
+                        }
+                    });
+                }
+
+                const resendBtn = document.getElementById('verify-resend-btn');
+                if (resendBtn) {
+                    resendBtn.addEventListener('click', function() {
+                        fetch('/api/resend-code', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ userId: 'user_id_here' }) 
+                        })
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.success) {
+                                    alert('A new verification code has been sent to your email.');
+                                } else {
+                                    alert('Failed to resend code. Please try again.');
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                                alert('An error occurred. Please try again later.');
+                            });
+                    });
+                }
             } else if (responseData === 0) { 
                 showModal('Registration successful! Welcome to Quizanchos!', true);
                 setTimeout(() => {
@@ -90,6 +158,18 @@ function redirectToCategory(category) {
     window.location.href = `/QuizCategories?filter=${category}`;
 }
 
+document.getElementById('verifyModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeVerifyModal();
+    }
+});
+
+const modalContent = document.querySelector('#verifyModal .verify-modal-content');
+if (modalContent) {
+    modalContent.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+}
 document.addEventListener("DOMContentLoaded", function () {
     const startQuestButton = document.getElementById("startQuestButton");
 

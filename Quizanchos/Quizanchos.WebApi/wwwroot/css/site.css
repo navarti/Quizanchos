@@ -414,7 +414,6 @@ body {
 }
 
 
-
 .google-signup-btn {
     display: flex;
     align-items: center;
@@ -731,71 +730,7 @@ body {
         transform: translateY(0);
     }
 }
-.contact-wrapper {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 40px 20px;
-}
-.contact-title {
-    color: #6a3093;
-    font-size: 32px;
-    text-align: center;
-    margin-bottom: 20px;
-}
-.contact-description {
-    text-align: center;
-    color: #666;
-    margin-bottom: 30px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-.form-group {
-    margin-bottom: 20px;
-}
-.form-label {
-    display: block;
-    color: #6a3093;
-    margin-bottom: 8px;
-}
-.form-input,
-.form-textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-.form-textarea {
-    min-height: 150px;
-    resize: vertical;
-}
-.form-submit {
-    width: 100%;
-    padding: 12px;
-    background: #6a3093;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-.form-submit:hover {
-    background: #8a4baf;
-}
-.email-info {
-    text-align: center;
-    margin-top: 20px;
-    color: #666;
-}
-.email-link {
-    color: #6a3093;
-    text-decoration: none;
-}
-.email-link:hover {
-    text-decoration: underline;
-}
+
 @media (max-width: 768px) {
     nav {
         flex-direction: column;
@@ -911,7 +846,170 @@ body {
     .signin-form .btn-primary:hover {
         background: #463bff;
     }
+.verify-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
 
+.verify-modal.active {
+    display: flex;
+    opacity: 1;
+    visibility: visible;
+}
+
+.verify-modal-content {
+    position: relative;
+    background: white;
+    width: 90%;
+    max-width: 460px;
+    border-radius: 16px;
+    padding: 40px 24px;
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.verify-modal-content .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.verify-modal-content .close-btn:hover {
+    color: #111827;
+}
+
+.verify-modal-content .input-container {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.verify-modal-content .mail-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-40%);
+    color: #9ca3af;
+    pointer-events: none; 
+    vertical-align: middle; 
+}
+
+.verify-modal-content input {
+    width: 100%;
+    padding: 16px 16px 16px 48px;
+    font-size: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #374151;
+    background: #fff;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+    line-height: normal;
+}
+
+.verify-modal-content input:focus {
+    outline: none;
+    border-color: #7C3AED;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.verify-modal-content input::placeholder {
+    color: #9ca3af;
+}
+
+.verify-modal-content .verify-btn,
+.verify-modal-content .resend-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-bottom: 16px;
+}
+
+.verify-modal-content .verify-btn {
+    background-color: #7C3AED;
+    color: white;
+    border: none;
+}
+
+.verify-modal-content .verify-btn:hover {
+    background-color: #6D28D9;
+}
+
+.verify-modal-content .resend-btn {
+    background: none;
+    border: 1px solid #7C3AED;
+    color: #7C3AED;
+}
+
+.verify-modal-content .resend-btn:hover {
+    background-color: rgba(124, 58, 237, 0.1);
+}
+
+.verify-modal-content .terms-text {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.verify-modal-content .terms-link {
+    color: #7C3AED;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.verify-modal-content .terms-link:hover {
+    text-decoration: underline;
+}
+
+.verify-modal .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #6b7280;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* Circle shape */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.verify-modal .modal-close:hover {
+    background-color: rgba(108, 99, 255, 0.1); /* Light purple background */
+    color: #7C3AED; /* Change color on hover */
+}
+
+.verify-modal .modal-close:focus {
+    outline: none;
+    box-shadow: 0 0 3px 2px rgba(108, 99, 255, 0.5); /* Add focus shadow */
+}
 .signin-footer {
     font-size: 0.9rem;
     color: #666666;

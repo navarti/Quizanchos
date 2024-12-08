@@ -44,8 +44,6 @@ function showModal(message, isSuccess = false) {
     modal.style.display = 'flex';
 }
 
-
-// Скрытие модального окна
 function hideModal() {
     const modal = document.getElementById('errorModal');
     modal.style.display = 'none';
@@ -83,5 +81,20 @@ function logout() {
             alert('An error occurred. Please try again.');
         });
 }
+const verifyModal = document.getElementById('verifyModal');
+const closeModalButton = document.querySelector('.modal-close');
+function openVerifyModal() {
+    verifyModal.style.display = 'flex'; 
+    verifyModal.offsetHeight;
+    verifyModal.classList.add('active');
+}
+
+function closeVerifyModal() {
+    verifyModal.classList.remove('active'); 
+    setTimeout(() => {
+        verifyModal.style.display = 'none'; 
+    }, 300);
+}
+
 
 
