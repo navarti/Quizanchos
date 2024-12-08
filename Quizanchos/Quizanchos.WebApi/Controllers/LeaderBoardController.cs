@@ -17,7 +17,7 @@ public class LeaderBoardController : Controller
     [HttpGet]
     public async Task<IActionResult> GetLeaderBoardAsync(int take, int skip)
     {
-        IEnumerable<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip);
+        List<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip);
         return Ok(result);
     }
 
