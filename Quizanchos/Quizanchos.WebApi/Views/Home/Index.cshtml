@@ -2,26 +2,128 @@
 @{
     ViewData["Title"] = "Home";
 }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+<div class="hero-waves">
+    <div class="wave"></div>
+    <div class="wave"></div>
+    <div class="wave"></div>
+</div>
+<main>
+    <div class="hero-section">
+        <h1>Quizzes</h1>
+        <p class="subtitle">Get your first 100 points on your first quiz!</p>
 
-<div class="quiz-section">
-    <h1 class="quiz-title">Quizzes</h1>
-    <p class="quiz-subtitle">Get your first 100 points on your first quiz!</p>
-    <div class="quiz-cards">
-        @foreach (var quiz in Model.QuizCategories)
-        {
-            <div class="quiz-card">
-                <img src="https://static.scientificamerican.com/sciam/cache/file/63CCF2B0-1E10-4583-9D4EDAA0569200D1_source.jpg" alt="@quiz.Name" class="quiz-image">
-                <div class="quiz-info">
-                    <div class="quiz-meta">
-                        <span class="quiz-date">15 Feb 2024</span>
-                        <span class="quiz-category">@quiz.Name</span>
-                        <span class="quiz-author">Adam Smith</span>
+        <div class="featured-quizzes">
+            @foreach (var category in Model.QuizCategories.Take(2))
+            {
+                <div class="quiz-card">
+                    <div class="quiz-image" style="background-image: url('@category.ImageUrl')">
+                        <div class="quiz-content">
+                            <div class="quiz-header">
+                                <h2>@category.Name Quiz</h2>
+                                <p>Explore the mysteries of ancient civilizations!</p> 
+                            </div>
+                            <div class="quiz-meta">
+                                <span>@category.CreationDate.ToShortDateString()</span>
+                                <span>@category.Name</span>
+                                <span>@category.AuthorName</span>
+                            </div>
+                            <a href="/Quiz/Setup/@category.Id" class="quiz-btn">GO →</a>
+                        </div>
                     </div>
-                    <h2 class="quiz-name">Sample Quiz</h2>
-                    <p class="quiz-description">This is a sample description for a quiz...</p>
-                    <a href="/Quiz/Setup/@quiz.Id" class="quiz-link">GO →</a>
+                </div>
+            }
+        </div>
+    </div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        if (Model.ActiveSession != null)
+        {
+            <div class="sessions-card">
+                <h2>Your Active Session</h2>
+                <div class="session-item">
+                    <div class="session-info">
+                        <p><strong>Quiz Name:</strong> @Model.QuizName</p>
+                        <p><strong>Start Time:</strong> @Model.FormattedCreationTime</p>
+                        <p><strong>Progress:</strong> @Model.Progress</p>
+                        <p><strong>Score:</strong> @Model.Score</p>
+                        <p><strong>Game Level:</strong> @Model.ActiveSession.GameLevel</p>
+                        <p><strong>Time Per Card:</strong> @Model.ActiveSession.SecondPerCard seconds</p>
+                    </div>
+                    <a href="/Quiz/@Model.ActiveSession.Id" class="join-btn">Continue →</a>
                 </div>
             </div>
         }
+        else
+        {
+            <div class="sessions-card">
+                <h2>Active Sessions</h2>
+                <p>No active sessions available.</p>
+            </div>
+        }
+    }
+    else
+    {
+        <p>Please log in to view your active sessions.</p>
+    }
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Total Quizzes</h3>
+            <p class="stat-number">42</p>
+        </div>
+        <div class="stat-card">
+            <h3>Active Users</h3>
+            <p class="stat-number">1,337</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total Points</h3>
+            <p class="stat-number">98,765</p>
+        </div>
     </div>
-</div>
+
+    <div class="leaderboards-grid">
+        <div class="leaderboard-card">
+            <h3>Current Leaderboard</h3>
+            <div class="leaderboard-list">
+                @foreach (var user in Model.Users.Take(3).Select((user, index) => new { User = user, Rank = index + 1 }))
+                {
+                    <div class="leaderboard-item">
+                        <span class="rank">@user.Rank</span>
+                        <span class="username">@user.User.UserName</span>
+                        <span class="points">@user.User.Score pts</span>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="leaderboard-card">
+            <h3>This month prizes</h3>
+            <div class="leaderboard-list">
+                <div class="leaderboard-item">
+                    <span class="rank">1</span>
+                    <span class="username">Amazon Gift Card</span>
+                    <span class="points">$100</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">2</span>
+                    <span class="username">Amazon Gift Card</span>
+                    <span class="points">$50</span>
+                </div>
+                <div class="leaderboard-item">
+                    <span class="rank">3</span>
+                    <span class="username">Amazon Gift Card</span>
+                    <span class="points">$25</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script src="/js/home.js" asp-append-version="true"></script>
+</body>
+</html>

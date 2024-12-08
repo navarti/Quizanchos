@@ -268,8 +268,14 @@ namespace Quizanchos.Migrations.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -312,6 +318,10 @@ namespace Quizanchos.Migrations.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QuestionToDisplay")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -414,15 +424,9 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract");
 
-                    b.Property<Guid?>("Option1Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("Option2Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasIndex("Option1Id");
-
-                    b.HasIndex("Option2Id");
+                    b.Property<string>("Options")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("QuizCardFloat");
                 });
@@ -431,23 +435,14 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasBaseType("Quizanchos.Domain.Entities.Abstractions.QuizCardAbstract");
 
-                    b.Property<Guid?>("Option1Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("Option2Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasIndex("Option1Id");
-
-                    b.HasIndex("Option2Id");
+                    b.Property<string>("Options")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.ToTable("QuizCardAbstract", t =>
                         {
-                            t.Property("Option1Id")
-                                .HasColumnName("QuizCardInt_Option1Id");
-
-                            t.Property("Option2Id")
-                                .HasColumnName("QuizCardInt_Option2Id");
+                            t.Property("Options")
+                                .HasColumnName("QuizCardInt_Options");
                         });
 
                     b.HasDiscriminator().HasValue("QuizCardInt");
@@ -527,7 +522,8 @@ namespace Quizanchos.Migrations.Migrations
                 {
                     b.HasOne("Quizanchos.Domain.Entities.SingleGameSession", "SingleGameSession")
                         .WithMany()
-                        .HasForeignKey("SingleGameSessionId");
+                        .HasForeignKey("SingleGameSessionId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("SingleGameSession");
                 });
@@ -549,36 +545,6 @@ namespace Quizanchos.Migrations.Migrations
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("QuizCategory");
-                });
-
-            modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCardFloat", b =>
-                {
-                    b.HasOne("Quizanchos.Domain.Entities.FeatureFloat", "Option1")
-                        .WithMany()
-                        .HasForeignKey("Option1Id");
-
-                    b.HasOne("Quizanchos.Domain.Entities.FeatureFloat", "Option2")
-                        .WithMany()
-                        .HasForeignKey("Option2Id");
-
-                    b.Navigation("Option1");
-
-                    b.Navigation("Option2");
-                });
-
-            modelBuilder.Entity("Quizanchos.Domain.Entities.QuizCardInt", b =>
-                {
-                    b.HasOne("Quizanchos.Domain.Entities.FeatureInt", "Option1")
-                        .WithMany()
-                        .HasForeignKey("Option1Id");
-
-                    b.HasOne("Quizanchos.Domain.Entities.FeatureInt", "Option2")
-                        .WithMany()
-                        .HasForeignKey("Option2Id");
-
-                    b.Navigation("Option1");
-
-                    b.Navigation("Option2");
                 });
 #pragma warning restore 612, 618
         }

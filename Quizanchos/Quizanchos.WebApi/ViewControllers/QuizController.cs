@@ -3,6 +3,7 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services;
 using Quizanchos.ViewModels;
 using Quizanchos.WebApi.Dto.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Quizanchos.WebApi.ViewControllers;
 
@@ -23,11 +24,14 @@ public class QuizController : Controller
     }
 
     [HttpGet("Setup/{quizcategoryid:guid}")]
+    [Authorize(Roles = "User")]
     public async Task<IActionResult> SessionSetup(Guid quizcategoryid)
     {
+        var quizCategory = await _quizCategoryService.GetById(quizcategoryid);
+
         var viewModel = new QuizCategoryViewModel()
         {
-            QuizCategoryName = await GetQuizCategoryName(quizcategoryid),
+            QuizCategoryName = quizCategory?.Name ?? "Unknown Category",
             CategoryId = quizcategoryid
         };
         return View(viewModel);
@@ -37,30 +41,12 @@ public class QuizController : Controller
     public async Task<IActionResult> SingleGameSession(Guid sessionId)
     {
         SingleGameSessionDto singleGameSessionDto = await _singleGameSessionService.GetById(User,sessionId);
-        
         QuizCardDtoAbstract quizCardDto = await _singleGameSessionService.GetCurrentCardForSession(User, sessionId);
 
-        var options = new List<QuizOptionViewModel>();
-        for (int i = 1; i <= (int)singleGameSessionDto.OptionCount; i++)
-        {
-            var propertyName = $"Entity{i}Id";
-            var propertyInfo = quizCardDto.GetType().GetProperty(propertyName);
+        QuizOptionViewModel[] options = await GetQuizOptionViewModel(quizCardDto.EntitiesId);
 
-            if (propertyInfo != null)
-            {
-                var entityId = propertyInfo.GetValue(quizCardDto) as Guid?;
-                if (entityId.HasValue)
-                {
-                    var entity = await _QuizEntityService.GetById(entityId.Value);
-                    options.Add(new QuizOptionViewModel
-                    {
-                        Id = entity.Id,
-                        Name = entity.Name
-                    });
-                }
-            }
-        }
-        
+        var quizCategory = await _quizCategoryService.GetById(singleGameSessionDto.QuizCategoryId);
+
         var viewModel = new QuizViewModel
         {
             CurrentCardIndex = singleGameSessionDto.CurrentCardIndex + 1 ,
@@ -68,21 +54,31 @@ public class QuizController : Controller
             SessionId = singleGameSessionDto.Id,
             CreationTime = quizCardDto.CreationTime,
             SecondsPerCard = (int)singleGameSessionDto.SecondPerCard,
-            OptionCount = options.Count,
+            OptionCount = (int)singleGameSessionDto.OptionCount,
             Score = singleGameSessionDto.Score,
             CategoryId = singleGameSessionDto.QuizCategoryId,
-            QuizCategoryName = await GetQuizCategoryName(singleGameSessionDto.QuizCategoryId),
-            Options = options
+            QuizCategoryName = quizCategory?.Name ?? "Unknown Category",
+            Options = options,
+            ImageUrl = quizCategory?.ImageUrl ?? "Unknown Image"
         };
-
         
-       return View(viewModel);
-
+        return View(viewModel);
     }
-    private async Task<string> GetQuizCategoryName(Guid quizCategoryId)
+
+    private async Task<QuizOptionViewModel[]> GetQuizOptionViewModel(Guid[] entitiesId)
     {
-        var quizCategory = await _quizCategoryService.GetById(quizCategoryId);
-        return quizCategory?.Name ?? "Unknown Category";
+        List<QuizOptionViewModel> options = new();
+
+        foreach(Guid id in entitiesId)
+        {
+            var entity = await _QuizEntityService.GetById(id);
+            options.Add(new QuizOptionViewModel
+            {
+                Id = entity.Id,
+                Name = entity.Name
+            });
+        }
+
+        return options.ToArray();
     }
 }
-

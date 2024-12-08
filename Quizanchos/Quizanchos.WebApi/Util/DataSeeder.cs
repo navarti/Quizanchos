@@ -31,8 +31,8 @@ public static class DataSeeder
     // Only one owner is allowed
     public static async Task SeedOwner(IServiceProvider serviceProvider, ConfigurationManager configuration)
     {
-        string ownerEmail = configuration["Owner:Email"] ?? throw CriticalExceptionFactory.CreateConfigException("Owner:Email");
-        string ownerPassword = configuration["Owner:Password"] ?? throw CriticalExceptionFactory.CreateConfigException("Owner:Password");
+        string ownerEmail = configuration.GetOption("Owner:Email");
+        string ownerPassword = configuration.GetOption("Owner:Password");
 
         UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 

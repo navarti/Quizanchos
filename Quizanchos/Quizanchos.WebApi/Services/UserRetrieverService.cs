@@ -3,7 +3,7 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Services.HelperServices;
+namespace Quizanchos.WebApi.Services;
 
 public class UserRetrieverService
 {
@@ -22,8 +22,6 @@ public class UserRetrieverService
 
     public async Task<ApplicationUser> GetUserByClaims(ClaimsPrincipal claimsPrincipal)
     {
-        string userId = GetUserId(claimsPrincipal);
-        ApplicationUser? user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
-        return user ?? throw HandledExceptionFactory.CreateIdNotFoundException(userId);
+        return await _userManager.GetUserAsync(claimsPrincipal) ?? throw HandledExceptionFactory.CreateNullException(nameof(ApplicationUser));
     }
 }

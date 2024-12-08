@@ -1696,24 +1696,27 @@
     
 </div>
 <main class="quiz-container" data-session-id="@Model.SessionId">
-	<a href="/quizzes" class="back-button">Back to Quizzes</a>
-	<div class="quiz-header">
-		<p class="question-info">Question: @Model.CurrentCardIndex / @Model.TotalCards</p>
+	<a href="/" class="back-button">
+		<span>Back to Home</span>
+	</a>
+	<div id="quiz-header" class="quiz-header" data-category-id="@Model.CategoryId">
+		<p class="question-info" data-current="@Model.CurrentCardIndex" data-total="@Model.TotalCards">
+			Question: @Model.CurrentCardIndex / @Model.TotalCards
+		</p>
 		<div class="timeline-container" data-creation-time="@Model.CreationTime.ToString("yyyy-MM-ddTHH:mm:ssZ")"
 		     data-seconds-per-card="@Model.SecondsPerCard">
 			<div class="timeline"></div>
 		</div>
 		<div class="pick-your-answer">
-			<h3>Pick Your Answer</h3>
+			<h3>What`s country has the biggest GDP per capita?</h3>
 		</div>
 	</div>
-	<div class="quiz-form">
-		<h2>What's got more hp?</h2>
-		<div class="quiz-options">
+	<div class="quiz-form" style="--background-url: url('@Model.ImageUrl');">
+		<div class="quiz-options" data-option-count="@Model.OptionCount">
 			@for (var i = 0; i < @Model.OptionCount; i++)
 			{
 				var option = Model.Options[i];
-				<div class="quiz-option" style="--bg-color: @(i % 2 == 0 ? "#f1c40f" : "#3498db");" data-id="@option.Id">
+				<div class="quiz-option" style="--bg-color: @(i % 6 == 0 ? "#7B61FF" : i % 6 == 1 ? "#4FC3F7" : i % 6 == 2 ? "#FFA500" : i % 6 == 3 ? "#F48FB1" : i % 6 == 4 ? "#CE93D8" : "#80CBC4");" data-id="@option.Id">
 					<p class="quiz-option-text">@option.Name</p>
 				</div>
 			}
@@ -1727,24 +1730,25 @@
 			</div>
 			<p id="modalErrorText">What’s next? Your call!</p>
 			<div class="modal-buttons">
-				<button id="continueQuiz" class="continue-btn">Continue Quiz</button>
+				<button id="restartQuiz" class="continue-btn">Restart Quiz</button>
 				<button id="returnToMenu" class="return-menu-btn">Return to Main Menu</button>
 			</div>
 		</div>
 	</div>
-	@if (Model.CurrentCardIndex == Model.TotalCards)
-	{
-		<div id="finalStatsModal" class="modal">
-			<div class="modal-content">
-				<h2>Quiz Complete!</h2>
-				<p>Your Score: @Model.Score / @Model.TotalCards</p>
-				<p>Thank you for participating!</p>
-				<button id="returnToMenu">Return to Main Menu</button>
-			</div>
+	<div id="finalStatsModal" class="modal" data-score="@Model.Score" data-total="@Model.TotalCards" style="display: none;">
+		<div class="modal-content">
+			<h2>Quiz Complete!</h2>
+			<p>Your Score: <strong id="scoreDisplay"></strong> / <span id="totalCardsDisplay"></span></p>
+			<p>Thank you for participating!</p>
+			<button id="goToResults">Return to Main Menu</button>
 		</div>
-	}
+	</div>
+	<div id="preloader">
+		<div id="loader"></div>
+	</div>
 </main>
-<script src="/js/common.js" asp-append-version="true"></script>
-<script src="/js/quiz.js" asp-append-version="true"></script>
+<script src="/js/common.js?v=1.0" asp-append-version="true"></script>
+<script src="/js/quiz.js?v=1.0" asp-append-version="true"></script>
+
 </body>
 </html>

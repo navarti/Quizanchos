@@ -11,4 +11,5 @@ public class QuizCategory : IKeyedEntity<Guid>
     public string ImageUrl { get; set; } = "";
     public string AuthorName { get; set; } = "";
     public DateTime CreationDate { get; set; }
+    public string QuestionToDisplay { get; set; } = "";
 }

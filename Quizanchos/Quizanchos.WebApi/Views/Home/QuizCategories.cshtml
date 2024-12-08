@@ -1,0 +1,76 @@
+@model HomeViewModel
+<!DOCTYPE html>
+@{
+    ViewData["Title"] = "Quiz Categories";
+}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/quizcategories.css">
+</head>
+<body>
+<div class="container">
+    <!-- Filters -->
+    <div class="filters">
+        <button class="filter-btn active" data-category="all">All</button>
+        @foreach (var category in Model.QuizCategories)
+        {
+            <button class="filter-btn" data-category="@category.Name.ToLower().Replace(" ", "-")">@category.Name</button>
+        }
+    </div>
+
+    <!-- Categories -->
+    <div id="categories">
+        @foreach (var category in Model.QuizCategories)
+        {
+            <div class="category" data-category="@category.Name.ToLower().Replace(" ", "-")" style="background-image: url('@category.ImageUrl');">
+                <div class="category-content">
+                    <div class="category-header">
+                        <h2 class="category-title">@category.Name Quiz</h2>
+                    </div>
+                    <div class="meta">
+                        <span>@category.CreationDate.ToShortDateString()</span>
+                        <span>@category.Name</span>
+                        <span>@category.AuthorName</span>
+                    </div>
+                    <p class="description">Challenge yourself with questions about world population statistics and demographics. Compare different countries and their population trends.</p>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value">1200</div>
+                            <div>Total Attempts</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">32%</div>
+                            <div>Average Score</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value">55%</div>
+                            <div>Completion Rate</div>
+                        </div>
+                    </div>
+                    <div class="quiz-categories-actions">
+                        <a href="#" class="quiz-categories-btn quiz-categories-btn-primary" onclick="startQuiz('@category.Id')">
+                            GO
+                            <span>→</span>
+                        </a>
+                        <a href="/leaderboard/@category.Id" class="quiz-categories-btn quiz-categories-btn-secondary">
+                            Leaderboard
+                            <span>📊</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <button class="page-btn" id="prevPage" onclick="changePage(-1)">Previous</button>
+        <span class="page-info" id="pageInfo"></span>
+        <button class="page-btn" id="nextPage" onclick="changePage(1)">Next</button>
+    </div>
+</div>
+<script src="/js/categories.js" asp-append-version="true"></script>
+</body>
+</html>

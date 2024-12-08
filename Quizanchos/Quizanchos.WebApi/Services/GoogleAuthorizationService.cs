@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Quizanchos.Common.Enums;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Constants;
@@ -38,9 +39,10 @@ public class GoogleAuthorizationService
     {
         ApplicationUser user = new ApplicationUser
         {
-            // TODO: make normal username
-            UserName = Guid.NewGuid().ToString(),
+            UserName = email,
             Email = email,
+            AvatarUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFAMn65QIVqFZGQBV1otby9cY8r27W-ZGm_Q&s",
+            Status = UserStatusEnum.Ordinary,
         };
 
         IdentityResult result = await _userManager.CreateAsync(user);

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
-using Quizanchos.WebApi.Services.HelperServices;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;
@@ -18,6 +18,7 @@ public class SingleGameSessionService
     private readonly UserRetrieverService _userRetrieverService;
     private readonly MainQuizCardService _mainQuizCardService;
     private readonly SessionTerminatorService _sessionTerminatorService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public SingleGameSessionService(
         IMapper mapper,
@@ -25,7 +26,8 @@ public class SingleGameSessionService
         IQuizCategoryRepository quizCategoryRepository,
         UserRetrieverService userRetrieverService,
         MainQuizCardService mainQuizCardService,
-        SessionTerminatorService sessionTerminatorService)
+        SessionTerminatorService sessionTerminatorService,
+        UserManager<ApplicationUser> userManager)
     {
         _mapper = mapper;
         _singleGameSessionRepository = singleGameSessionRepository;
@@ -33,6 +35,7 @@ public class SingleGameSessionService
         _userRetrieverService = userRetrieverService;
         _mainQuizCardService = mainQuizCardService;
         _sessionTerminatorService = sessionTerminatorService;
+        _userManager = userManager;
     }
 
     public async Task<SingleGameSessionDto> Create(BaseSingleGameSessionDto baseSingleGameSessionDto, ClaimsPrincipal claimsPrincipal)
@@ -146,8 +149,8 @@ public class SingleGameSessionService
         SingleGameSession gameSession = await _singleGameSessionRepository.GetByIdIncluding(answerDto.Sessionid).ConfigureAwait(false);
         await _sessionTerminatorService.TerminateSessionIfNeeded(gameSession);
 
-        string userId = _userRetrieverService.GetUserId(claimsPrincipal);
-        if (gameSession.ApplicationUser.Id != userId)
+        ApplicationUser? user = await _userRetrieverService.GetUserByClaims(claimsPrincipal);
+        if (gameSession.ApplicationUser.Id != user.Id)
         {
             throw HandledExceptionFactory.CreateForbiddenException();
         }
@@ -157,18 +160,29 @@ public class SingleGameSessionService
             throw HandledExceptionFactory.Create("Game session is already finished");
         }
 
-        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > (int)gameSession.OptionCount - 1)
+        if(answerDto.OptionPicked < 0 || answerDto.OptionPicked > gameSession.OptionCountInt - 1)
         {
             throw HandledExceptionFactory.Create("Invalid option picked");
         }
 
-        if (gameSession.CurrentCardIndex == (int)gameSession.CardsCount - 1)
+        if (gameSession.CurrentCardIndex == gameSession.CardsCountInt - 1)
         {
             gameSession.IsFinished = true;
+
+            user.Score += gameSession.Score;
+            await _userManager.UpdateAsync(user);
         }
         await _singleGameSessionRepository.Update(gameSession).ConfigureAwait(false);
 
-        return await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
+        (QuizCardDtoAbstract QuizCard, bool IsCorrect) result = await _mainQuizCardService.PickAnswerForSession(gameSession, answerDto.OptionPicked);
+
+        if(result.IsCorrect)
+        {
+            gameSession.Score++;
+        }
+        await _singleGameSessionRepository.Update(gameSession);
+
+        return result.QuizCard;
     }
 
     public async Task<SingleGameSession?> FindAliveSession(string userId)

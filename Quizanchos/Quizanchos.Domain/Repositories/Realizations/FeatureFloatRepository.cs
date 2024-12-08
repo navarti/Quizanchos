@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
@@ -8,6 +9,23 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
 {
     public FeatureFloatRepository(QuizDbContext dbContext) : base(dbContext)
     {
+    }
+
+    public async Task<FeatureFloat> GetByIdIncluding(Guid id)
+    {
+        return await _dbSet
+            .Include(s => s.QuizEntity)
+            .Include(s => s.QuizCategory)
+            .FirstOrDefaultAsync(s => s.Id == id) ?? throw HandledExceptionFactory.CreateIdNotFoundException(id);
+    }
+
+    public async Task<List<FeatureFloat>> GetByCategoryId(Guid categoryId)
+    {
+        return await _dbSet
+            .Include(s => s.QuizEntity)
+            .Include(s => s.QuizCategory)
+            .Where(s => s.QuizCategory.Id == categoryId)
+            .ToListAsync();
     }
 
     public Task<FeatureFloat?> FindByCategoryAndEntity(Guid categoryId, Guid entityId)

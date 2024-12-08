@@ -38,7 +38,7 @@ public class GoogleAuthController : Controller
         AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(AuthScheme);
         if (!authenticateResult.Succeeded)
         {
-            // TOD: change this
+            // TODO: change this
             return RedirectToAction("Login", "Account");
         }
 

@@ -7,6 +7,5 @@ public record QuizCardFloatDto(
     int CardIndex,
     int? OptionPicked,
     DateTime CreationTime,
-    Guid Entity1Id,
-    Guid Entity2Id
-) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked, CreationTime, Entity1Id, Entity2Id);
+    Guid[] EntitiesId
+) : QuizCardDtoAbstract(Id, CardIndex, OptionPicked, CreationTime, EntitiesId);

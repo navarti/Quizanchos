@@ -1,0 +1,80 @@
+@model HomeViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizanchos - Leaderboard</title>
+    <link rel="stylesheet" href="/css/leaderboard.css">
+</head>
+<body>
+<main>
+    <div class="hero">
+        <h1>Leaderboard</h1>
+        <button class="prize-btn">
+            <span class="trophy">🏆</span>
+            Monthly Prizes
+        </button>
+    </div>
+
+    <div class="leaderboard-container">
+        <div class="filters">
+            <button class="filter-btn active" data-category="all">All</button>
+        </div>
+
+        <div class="leaderboard">
+            @foreach (var user in Model.Users.Select(user => new { User = user, Rank = user.Position }))
+            {
+                <div class="leaderboard-item @(Model.CurrentUserName == user.User.UserName ? "current-user" : "")">
+                    <div class="rank">@user.Rank</div>
+                    <div class="player-info">
+                        <img src="@user.User.AvatarUrl" alt="@user.User.UserName" class="player-avatar">
+                        <span class="player-name">@user.User.UserName</span>
+                    </div>
+                    <div class="score">
+                        <span class="trophy">@((user.Rank == 1) ? "🏆" : "")</span>
+                        @user.User.Score
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="pagination">
+            <button class="page-btn" disabled>←</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <button class="page-btn">→</button>
+        </div>
+    </div>
+
+    <!-- Prize Modal -->
+    <div class="modal" id="prizeModal">
+        <div class="modal-content">
+            <h2>Monthly Prizes 🏆</h2>
+            <div class="prizes">
+                <div class="prize">
+                    <div class="prize-medal">🥇</div>
+                    <h3>1st Place</h3>
+                    <p>$100 Amazon Gift Card</p>
+                </div>
+                <div class="prize">
+                    <div class="prize-medal">🥈</div>
+                    <h3>2nd Place</h3>
+                    <p>$50 Amazon Gift Card</p>
+                </div>
+                <div class="prize">
+                    <div class="prize-medal">🥉</div>
+                    <h3>3rd Place</h3>
+                    <p>$25 Amazon Gift Card</p>
+                </div>
+            </div>
+            <button class="close-modal">Close</button>
+        </div>
+    </div>
+</main>
+
+<script src="/js/leaderboard.js" asp-append-version="true"></script>
+
+</body>
+</html>

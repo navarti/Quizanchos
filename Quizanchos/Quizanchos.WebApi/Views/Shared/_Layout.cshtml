@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - Quizzes</title>
-    <link rel="stylesheet" href="/css/site.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
 
@@ -21,7 +21,7 @@
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/LeaderBoard">LeaderBoard</a></li>
-                <li><a href="/Quizzes">Quizzes</a></li>
+                <li><a href="/QuizCategories">Quizzes</a></li>
                 <li><a href="/FAQ">FAQ</a></li>
                 <li><a href="/Contact">Contact</a></li>
             </ul>
@@ -33,7 +33,7 @@
                         <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">
                         <span>Profile</span>
                     </a>
-                    <a href="/Account/Logout" class="btn-logout">Logout</a>
+                <a href="javascript:void(0);" class="btn-logout" onclick="logout()">Logout</a>
                 }
                 else
                 {
@@ -55,8 +55,7 @@
     </div>
 </footer>
 
-<script src="/js/jquery.min.js"></script>
-<script src="/js/bootstrap.bundle.min.js"></script>
+<script src="js/common.js" asp-append-version="true"></script>
 <script src="js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -10,5 +10,9 @@ internal class QuizCardCommonConfiguration : IEntityTypeConfiguration<QuizCardAb
     {
         // TODO: make unique constraint for SingleGameSession and CardIndex
         builder.HasKey(x => x.Id);
+
+        builder.HasOne(q => q.SingleGameSession)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

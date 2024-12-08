@@ -34,9 +34,12 @@ public class QuizEntityService
         return _mapper.Map<QuizEntityDto>(quizEntity);
     }
 
-    public async Task<List<QuizEntityDto>> GetAll()
+    public async Task<List<QuizEntityDto>> GetAll(string name, int take, int skip)
     {
-        List<QuizEntity> quizEntities = await _quizEntityRepository.Get().ToListAsync().ConfigureAwait(false);
+        List<QuizEntity> quizEntities = await _quizEntityRepository
+            .Get(skip: skip, take: take, e => e.Name.StartsWith(name))
+            .ToListAsync()
+            .ConfigureAwait(false);
         return _mapper.Map<List<QuizEntityDto>>(quizEntities);
     }
 

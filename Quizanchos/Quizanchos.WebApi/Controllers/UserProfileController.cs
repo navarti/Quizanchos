@@ -20,7 +20,7 @@ public class UserProfileController : Controller
     [Authorize(QuizPolicy.User)]
     public async Task<IActionResult> GetUserInfo()
     {
-        ApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
+        FullApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
         return Ok(userDto);
     }
 
@@ -29,6 +29,14 @@ public class UserProfileController : Controller
     public async Task<IActionResult> UpdateAvatarUrl(string avatarUrl)
     {
         await _userProfileService.UpdateAvatarUrl(User, avatarUrl);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Authorize(QuizPolicy.User)]
+    public async Task<IActionResult> UpdateAvatar(IFormFile formFile)
+    {
+        await _userProfileService.UpdateAvatar(User, formFile);
         return Ok();
     }
 
