@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Quizanchos.WebApi.Constants;
 
 namespace Quizanchos.WebApi.ViewControllers
 {
@@ -13,8 +14,8 @@ namespace Quizanchos.WebApi.ViewControllers
         {
             _logger = logger;
         }
-        [HttpGet("/Admin/Signup")]
-        [AllowAnonymous]
+        [HttpGet("/Admin/Create")]
+        [Authorize(QuizPolicy.Admin)]
         public IActionResult Signup()
         {
             return View();
@@ -28,7 +29,7 @@ namespace Quizanchos.WebApi.ViewControllers
         }
 
         [HttpGet("/Admin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(QuizRole.Admin)]
         public IActionResult Admin()
         {
             return View();

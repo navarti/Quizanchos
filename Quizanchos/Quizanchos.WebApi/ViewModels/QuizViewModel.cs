@@ -13,6 +13,7 @@ namespace Quizanchos.ViewModels
         public int Score { get; set; } 
         public Guid CategoryId { get; set; }
         public string QuizCategoryName { get; set; }
+        public string ImageUrl { get; set; }
         
         public int CurrentCardIndex { get; set; }
         

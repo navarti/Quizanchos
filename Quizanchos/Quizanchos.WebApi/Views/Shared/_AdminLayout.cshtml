@@ -1,3 +1,4 @@
+@using Quizanchos.WebApi.Constants
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,8 +9,7 @@
 </head>
 <body>
 <div class="admin-layout">
-
-    @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+    @if (User.IsInRole(QuizRole.Owner)|| User.IsInRole(QuizRole.Admin))
     {
         <header class="admin-header">
             <div class="header-container">

@@ -31,7 +31,7 @@
                 <div class="info-group">
                     <label class="info-label">
                         Username
-                        <button type="button" class="edit-button" onclick="toggleEdit('username')">✏️</button>
+                        <button type="button" class="edit-button" id="edit-username-btn" onclick="toggleEdit('username')">Edit</button>
                     </label>
                     <input type="text" id="username" class="info-value" value="@Model.UserName" readonly>
                 </div>
@@ -41,7 +41,7 @@
                     <input type="email" id="email" class="info-value" value="@Model.Email" readonly>
                 </div>
 
-                <button type="submit" class="save-button">Save Changes</button>
+                <button type="button" class="save-button" onclick="saveChanges('username')">Save Changes</button>
             </div>
 
             <div class="stats-section">

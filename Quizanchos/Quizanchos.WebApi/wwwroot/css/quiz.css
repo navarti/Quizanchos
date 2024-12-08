@@ -1,6 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 body {
     background-color: #f9f9fb;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: #333;
     margin: 0;
     padding: 0;
@@ -264,3 +265,5 @@ footer a:hover {
     color: #333; 
     margin-top: 10px;
 }
+
+

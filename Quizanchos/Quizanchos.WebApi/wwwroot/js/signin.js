@@ -1,5 +1,5 @@
 ﻿document.getElementById('signinButton').addEventListener('click', async function (event) {
-    event.preventDefault(); 
+    event.preventDefault();
 
     const email = document.getElementById('signinEmail');
     const password = document.getElementById('signinPassword');
@@ -40,11 +40,11 @@
             showModal('Sign in successful! Welcome back!', true);
             setTimeout(() => {
                 window.location.href = "/";
-            }, 2000); 
+            }, 2000);
         } else {
             const errorData = await response.json();
-            if (errorData.Message) {
-                showModal(errorData.Message); 
+            if (errorData && errorData.Message) {
+                showModal(errorData.Message);
             } else {
                 showModal('An unexpected error occurred. Please try again.');
             }

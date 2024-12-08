@@ -31,7 +31,7 @@ function clearErrors() {
 function showModal(message, isSuccess = false) {
     const modal = document.getElementById('errorModal');
     const modalText = document.getElementById('modalErrorText');
-    modalText.innerHTML = message;
+    modalText.textContent = message; 
 
     if (isSuccess) {
         modal.classList.add('success');
@@ -51,10 +51,8 @@ function hideModal() {
     modal.style.display = 'none';
 }
 
-// Закрытие модального окна при нажатии на кнопку
 document.getElementById('closeModal').addEventListener('click', hideModal);
 
-// Закрытие модального окна при клике вне области окна
 window.addEventListener('click', function (event) {
     const modal = document.getElementById('errorModal');
     if (event.target === modal) {
@@ -62,5 +60,28 @@ window.addEventListener('click', function (event) {
     }
 });
 
+function deleteCookie(name) {
+    document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
+}
+
+function logout() {
+    deleteCookie('Identity.External');
+    deleteCookie('QAuth');
+
+    fetch('/Account/Logout', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+    })
+        .then(response => {
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Error during logout:', error);
+            alert('An error occurred. Please try again.');
+        });
+}
 
 

@@ -29,9 +29,12 @@ public class ProfileController : Controller
 
     [HttpPost("Logout")]
     [Authorize]
-    public IActionResult Logout()
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
     {
-        HttpContext.SignOutAsync();
-        return RedirectToAction("Index", "Home");
+        Response.Cookies.Delete("Identity.External");
+        Response.Cookies.Delete("QAuth");
+        await HttpContext.SignOutAsync("Cookies");
+        return Ok();
     }
 }
