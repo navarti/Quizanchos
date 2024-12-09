@@ -18,8 +18,11 @@
 });
 
 async function handleSubmit(event) {
-    event.preventDefault(); 
-
+    event.preventDefault();
+    const verifyButton = document.getElementById("verifyButton");
+    const codeInput = document.getElementById("codeInput");
+    const errorContainer = document.getElementById("errorContainer");
+    const messageContainer = document.getElementById("messageContainer");
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const repeatPassword = document.getElementById('repeatPassword');
@@ -64,77 +67,50 @@ async function handleSubmit(event) {
 
         if (response.ok) {
             const responseData = await response.json();
-
             if (responseData === 1) {
                 openVerifyModal();
-                const verifyForm = document.getElementById('verify-form');
-                if (verifyForm) {
-                    verifyForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        const codeInput = verifyForm.querySelector('input[type="text"]');
-                        if (codeInput && codeInput.value.length === 6) {
-                            const code = codeInput.value;
+                if (verifyButton) {
+                    verifyButton.addEventListener("click", function () {
+                        errorContainer.innerText = "";
+                        messageContainer.innerHTML = "";
+                        codeInput.classList.remove("error");
 
-                            fetch('/EmailConfirmation/ConfirmEmail', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({ code: code })
-                            })
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.json();
-                                })
-                                .then(data => {
-                                    if (data.success) {
-                                        alert('Code verified successfully!');
-                                        closeVerifyModal();
-                                    } else {
-                                        alert('Invalid code. Please try again.');
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.error('Error:', error);
-                                    alert('An error occurred. Please try again later.');
-                                });
-                        } else {
-                            alert('Please enter a valid 6-digit code');
+                        const code = codeInput.value.trim();
+                        if (code.length !== 6) {
+                            displayError("Code must be exactly 6 characters long.");
+                            return;
                         }
-                    });
-                }
-
-                const resendBtn = document.getElementById('verify-resend-btn');
-                if (resendBtn) {
-                    resendBtn.addEventListener('click', function() {
-                        fetch('/api/resend-code', {
-                            method: 'POST',
+                        fetch("/EmailConfirmation/ConfirmEmail", {
+                            method: "POST",
                             headers: {
-                                'Content-Type': 'application/json',
+                                "Content-Type": "application/x-www-form-urlencoded",
                             },
-                            body: JSON.stringify({ userId: 'user_id_here' }) 
+                            body: new URLSearchParams({ code: code }),
                         })
-                            .then(response => {
+                            .then((response) => {
                                 if (!response.ok) {
-                                    throw new Error('Network response was not ok');
+                                    throw new Error(`HTTP error! status: ${response.status}`);
                                 }
                                 return response.json();
                             })
-                            .then(data => {
+                            .then((data) => {
                                 if (data.success) {
-                                    alert('A new verification code has been sent to your email.');
+                                    displaySuccess("Code verified successfully!");
+                                    codeInput.value = "";
+                                    disableInput();
+                                    setTimeout(() => {
+                                        window.location.href = '/Profile';
+                                    }, 2000);
                                 } else {
-                                    alert('Failed to resend code. Please try again.');
+                                    displayError(data.message || "Invalid code. Please try again.");
                                 }
                             })
                             .catch((error) => {
-                                console.error('Error:', error);
-                                alert('An error occurred. Please try again later.');
+                                displayError("An error occurred. Please try again later.");
                             });
                     });
                 }
+
             } else if (responseData === 0) { 
                 showModal('Registration successful! Welcome to Quizanchos!', true);
                 setTimeout(() => {

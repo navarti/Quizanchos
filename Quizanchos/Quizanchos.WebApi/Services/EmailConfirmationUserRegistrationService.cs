@@ -1,4 +1,5 @@
-﻿using Quizanchos.Common.Util;
+﻿using Microsoft.AspNetCore.Mvc;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Services.Interfaces;
@@ -50,7 +51,7 @@ public class EmailConfirmationUserRegistrationService : IUserRegistrationService
         return RegisterUserResult.PendingConfirmation;
     }
 
-    public async Task ConfirmEmail(string code)
+    public async Task ConfirmEmail([FromBody] string code)
     {
         if (!_containerService.PendingUsersDictionary.TryGetValue(code, out UserData userData))
         {

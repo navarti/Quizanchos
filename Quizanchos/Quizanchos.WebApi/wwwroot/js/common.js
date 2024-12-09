@@ -95,6 +95,19 @@ function closeVerifyModal() {
         verifyModal.style.display = 'none'; 
     }, 300);
 }
+function disableInput() {
+    codeInput.disabled = true; 
+    codeInput.classList.add("disabled"); 
+}
 
+function displayError(message) {
+    errorContainer.innerText = message;
+    codeInput.classList.add("error"); 
+}
+
+function displaySuccess(message) {
+    messageContainer.innerHTML = `<span class="success-message">${message}</span>`;
+    errorContainer.innerText = ""; 
+}
 
 
