@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using Quizanchos.DbUpdater.Entities;
+using Quizanchos.DbUpdater.Utils;
 
 namespace Quizanchos.DbUpdater.DataSources;
 
@@ -34,53 +35,11 @@ internal class CountryDataSource
 
     private void ProcessTokenAndAppend(JToken token)
     {
-        string name = GetName(token);
-        float area = GetArea(token);
-        int population = GetPopulation(token);
+        string name = token.GetOption<string>("area");
+        float area = token.GetOption<int>("area");
+        int population = token.GetOption<int>("population");
             
         Country country = new Country(name, area, population);
         _countries.Add(country);
-    }
-
-    private string GetName(JToken token)
-    {
-        const string TokenName = "name";
-        const string TokenCommon = "common";
-
-        string? name = token[TokenName]?[TokenCommon]?.ToString();
-        if(name is null)
-        {
-            ThrowAttribute($"{TokenName}.{TokenCommon}");
-        }
-        return name;
-    }
-
-    private float GetArea(JToken token)
-    {
-        const string TokenArea = "area";
-
-        float? area = token[TokenArea]?.ToObject<float>();
-        if (area is null)
-        {
-            ThrowAttribute(TokenArea);
-        }
-        return area.Value;
-    }
-
-    private int GetPopulation(JToken token)
-    {
-        const string TokenPopulation = "population";
-
-        int? population = token[TokenPopulation]?.ToObject<int>();
-        if (population is null)
-        {
-            ThrowAttribute(TokenPopulation);
-        }
-        return population.Value;
-    }
-
-    private void ThrowAttribute(string attributeName)
-    {
-        throw new ArgumentNullException($"Token does not have attribute {attributeName}");
     }
 }
