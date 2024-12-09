@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
-using Quizanchos.WebApi.Services.HelperServices;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 

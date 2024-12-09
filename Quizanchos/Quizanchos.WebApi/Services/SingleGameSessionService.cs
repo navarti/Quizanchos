@@ -6,7 +6,6 @@ using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
-using Quizanchos.WebApi.Services.HelperServices;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;
