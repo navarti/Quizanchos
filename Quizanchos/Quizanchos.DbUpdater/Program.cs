@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Quizanchos.DbUpdater.SpecificUpdaters;
 using Quizanchos.DbUpdater.Updater;
 using Quizanchos.DbUpdater.Updater.FeatureUpdaters;
@@ -53,9 +54,18 @@ internal class Program
         using (IServiceScope scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
             IDataUpdater dbUpdater = scope.ServiceProvider.GetRequiredService<IDataUpdater>();
-            
-            CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
-            countriesUpdater.UpdateSafe();
+            IConfiguration config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+            //CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
+            //countriesUpdater.UpdateSafe();
+
+            string? moviesApiKey = config["MoviesApiKey"];
+            if (moviesApiKey.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException("MoviesApiKey is not set in configuration");
+            }
+            MoviesUpdater moviesUpdater = new MoviesUpdater(dbUpdater, moviesApiKey, maxAmountOfMovies: 100000);
+            moviesUpdater.UpdateSafe();
         }
     }
 }
