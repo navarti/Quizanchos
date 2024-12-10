@@ -555,7 +555,38 @@ body {
 .modal.error .modal-content {
     background: linear-gradient(145deg, #ef9a9a, #e57373); 
 }
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
 
+.modal-buttons .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.modal-buttons .btn-yes {
+    background-color: #4caf50;
+    color: white;
+}
+
+.modal-buttons .btn-yes:hover {
+    background-color: #45a049;
+}
+
+.modal-buttons .btn-no {
+    background-color: #f44336;
+    color: white;
+}
+
+.modal-buttons .btn-no:hover {
+    background-color: #d32f2f;
+}
 .auth-buttons {
     display: flex;
     align-items: center;
@@ -729,6 +760,72 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+.contact-wrapper {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+.contact-title {
+    color: #6a3093;
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.contact-description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-label {
+    display: block;
+    color: #6a3093;
+    margin-bottom: 8px;
+}
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+.form-textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+.form-submit {
+    width: 100%;
+    padding: 12px;
+    background: #6a3093;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.form-submit:hover {
+    background: #8a4baf;
+}
+.email-info {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+.email-link {
+    color: #6a3093;
+    text-decoration: none;
+}
+.email-link:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {

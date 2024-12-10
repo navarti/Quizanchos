@@ -92,7 +92,54 @@ async function saveChanges(fieldId) {
         console.error("Error saving changes:", error);
     }
 }
+
+function deleteCookie(name) {
+    document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
+}
+
+function logout() {
+    showModal(
+        'Confirm Logout',
+        'Are you sure you want to log out?',
+        false,
+        [
+            {
+                text: 'Yes',
+                class: 'btn-yes',
+                onClick: () => {
+                    deleteCookie('Identity.External');
+                    deleteCookie('QAuth');
+
+                    fetch('/Account/Logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                    })
+                        .then(() => {
+                            document.getElementById('errorModal').style.display = 'none';
+                            window.location.reload();
+                        })
+                        .catch((error) => {
+                            console.error('Error during logout:', error);
+                            showModal('Error', 'Logout failed. Please try again.');
+                        });
+                },
+            },
+            {
+                text: 'No',
+                class: 'btn-no',
+                onClick: () => {
+                    document.getElementById('errorModal').style.display = 'none';
+                },
+            },
+        ]
+    );
+}
+let elements;
 document.addEventListener('DOMContentLoaded', function () {
+
     const avatarInput = document.getElementById('avatar-input');
     const avatarImg = document.getElementById('avatar');
     const editUsernameBtn = document.getElementById('edit-username-btn');
@@ -106,30 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     switchView(defaultView, defaultButton);
 
-    // Logout Functionality
-    function deleteCookie(name) {
-        document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
-    }
-
-    function logout() {
-        deleteCookie('Identity.External');
-        deleteCookie('QAuth');
-
-        fetch('/Account/Logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-        })
-            .then(() => {
-                window.location.reload();
-            })
-            .catch((error) => {
-                console.error('Error during logout:', error);
-                alert('Logout failed. Please try again.');
-            });
-    }
+    elements.closeModalButton?.addEventListener('click', closeVerifyModal);
 });
 
 function switchView(view, button) {
@@ -177,24 +201,81 @@ function handlePasswordSubmit(event) {
         });
 }
 
-async function changePassword(email, newPassword) {
-    try {
-        const response = await fetch('/Authorization/UpdatePassword', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ Email: email, NewPassword: newPassword }),
+function changePassword(email, newPassword) {
+    const resendButton = document.getElementById('resendButton');
+    const verifyButton = document.getElementById('verifyButton');
+    const messageContainer = document.getElementById('messageContainer');
+    const codeInput = document.getElementById('codeInput');
+    const errorContainer = document.getElementById('errorContainer');
+
+    fetch('/Authorization/UpdatePassword', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ Email: email, NewPassword: newPassword }),
+    })
+        .then((response) => {
+            if (response.ok) {
+                openVerifyModal();
+
+                if (verifyButton) {
+                    verifyButton.addEventListener("click", function () {
+                        if (errorContainer) errorContainer.innerText = "";
+                        if (messageContainer) messageContainer.innerHTML = "";
+                        if (codeInput) codeInput.classList.remove("error");
+
+                        const code = codeInput ? codeInput.value.trim() : "";
+                        if (code.length !== 6) {
+                            if (errorContainer) errorContainer.innerText = "Code must be exactly 6 characters long.";
+                            if (codeInput) codeInput.classList.add("error");
+                            return;
+                        }
+
+                        fetch("/EmailConfirmation/ConfirmPassword", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                            },
+                            body: new URLSearchParams({ code: code }),
+                        })
+                            .then((response) => {
+                                if (response.ok) {
+                                    if (messageContainer) {
+                                        messageContainer.innerHTML = `<span class="success-message">Password is changed! Code verified successfully!</span>`;
+                                    }
+                                    if (codeInput) {
+                                        codeInput.value = "";
+                                        codeInput.disabled = true;
+                                        codeInput.classList.add("disabled");
+                                    }
+                                    setTimeout(() => {
+                                        window.location.href = '/Account/Profile';
+                                    }, 2000);
+                                } else {
+                                    if (errorContainer) {
+                                        errorContainer.innerText = "Invalid code. Please try again.";
+                                    }
+                                }
+                            })
+                            .catch((error) => {
+                                if (errorContainer) {
+                                    errorContainer.innerText = "An error occurred. Please try again later.";
+                                }
+                                console.error("Error during verification:", error);
+                            });
+                    });
+                }
+            } else {
+                response.json().then((errorData) => {
+                    throw new Error(errorData.message || 'Failed to change password');
+                });
+            }
+        })
+        .catch((error) => {
+            console.error('Error changing password:', error);
+            if (errorContainer) {
+                errorContainer.innerText = 'An unexpected error occurred. Please try again later.';
+            }
         });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to change password');
-        }
-
-        return await response.json(); 
-    } catch (error) {
-        console.error('Error changing password:', error);
-        throw error; 
-    }
 }

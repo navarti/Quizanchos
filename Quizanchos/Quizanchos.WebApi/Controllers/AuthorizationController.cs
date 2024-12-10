@@ -41,7 +41,6 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.Admin)]
     public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordModelDto passwordModelDto)
     {
         await _authorizationService.UpdatePassword(passwordModelDto);

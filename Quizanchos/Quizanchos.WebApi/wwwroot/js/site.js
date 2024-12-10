@@ -80,6 +80,7 @@ async function handleSubmit(event) {
                             displayError("Code must be exactly 6 characters long.");
                             return;
                         }
+
                         fetch("/EmailConfirmation/ConfirmEmail", {
                             method: "POST",
                             headers: {
@@ -88,31 +89,25 @@ async function handleSubmit(event) {
                             body: new URLSearchParams({ code: code }),
                         })
                             .then((response) => {
-                                if (!response.ok) {
-                                    throw new Error(`HTTP error! status: ${response.status}`);
-                                }
-                                return response.json();
-                            })
-                            .then((data) => {
-                                if (data.success) {
+                                if (response.ok) {
                                     displaySuccess("Code verified successfully!");
                                     codeInput.value = "";
                                     disableInput();
                                     setTimeout(() => {
-                                        window.location.href = '/Profile';
+                                        window.location.href = '/Account/Profile';
                                     }, 2000);
                                 } else {
-                                    displayError(data.message || "Invalid code. Please try again.");
+                                    displayError("Invalid code. Please try again.");
                                 }
                             })
                             .catch((error) => {
                                 displayError("An error occurred. Please try again later.");
+                                console.error("Error during verification:", error);
                             });
                     });
                 }
-
             } else if (responseData === 0) { 
-                showModal('Registration successful! Welcome to Quizanchos!', true);
+                showModal('Sucssesful Message','Registration successful! Welcome to Quizanchos!', true);
                 setTimeout(() => {
                     window.location.href = "/";
                 }, 2000);
@@ -124,10 +119,10 @@ async function handleSubmit(event) {
         
         const responseData = await response.json(); 
         const errorMessage = responseData.Message || 'An unexpected error occurred.';
-        showModal(errorMessage);
+        showModal('Notification', errorMessage);
     } catch (error) {
         console.error('Network error:', error);
-        showModal('A network error occurred. Please try again later.');
+        showModal('Notification','A network error occurred. Please try again later.');
     }
 }
 function redirectToCategory(category) {
@@ -198,7 +193,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-
 
 
 

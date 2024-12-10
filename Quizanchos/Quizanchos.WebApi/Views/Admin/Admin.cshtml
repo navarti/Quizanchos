@@ -1,66 +1,146 @@
 @{
     ViewData["Title"] = "Admin";
 }
-
-<div class="admin-dashboard container mt-4">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Total Users</h5>
-                    <p class="card-text">
-                        <strong>125</strong> Registered users
-                    </p>
-                    <a href="/Admin/Users" class="btn btn-primary">View Users</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Active Content</h5>
-                    <p class="card-text">
-                        <strong>58</strong> Published posts
-                    </p>
-                    <a href="/Admin/Content" class="btn btn-primary">Manage Content</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">System Logs</h5>
-                    <p class="card-text">
-                        View recent activity logs
-                    </p>
-                    <a href="/Admin/Logs" class="btn btn-primary">View Logs</a>
-                </div>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/admindash.css">
+</head>
+<body>
+<div class="admin-dashboard-grid">
+    <div class="admin-card user-management-card">
+        <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Total Users
+        </h2>
+        <p class="user-count">125</p>
+        <p>Registered users</p>
+        <button onclick="openModal('userManagementModal')">View Users</button>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">Admin Settings</h5>
-                    <p class="card-text">
-                        Configure system and permissions
-                    </p>
-                    <a href="/Admin/Settings" class="btn btn-secondary">Go to Settings</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h5 class="card-title">FAQ Management</h5>
-                    <p class="card-text">
-                        Update and manage FAQs
-                    </p>
-                    <a href="/Admin/FAQ" class="btn btn-secondary">Manage FAQ</a>
-                </div>
-            </div>
+    <div class="admin-card content-management-card">
+        <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            Active Content
+        </h2>
+        <p class="content-count">58</p>
+        <p>Published posts</p>
+        <button  onclick="openModal('categoryManagementModal')">Manage Content</button>
+    </div>
+
+    <div class="admin-card system-logs-card">
+        <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            System Logs
+        </h2>
+        <p>View recent activity logs</p>
+        <button>View Logs</button>
+    </div>
+
+    <div class="admin-card settings-card">
+        <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            Admin Settings
+        </h2>
+        <p>Configure system and permissions</p>
+        <button>Go to Settings</button>
+    </div>
+
+    <div class="admin-card faq-management-card">
+        <h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            FAQ Management
+        </h2>
+        <p>Manage frequently asked questions</p>
+        <button>Manage FAQs</button>
+    </div>
+</div>
+
+<div id="userManagementModal" class="user-management-modal">
+    <div class="user-management-content">
+        <span class="modal-close-btn" onclick="closeModal('userManagementModal')">&times;</span>
+        <h2>User Management</h2>
+        <input type="text" id="userSearchInput" class="user-search-input" placeholder="Search by name...">
+        <table id="userTable" class="user-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div class="user-pagination">
+            <button onclick="changePage(-1)">Previous</button>
+            <button onclick="changePage(1)">Next</button>
         </div>
     </div>
 </div>
+
+<div id="categoryManagementModal" class="category-management-modal">
+    <div class="category-management-content">
+        <span class="modal-close-btn" onclick="closeModal('categoryManagementModal')">&times;</span>
+        <h2>Category Management</h2>
+        <table id="categoryTable" class="category-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Feature Type</th>
+                <th>Image</th>
+                <th>Author</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="editFeaturesModal" class="edit-features-modal">
+    <div class="edit-features-content">
+        <span class="modal-close-btn" onclick="closeModal('editFeaturesModal')">&times;</span>
+        <h2>Edit Features</h2>
+        <table id="featuresTable" class="features-table">
+            <thead>
+            <tr>
+                <th>Value</th>
+                <th>Entity Name</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div id="featuresPagination" class="features-pagination"></div>
+    </div>
+</div>
+<script src="/js/common.js" asp-append-version="true"></script>
+<script src="/js/admindash.js"></script>
+</body>
+</html> 
