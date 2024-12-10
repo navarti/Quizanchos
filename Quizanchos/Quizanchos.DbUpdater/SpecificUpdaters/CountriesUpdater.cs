@@ -7,7 +7,7 @@ namespace Quizanchos.DbUpdater.SpecificUpdaters;
 
 internal class CountriesUpdater
 {
-    IDataUpdater _dbUpdater;
+    private readonly IDataUpdater _dbUpdater;
 
     public CountriesUpdater(IDataUpdater dbUpdater)
     {
