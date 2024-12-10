@@ -372,23 +372,28 @@ function renderFeaturesPagination() {
     paginationContainer.appendChild(nextButton);
 }
 
-// Обновление характеристики
 function updateFeature(feature) {
-    const url = featureType === 1
+    const url = currentFeatureType === 1
         ? `/FeatureInt/Update`
         : `/FeatureFloat/Update`;
+    const payload = {
+        Id: feature.id, // Переименовать в "Id" вместо "id", если требуется
+        Value: feature.value, // Переименовать в "Value" вместо "value"
+        QuizCategoryId: feature.quizCategoryId, // Переименовать в "QuizCategoryId"
+        QuizEntityId: feature.quizEntityId // Переименовать в "QuizEntityId"
+    };
     fetch(url, {
         method: 'POST',
         headers: {
             'Accept': '*/*',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(feature),
+        body: JSON.stringify(payload),
     })
         .then(response => {
             if (response.ok) {
                 alert('Feature updated successfully!');
-                openEditFeaturesModal(currentCategoryId, currentFeatureType); // Перезагружаем характеристики
+                openEditFeaturesModal(currentCategoryId, currentFeatureType); 
             } else {
                 alert('Failed to update feature.');
             }
@@ -396,13 +401,13 @@ function updateFeature(feature) {
         .catch(error => console.error('Error updating feature:', error));
 }
 
-// Удаление характеристики
 function deleteFeature(featureId) {
-    const url = featureType === 1
+    const url = currentFeatureType === 1
         ? `/FeatureInt/Delete?id=${featureId}`
         : `/FeatureFloat/Delete?id=${featureId}`;
+
     fetch(url, {
-        method: 'DELETE',
+        method: 'POST',
         headers: {
             'Accept': '*/*',
         },

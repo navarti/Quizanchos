@@ -26,7 +26,6 @@ public static class Startup
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
         if (!app.Environment.IsDevelopment())
         {
             app.UseHttpsRedirection();
@@ -74,7 +73,7 @@ public static class Startup
         services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = new PathString("/QuizAuthorization/Login");
-            options.LogoutPath = "/QuizAuthorization/Logout";
+            options.LogoutPath = "/Account/Logout";
             options.Cookie = new CookieBuilder
             {
                 Name = "QAuth",

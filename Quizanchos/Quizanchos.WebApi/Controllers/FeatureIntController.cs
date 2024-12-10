@@ -43,7 +43,7 @@ public class FeatureIntController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(FeatureIntDto featureIntDto)
+    public async Task<IActionResult> Update([FromBody] FeatureIntDto featureIntDto)
     {
         featureIntDto = await _featureIntService.Update(featureIntDto);
         return Ok(featureIntDto);
