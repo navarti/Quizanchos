@@ -27,11 +27,41 @@ function clearErrors() {
     document.querySelectorAll('.error-message').forEach((el) => (el.textContent = ''));
     document.querySelectorAll('.input-error').forEach((el) => el.classList.remove('input-error'));
 }
-
-function showModal(message, isSuccess = false) {
+function showModal(headerText = 'Notification', bodyText, isSuccess = false,buttons = []) {
     const modal = document.getElementById('errorModal');
-    const modalText = document.getElementById('modalErrorText');
-    modalText.textContent = message; 
+    const modalHeader = document.getElementById('modalHeader');
+    const modalErrorText = document.getElementById('modalErrorText');
+    const modalButtons = document.getElementById('modalButtons');
+
+    if (!modal) {
+        console.error('Error: Modal element not found.');
+        return;
+    }
+    if (!modalHeader) {
+        console.error('Error: Modal header element not found.');
+        return;
+    }
+    if (!modalErrorText) {
+        console.error('Error: Modal error text element not found.');
+        return;
+    }
+    if (!modalButtons) {
+        console.error('Error: Modal buttons container not found.');
+        return;
+    }
+    
+    modalHeader.textContent = headerText;
+    modalErrorText.textContent = bodyText;
+    
+    modalButtons.innerHTML = '';
+    
+    buttons.forEach(button => {
+        const btn = document.createElement('button');
+        btn.textContent = button.text;
+        btn.className = `btn ${button.class || ''}`;
+        btn.addEventListener('click', button.onClick);
+        modalButtons.appendChild(btn);
+    });
 
     if (isSuccess) {
         modal.classList.add('success');
@@ -44,8 +74,6 @@ function showModal(message, isSuccess = false) {
     modal.style.display = 'flex';
 }
 
-
-// Скрытие модального окна
 function hideModal() {
     const modal = document.getElementById('errorModal');
     modal.style.display = 'none';
@@ -64,24 +92,35 @@ function deleteCookie(name) {
     document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
 }
 
-function logout() {
-    deleteCookie('Identity.External');
-    deleteCookie('QAuth');
+function openVerifyModal() {
+    const verifyModal = document.getElementById('verifyModal');
+    const closeModalButton = document.querySelector('.modal-close');
+    verifyModal.style.display = 'flex'; 
+    verifyModal.offsetHeight;
+    verifyModal.classList.add('active');
+}
 
-    fetch('/Account/Logout', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-    })
-        .then(response => {
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Error during logout:', error);
-            alert('An error occurred. Please try again.');
-        });
+function closeVerifyModal() {
+    const verifyModal = document.getElementById('verifyModal');
+    const closeModalButton = document.querySelector('.modal-close');
+    verifyModal.classList.remove('active'); 
+    setTimeout(() => {
+        verifyModal.style.display = 'none'; 
+    }, 300);
+}
+function disableInput() {
+    codeInput.disabled = true; 
+    codeInput.classList.add("disabled"); 
+}
+
+function displayError(message) {
+    errorContainer.innerText = message;
+    codeInput.classList.add("error"); 
+}
+
+function displaySuccess(message) {
+    messageContainer.innerHTML = `<span class="success-message">${message}</span>`;
+    errorContainer.innerText = ""; 
 }
 
 

@@ -29,7 +29,7 @@ public class FeatureIntController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(BaseFeatureIntDto baseFeatureIntDto)
+    public async Task<IActionResult> Create([FromBody] BaseFeatureIntDto baseFeatureIntDto)
     {
         FeatureIntDto feature = await _featureIntService.Create(baseFeatureIntDto);
         return Ok(feature);
@@ -43,7 +43,7 @@ public class FeatureIntController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(FeatureIntDto featureIntDto)
+    public async Task<IActionResult> Update([FromBody] FeatureIntDto featureIntDto)
     {
         featureIntDto = await _featureIntService.Update(featureIntDto);
         return Ok(featureIntDto);

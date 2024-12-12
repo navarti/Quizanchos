@@ -37,7 +37,7 @@
         });
 
         if (response.ok) {
-            showModal('Sign in successful! Welcome back!', true);
+            showModal('Succesful Message','Sign in successful! Welcome back!', true);
             setTimeout(() => {
                 window.location.href = "/";
             }, 2000);
@@ -46,11 +46,11 @@
             if (errorData && errorData.Message) {
                 showModal(errorData.Message);
             } else {
-                showModal('An unexpected error occurred. Please try again.');
+                showModal('Notification','An unexpected error occurred. Please try again.');
             }
         }
     } catch (error) {
         console.error('Error:', error);
-        showModal('A network error occurred. Please try again later.');
+        showModal('Notification','A network error occurred. Please try again later.');
     }
 });

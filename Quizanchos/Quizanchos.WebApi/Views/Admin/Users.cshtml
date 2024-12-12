@@ -1,0 +1,38 @@
+@{
+    ViewData["Title"] = "Users";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/admindash.css">
+</head>
+<body>
+<div id="userManagementModal" class="user-management-modal" style="display: block">
+    <div class="user-management-content">
+        <span class="modal-close-btn" onclick="closeModal('userManagementModal')">&times;</span>
+        <h2>User Management</h2>
+        <input type="text" id="userSearchInput" class="user-search-input" placeholder="Search by name...">
+        <table id="userTable" class="user-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <div class="user-pagination">
+            <button onclick="changePage(-1)">Previous</button>
+            <button onclick="changePage(1)">Next</button>
+        </div>
+    </div>
+</div>
+<script src="/js/common.js" asp-append-version="true"></script>
+<script src="/js/admindash.js"></script>
+</body>
+</html> 

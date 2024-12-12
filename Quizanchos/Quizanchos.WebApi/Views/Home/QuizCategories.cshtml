@@ -50,11 +50,11 @@
                         </div>
                     </div>
                     <div class="quiz-categories-actions">
-                        <a href="#" class="quiz-categories-btn quiz-categories-btn-primary" onclick="startQuiz('@category.Id')">
+                        <a href="/Quiz/Setup/@category.Id" class="quiz-categories-btn quiz-categories-btn-primary" >
                             GO
                             <span>→</span>
                         </a>
-                        <a href="/leaderboard/@category.Id" class="quiz-categories-btn quiz-categories-btn-secondary">
+                        <a href="/Leaderboard" class="quiz-categories-btn quiz-categories-btn-secondary">
                             Leaderboard
                             <span>📊</span>
                         </a>
@@ -68,7 +68,7 @@
     <div class="pagination">
         <button class="page-btn" id="prevPage" onclick="changePage(-1)">Previous</button>
         <span class="page-info" id="pageInfo"></span>
-        <button class="page-btn" id="nextPage" onclick="changePage(1)">Next</button>
+        <button class="page-btn" id="nextPage" onclick="changePage(1)">Nex</button>
     </div>
 </div>
 <script src="/js/categories.js" asp-append-version="true"></script>

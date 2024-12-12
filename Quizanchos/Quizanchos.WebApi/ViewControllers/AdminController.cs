@@ -36,15 +36,15 @@ namespace Quizanchos.WebApi.ViewControllers
         }
 
         [HttpGet("/Admin/Users")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(QuizPolicy.Admin)]
         public IActionResult Users()
         {
             return View();
         }
 
-        [HttpGet("/Admin/Content")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult Content()
+        [HttpGet("/Admin/CreateQuiz")]
+        [Authorize(QuizPolicy.Admin)]
+        public IActionResult CreateQuiz()
         {
             return View();
         }
