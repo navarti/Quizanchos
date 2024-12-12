@@ -29,7 +29,7 @@ public class FeatureIntController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(BaseFeatureIntDto baseFeatureIntDto)
+    public async Task<IActionResult> Create([FromBody] BaseFeatureIntDto baseFeatureIntDto)
     {
         FeatureIntDto feature = await _featureIntService.Create(baseFeatureIntDto);
         return Ok(feature);
