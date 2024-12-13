@@ -31,19 +31,17 @@ document.getElementById('categoryForm').addEventListener('submit', async (e) => 
 
         if (!response.ok) throw new Error('Failed to update category');
         const result = await response.json();
-
-        // Update the quizCategoryId if it's a new creation
+        
         quizCategoryId = result.id;
 
         alert('Category updated successfully!');
-        fetchAndRenderCategories(); // Refresh category dropdown
+        fetchAndRenderCategories(); 
     } catch (error) {
         console.error('Error updating category:', error);
         alert('Failed to update category');
     }
 });
 
-// Event Listener for Entity Form Submission
 document.getElementById('entityForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -73,11 +71,9 @@ document.getElementById('entityForm').addEventListener('submit', async (e) => {
     }
 });
 
-// Event Listener for Feature Form Submission
 document.getElementById('featureForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    // Get the selected entity ID from the dropdown
+    
     quizEntityId = document.getElementById('entitySelect').value;
 
     if (!quizCategoryId) {
@@ -121,7 +117,6 @@ document.getElementById('featureForm').addEventListener('submit', async (e) => {
 });
 
 
-// Fetch and Render Existing Categories
 async function fetchAndRenderCategories() {
     try {
         const response = await fetch('/QuizCategory/GetAll', {
@@ -165,18 +160,15 @@ document.getElementById('loadCategoryButton').addEventListener('click', async ()
         }
 
         const category = await response.json();
-
-        // Store the ID for potential updates
+        
         quizCategoryId = category.id;
-
-        // Populate the form fields
+        
         document.getElementById('categoryName').value = category.name;
         document.getElementById('featureType').value = category.featureType;
         document.getElementById('imageUrl').value = category.imageUrl;
-        document.getElementById('authorName').value = category.authorName || ''; // Handle empty strings
+        document.getElementById('authorName').value = category.authorName || ''; 
         document.getElementById('questionToDisplay').value = category.questionToDisplay;
-
-        // Disable inputs to prevent accidental edits
+        
         setCategoryFormDisabled(true);
 
         alert('Category loaded successfully!');
@@ -186,12 +178,10 @@ document.getElementById('loadCategoryButton').addEventListener('click', async ()
     }
 });
 
-// Enable Editing of the Category Form
 document.getElementById('enableEditButton').addEventListener('click', () => {
     setCategoryFormDisabled(false);
 });
 
-// Helper Function to Disable/Enable Category Form
 function setCategoryFormDisabled(disabled) {
     document.getElementById('categoryName').disabled = disabled;
     document.getElementById('featureType').disabled = disabled;
@@ -199,8 +189,6 @@ function setCategoryFormDisabled(disabled) {
     document.getElementById('authorName').disabled = disabled;
     document.getElementById('questionToDisplay').disabled = disabled;
 }
-
-// Update Entity List
 function updateEntityList() {
     const list = document.getElementById('entityList');
     list.innerHTML = '';
@@ -212,7 +200,6 @@ function updateEntityList() {
     });
 }
 
-// Update Entity Dropdown
 function updateEntitySelect() {
     const select = document.getElementById('entitySelect');
     select.innerHTML = '<option value="">Select Entity</option>';
@@ -224,7 +211,6 @@ function updateEntitySelect() {
     });
 }
 
-// Update Feature List
 function updateFeatureList() {
     const list = document.getElementById('featureList');
     list.innerHTML = '';
@@ -236,7 +222,6 @@ function updateFeatureList() {
     });
 }
 
-// Fetch and render categories when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndRenderCategories();
 });

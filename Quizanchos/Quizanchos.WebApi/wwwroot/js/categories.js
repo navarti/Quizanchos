@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filter) {
         filterCategories(filter);
     } else {
-        renderCategories(); // Initial render for 'all' categories
+        renderCategories(); 
     }
 });
 

@@ -49,7 +49,7 @@
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-bottom: 15px; /* Add spacing between buttons */
+    margin-bottom: 15px; 
     transition: background 0.3s ease, transform 0.2s ease;
 }
 
@@ -61,7 +61,7 @@
 #categoryForm {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Add spacing between form elements */
+    gap: 15px; 
 }
 
 .entity-list,
