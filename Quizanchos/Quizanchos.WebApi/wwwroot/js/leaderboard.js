@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Filter functionality
     const filterBtns = document.querySelectorAll('.filter-btn');
     const leaderboardItems = document.querySelectorAll('.leaderboard-item');
     const currentUserItem = document.querySelector('.leaderboard-item.current-user');
@@ -29,8 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 300);
                 }
             });
-
-            // Always show current user's position
+            
             if (category !== 'all' && currentUserItem.dataset.category !== category) {
                 currentUserItem.style.display = 'grid';
                 setTimeout(() => {
@@ -63,26 +61,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Pagination functionality
-    const pageButtons = document.querySelectorAll('.page-btn');
+    document.querySelectorAll('.page-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+            const page = button.dataset.page;
+            const response = await fetch(`/Home/GetPage?page=${page}`);
+            const data = await response.json();
 
-    pageButtons.forEach(button => {
-        if (!button.disabled) {
-            button.addEventListener('click', () => {
-                pageButtons.forEach(btn => btn.classList.remove('active'));
-                button.classList.add('active');
+            // Update pagination
+            document.querySelectorAll('.page-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
 
-                // Simulate page change with animation
-                const leaderboard = document.querySelector('.leaderboard');
-                leaderboard.style.opacity = '0';
-                leaderboard.style.transform = 'translateY(20px)';
-
-                setTimeout(() => {
-                    leaderboard.style.opacity = '1';
-                    leaderboard.style.transform = 'translateY(0)';
-                }, 300);
+            // Update leaderboard
+            const leaderboard = document.querySelector('.leaderboard');
+            leaderboard.innerHTML = ''; // Clear current leaderboard
+            data.Users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'leaderboard-item';
+                userItem.innerHTML = `
+                <div class="rank">${user.Position}</div>
+                <div class="player-info">
+                    <img src="${user.AvatarUrl}" alt="${user.UserName}" class="player-avatar">
+                    <span class="player-name">${user.UserName}</span>
+                </div>
+                <div class="score">${user.Score}</div>`;
+                leaderboard.appendChild(userItem);
             });
-        }
+        });
     });
 });
 

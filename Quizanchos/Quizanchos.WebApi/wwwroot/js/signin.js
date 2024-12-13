@@ -44,7 +44,7 @@
         } else {
             const errorData = await response.json();
             if (errorData && errorData.Message) {
-                showModal(errorData.Message);
+                showModal('Notification',errorData.Message);
             } else {
                 showModal('Notification','An unexpected error occurred. Please try again.');
             }

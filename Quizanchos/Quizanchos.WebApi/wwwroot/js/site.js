@@ -15,8 +15,58 @@
     
     submitButton.removeEventListener('click', handleSubmit); 
     submitButton.addEventListener('click', handleSubmit);
+    const startQuestButton = document.getElementById("startQuestButton");
+    
 });
 
+startQuestButton.addEventListener("click", async function (event) {
+    event.preventDefault();
+
+    const categoryId = this.getAttribute("data-category-id");
+
+    if (!categoryId) {
+        alert("Quiz Category ID is missing.");
+        return;
+    }
+
+    const gameLevel = document.getElementById("gameLevel").value;
+    const cardsCount = document.getElementById("cardsCount").value;
+    const secondPerCard = document.getElementById("secondsPerCard").value;
+    const optionCount = document.getElementById("optionCount").value;
+
+    const data = {
+        quizCategoryId: categoryId,
+        gameLevel: parseInt(gameLevel, 10),
+        cardsCount: parseInt(cardsCount, 10),
+        SecondPerCard: parseInt(secondPerCard, 10),
+        optionCount: parseInt(optionCount, 10),
+    };
+
+    try {
+        const response = await fetch("/SingleGameSession/Create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            if (responseData && responseData.id) {
+                window.location.href = `/Quiz/${responseData.id}`;
+            } else {
+                alert("Unexpected response format. Please try again.");
+            }
+        } else {
+            const errorData = await response.json();
+            alert(errorData.message || "An error occurred. Please try again.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("A network error occurred. Please try again later.");
+    }
+});
 async function handleSubmit(event) {
     event.preventDefault();
     const verifyButton = document.getElementById("verifyButton");
@@ -141,58 +191,7 @@ if (modalContent) {
         e.stopPropagation();
     });
 }
-document.addEventListener("DOMContentLoaded", function () {
-    const startQuestButton = document.getElementById("startQuestButton");
 
-    startQuestButton.addEventListener("click", async function (event) {
-        event.preventDefault();
-
-        const categoryId = this.getAttribute("data-category-id");
-
-        if (!categoryId) {
-            alert("Quiz Category ID is missing.");
-            return;
-        }
-
-        const gameLevel = document.getElementById("gameLevel").value;
-        const cardsCount = document.getElementById("cardsCount").value;
-        const secondPerCard = document.getElementById("secondsPerCard").value;
-        const optionCount = document.getElementById("optionCount").value;
-
-        const data = {
-            quizCategoryId: categoryId,
-            gameLevel: parseInt(gameLevel, 10),
-            cardsCount: parseInt(cardsCount, 10),
-            SecondPerCard: parseInt(secondPerCard, 10),
-            optionCount: parseInt(optionCount, 10),
-        };
-
-        try {
-            const response = await fetch("/SingleGameSession/Create", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                const responseData = await response.json();
-                if (responseData && responseData.id) {
-                    window.location.href = `/Quiz/${responseData.id}`;
-                } else {
-                    alert("Unexpected response format. Please try again.");
-                }
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || "An error occurred. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("A network error occurred. Please try again later.");
-        }
-    });
-});
 
 
 
