@@ -5,17 +5,15 @@ using Quizanchos.DbUpdater.Utils;
 
 namespace Quizanchos.DbUpdater.SpecificUpdaters;
 
-internal class MoviesUpdater
+internal class CurrenciesUpdater
 {
     private readonly IDataUpdater _dbUpdater;
     private readonly string _apiKey;
-    private readonly int _maxAmountOfMovies;
 
-    public MoviesUpdater(IDataUpdater dbUpdater, string apiKey, int maxAmountOfMovies)
+    public CurrenciesUpdater(IDataUpdater dbUpdater, string apiKey)
     {
         _dbUpdater = dbUpdater;
         _apiKey = apiKey;
-        _maxAmountOfMovies = maxAmountOfMovies;
     }
 
     public void UpdateSafe()
@@ -26,18 +24,18 @@ internal class MoviesUpdater
         }
         catch (Exception ex)
         {
-            string message = "Could not update movies\n" + $"Reason: {ex.Message}";
+            string message = "Could not update currencies\n" + $"Reason: {ex.Message}";
             Console.WriteLine(message);
         }
     }
 
     private void Update()
     {
-        MoviesDataSource moviesDataSource = new MoviesDataSource(_apiKey, _maxAmountOfMovies);
-        List<Movie> movies = moviesDataSource.GetMovies().Result;
+        CurrenciesDataSource currenciesDataSource = new CurrenciesDataSource(_apiKey);
+        List<Currency> currencies = currenciesDataSource.GetMovies().Result;
 
-        MoviesDataToUpdateBuilder moviesDataToUpdateBuilder = new MoviesDataToUpdateBuilder();
-        DataToUpdate[] dataToUpdate = moviesDataToUpdateBuilder.BuildData(movies);
+        CurrenciesDataToUpdateBuilder moviesDataToUpdateBuilder = new CurrenciesDataToUpdateBuilder();
+        DataToUpdate[] dataToUpdate = moviesDataToUpdateBuilder.BuildData(currencies);
         foreach (DataToUpdate data in dataToUpdate)
         {
             _dbUpdater.Update(data).Wait();

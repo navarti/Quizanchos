@@ -12,8 +12,6 @@ internal class MoviesDataSource
     private readonly int _maxAmountOfMovies;
     private readonly List<Movie> _movies = new List<Movie>();
 
-    private readonly HashSet<int> pagesAdded = new HashSet<int>();
-
     public MoviesDataSource(string apiKey, int maxAmountOfMovies)
     {
         _apiKey = apiKey;
@@ -22,7 +20,6 @@ internal class MoviesDataSource
 
     public async Task<List<Movie>> GetMovies()
     {
-        pagesAdded.Clear();
         _movies.Clear();
         await AddMoviesToListAsync();
         return _movies;

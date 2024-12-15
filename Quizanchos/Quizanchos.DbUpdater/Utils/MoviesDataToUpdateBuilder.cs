@@ -10,13 +10,13 @@ internal class MoviesDataToUpdateBuilder
     {
         DataToUpdate[] dataToUpdate =
         [
-            BuildCountriesDataToUpdateWithArea(movies),
+            BuildCountriesDataToUpdateWithRating(movies),
         ];
 
         return dataToUpdate;
     }
 
-    private DataToUpdate BuildCountriesDataToUpdateWithArea(List<Movie> movies)
+    private DataToUpdate BuildCountriesDataToUpdateWithRating(List<Movie> movies)
     {
         EntityWithValueToUpdate[] entities = movies.Select(movie => movie.ToUniversalEntityWithRating()).ToArray();
         return new DataToUpdate(FeatureType.Float, "Movie-Rating", "https://static0.srcdn.com/wordpress/wp-content/uploads/2023/11/greatest-movies-of-all-time.jpg",
