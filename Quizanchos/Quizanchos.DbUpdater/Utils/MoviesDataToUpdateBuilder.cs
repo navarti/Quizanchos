@@ -20,6 +20,6 @@ internal class MoviesDataToUpdateBuilder
     {
         EntityWithValueToUpdate[] entities = movies.Select(movie => movie.ToUniversalEntityWithRating()).ToArray();
         return new DataToUpdate(FeatureType.Float, "Movie-Rating", "https://static0.srcdn.com/wordpress/wp-content/uploads/2023/11/greatest-movies-of-all-time.jpg",
-            "Danchos", DateTime.Now, "Which movies has bigger rating?", entities);
+            "Danchos", DateTime.Now, "Which movies has bigger rating?", isPremium: true, entities);
     }
 }

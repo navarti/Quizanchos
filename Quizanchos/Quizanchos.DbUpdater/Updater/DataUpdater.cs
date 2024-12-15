@@ -47,7 +47,8 @@ internal class DataUpdater : IDataUpdater
             Name = data.CategoryName,
             QuestionToDisplay = data.QuestionToDisplay,
             FeatureType = data.FeatureType,
-            ImageUrl = data.ImageUrl
+            ImageUrl = data.ImageUrl,
+            IsPremium = data.IsPremium,
         };
         
         return await _quizCategoryRepository.Create(quizCategory);

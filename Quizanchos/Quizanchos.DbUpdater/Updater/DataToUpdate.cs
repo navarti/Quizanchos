@@ -10,10 +10,11 @@ internal class DataToUpdate
     public string AuthorName { get; }
     public DateTime CreationDate { get; }
     public string QuestionToDisplay { get; }
+    public bool IsPremium { get; set; }
     public EntityWithValueToUpdate[] Entities { get; }
 
     public DataToUpdate(FeatureType featureType, string categoryName, string imageUrl, string authorName, DateTime creationDate,
-        string questionToDisplay, EntityWithValueToUpdate[] entities)
+        string questionToDisplay, bool isPremium, EntityWithValueToUpdate[] entities)
     {
         FeatureType = featureType;
         CategoryName = categoryName;
@@ -22,5 +23,6 @@ internal class DataToUpdate
         AuthorName = authorName;
         CreationDate = creationDate;
         QuestionToDisplay = questionToDisplay;
+        IsPremium = isPremium;
     }
 }

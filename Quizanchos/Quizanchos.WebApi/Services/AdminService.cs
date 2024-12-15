@@ -28,7 +28,7 @@ public class AdminService
             users = users.Where(u => u.UserName.StartsWith(name));
         }
 
-        return (await users.Skip(skip).Take(take).ToListAsync()).Select(u => new ApplicationUserDto(u.UserName, u.AvatarUrl, u.Score));
+        return (await users.Skip(skip).Take(take).ToListAsync()).Select(u => new ApplicationUserDto(u.UserName, u.AvatarUrl, u.Score, u.Status));
     }
 
     public async Task DeleteUser(string email)
