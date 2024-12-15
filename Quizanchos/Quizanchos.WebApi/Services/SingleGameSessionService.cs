@@ -6,6 +6,7 @@ using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Dto.Abstractions;
+using Quizanchos.WebApi.Util;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;
@@ -42,15 +43,16 @@ public class SingleGameSessionService
     {
         _ = baseSingleGameSessionDto ?? throw HandledExceptionFactory.CreateNullException(nameof(baseSingleGameSessionDto));
 
-        QuizCategory quizCategory = await _quizCategoryRepository.GetById(baseSingleGameSessionDto.QuizCategoryId).ConfigureAwait(false);
-
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
-
+        
         SingleGameSession? existingGameSession = await FindAliveSession(user.Id).ConfigureAwait(false);
         if (existingGameSession is not null)
         {
             throw HandledExceptionFactory.Create("There is already an active game session for this user.");
         }
+
+        QuizCategory quizCategory = await _quizCategoryRepository.GetById(baseSingleGameSessionDto.QuizCategoryId).ConfigureAwait(false);
+        PremiumQuizCategoryChecker.ThrowIfIsNotAllowed(user, quizCategory);
 
         SingleGameSession gameSession = new()
         {
