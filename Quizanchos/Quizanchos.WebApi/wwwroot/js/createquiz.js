@@ -1,4 +1,3 @@
-// Global variables to store data
 let quizCategoryId = null;
 let entities = [];
 let features = [];
@@ -18,7 +17,7 @@ document.getElementById('categoryForm').addEventListener('submit', async (e) => 
         featureType: parseInt(document.getElementById('featureType').value),
         imageUrl: document.getElementById('imageUrl').value,
         authorName: document.getElementById('authorName').value,
-        creationDate: new Date().toISOString(), // Use current date for creation or updates
+        creationDate: new Date().toISOString(),
         questionToDisplay: document.getElementById('questionToDisplay').value
     };
 
@@ -60,7 +59,6 @@ document.getElementById('entityForm').addEventListener('submit', async (e) => {
 
         if (!response.ok) throw new Error('Failed to create entity');
         const result = await response.json();
-
         entities.push({ id: result.id, name: entityName });
         updateEntityList();
         updateEntitySelect();
@@ -101,13 +99,11 @@ document.getElementById('featureForm').addEventListener('submit', async (e) => {
 
         if (!response.ok) throw new Error('Failed to create feature');
         const result = await response.json();
-
         features.push({
             entityId: quizEntityId,
             value,
             entityName: entities.find(e => e.id === quizEntityId)?.name
         });
-
         updateFeatureList();
         document.getElementById('featureValue').value = '';
     } catch (error) {
@@ -115,7 +111,6 @@ document.getElementById('featureForm').addEventListener('submit', async (e) => {
         alert('Failed to create feature');
     }
 });
-
 
 async function fetchAndRenderCategories() {
     try {

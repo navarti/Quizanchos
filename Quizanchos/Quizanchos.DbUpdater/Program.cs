@@ -59,12 +59,20 @@ internal class Program
             //CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
             //countriesUpdater.UpdateSafe();
 
-            string? moviesApiKey = config["MoviesApiKey"];
-            if (moviesApiKey.IsNullOrEmpty())
+            //string? moviesApiKey = config["MoviesApiKey"];
+            //if (moviesApiKey.IsNullOrEmpty())
+            //{
+            //    throw new InvalidOperationException("MoviesApiKey is not set in configuration");
+            //}
+            //MoviesUpdater moviesUpdater = new MoviesUpdater(dbUpdater, moviesApiKey, maxAmountOfMovies: 100000);
+            //moviesUpdater.UpdateSafe();
+
+            string? currenciesApiKey = config["CurrenciesApiKey"];
+            if (currenciesApiKey.IsNullOrEmpty())
             {
-                throw new InvalidOperationException("MoviesApiKey is not set in configuration");
+                throw new InvalidOperationException("CurrenciesApiKey is not set in configuration");
             }
-            MoviesUpdater moviesUpdater = new MoviesUpdater(dbUpdater, moviesApiKey, maxAmountOfMovies: 100000);
+            CurrenciesUpdater moviesUpdater = new CurrenciesUpdater(dbUpdater, currenciesApiKey);
             moviesUpdater.UpdateSafe();
         }
     }
