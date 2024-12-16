@@ -15,4 +15,6 @@ public class HomeViewModel
     public List<ApplicationUserInLeaderBoardDto> Users { get; set; } = new List<ApplicationUserInLeaderBoardDto>();
     
     public string CurrentUserName { get; set; }
+    public int TotalPages { get; set; }
+    public int CurrentPage { get; set; }
 }
