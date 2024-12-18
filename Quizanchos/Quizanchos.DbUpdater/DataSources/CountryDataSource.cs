@@ -35,7 +35,9 @@ internal class CountryDataSource
 
     private void ProcessTokenAndAppend(JToken token)
     {
-        string name = token.GetOption<string>("area");
+        string name = token["name"]?.GetOption<string>("common")
+            ?? throw new Exception("Could not parse country name");
+
         float area = token.GetOption<int>("area");
         int population = token.GetOption<int>("population");
             

@@ -56,24 +56,24 @@ internal class Program
             IDataUpdater dbUpdater = scope.ServiceProvider.GetRequiredService<IDataUpdater>();
             IConfiguration config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            //CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
-            //countriesUpdater.UpdateSafe();
+            CountriesUpdater countriesUpdater = new CountriesUpdater(dbUpdater);
+            countriesUpdater.UpdateSafe();
 
-            //string? moviesApiKey = config["MoviesApiKey"];
-            //if (moviesApiKey.IsNullOrEmpty())
-            //{
-            //    throw new InvalidOperationException("MoviesApiKey is not set in configuration");
-            //}
-            //MoviesUpdater moviesUpdater = new MoviesUpdater(dbUpdater, moviesApiKey, maxAmountOfMovies: 100000);
-            //moviesUpdater.UpdateSafe();
+            string? moviesApiKey = config["MoviesApiKey"];
+            if (moviesApiKey.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException("MoviesApiKey is not set in configuration");
+            }
+            MoviesUpdater moviesUpdater = new MoviesUpdater(dbUpdater, moviesApiKey, maxAmountOfMovies: 100000);
+            moviesUpdater.UpdateSafe();
 
             string? currenciesApiKey = config["CurrenciesApiKey"];
             if (currenciesApiKey.IsNullOrEmpty())
             {
                 throw new InvalidOperationException("CurrenciesApiKey is not set in configuration");
             }
-            CurrenciesUpdater moviesUpdater = new CurrenciesUpdater(dbUpdater, currenciesApiKey);
-            moviesUpdater.UpdateSafe();
+            CurrenciesUpdater currenciesUpdater = new CurrenciesUpdater(dbUpdater, currenciesApiKey);
+            currenciesUpdater.UpdateSafe();
         }
     }
 }
