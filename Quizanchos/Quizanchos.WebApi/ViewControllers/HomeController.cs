@@ -60,12 +60,29 @@ public class HomeController : Controller
     public async Task<IActionResult> Leaderboard()
     {
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
+        var currentUser = users.FirstOrDefault(u => u.UserName == User.Identity.Name);
         var currentUserName = User.Identity?.Name ?? "Guest"; 
-
+        int itemsPerPage = 10;
+        int totalUsers = users.Count;
+        int totalPages = (int)Math.Ceiling(totalUsers / (double)itemsPerPage);
+        var currentPageUsers = users
+            .OrderBy(u => u.Position)
+            .Take(itemsPerPage - 1)
+            .ToList();
+        if (currentUser != null && !currentPageUsers.Contains(currentUser))
+        {
+            currentPageUsers.Insert(0, currentUser);
+            if (currentPageUsers.Count > itemsPerPage)
+            {
+                currentPageUsers = currentPageUsers.Take(itemsPerPage).ToList();
+            }
+        }
         var viewModel = new HomeViewModel
         {
             Users = users.ToList(),
-            CurrentUserName = currentUserName
+            CurrentUserName = currentUserName,
+            TotalPages = totalPages,
+            CurrentPage = 1
         };
 
         return View(viewModel);

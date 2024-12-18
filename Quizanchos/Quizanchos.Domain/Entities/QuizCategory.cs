@@ -12,4 +12,5 @@ public class QuizCategory : IKeyedEntity<Guid>
     public string AuthorName { get; set; } = "";
     public DateTime CreationDate { get; set; }
     public string QuestionToDisplay { get; set; } = "";
+    public bool IsPremium { get; set; }
 }

@@ -21,7 +21,7 @@ public class LeaderBoardService
     public async Task<List<ApplicationUserInLeaderBoardDto>> GetLeaderBoardAsync(int take, int skip)
     {
         return (await GetAppUsesLeaderBoardAsync(take, skip))
-            .Select((user, position) => new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1))
+            .Select((user, position) => new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1, user.Status))
             .ToList();
     }
 
@@ -45,6 +45,6 @@ public class LeaderBoardService
 
         int position = users.FindIndex(u => u.Id == user.Id);
 
-        return new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1);
+        return new ApplicationUserInLeaderBoardDto(user.UserName, user.AvatarUrl, user.Score, position + 1, user.Status);
     }
 }

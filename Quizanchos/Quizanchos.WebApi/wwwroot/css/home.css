@@ -108,6 +108,7 @@ main {
     opacity: 1; /* Убедимся, что затемнение не уменьшает видимость */
     z-index: 2; /* Убедимся, что она выше слоя затемнения */
     position: relative; /* Чтобы оставаться над затемняющим слоем */
+    justify-content: center;
 }
 .quiz-btn {
     display: inline-block;

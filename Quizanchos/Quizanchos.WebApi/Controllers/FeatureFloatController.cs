@@ -43,7 +43,7 @@ public class FeatureFloatController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(FeatureFloatDto featurefloatDto)
+    public async Task<IActionResult> Update([FromBody] FeatureFloatDto featurefloatDto)
     {
         featurefloatDto = await _featureFloatService.Update(featurefloatDto);
         return Ok(featurefloatDto);

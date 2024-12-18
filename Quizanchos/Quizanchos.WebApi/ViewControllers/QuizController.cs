@@ -49,6 +49,7 @@ public class QuizController : Controller
 
         var viewModel = new QuizViewModel
         {
+            Question = quizCategory.QuestionToDisplay,
             CurrentCardIndex = singleGameSessionDto.CurrentCardIndex + 1 ,
             TotalCards = (int)singleGameSessionDto.CardsCount,
             SessionId = singleGameSessionDto.Id,

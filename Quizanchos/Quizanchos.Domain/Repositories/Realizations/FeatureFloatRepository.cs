@@ -33,12 +33,36 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
         return _dbSet.FirstOrDefaultAsync(feature => feature.QuizCategory.Id == categoryId && feature.QuizEntity.Id == entityId);
     }
 
-    public Task<FeatureFloat?> FindRandomByCategory(Guid categoryId)
+    public async Task<FeatureFloat?> FindRandomByCategory(Guid categoryId, double coefficient, float? lastValue = null)
     {
-        return _dbSet
+        var query = _dbSet
             .Include(feature => feature.QuizEntity)
-            .Where(feature => feature.QuizCategory.Id == categoryId)
-            .OrderBy(feature => Guid.NewGuid())
-            .FirstOrDefaultAsync();
+            .Where(feature => feature.QuizCategory.Id == categoryId);
+
+        int totalFeatures = await query.CountAsync();
+
+        if (totalFeatures == 0)
+        {
+            return null;
+        }
+
+        int subsetSize = (int)Math.Ceiling(totalFeatures * coefficient);
+
+        List<FeatureFloat> features = await query.OrderBy(feature => feature.Value).ToListAsync();
+
+        List<FeatureFloat> subset;
+        if (lastValue.HasValue)
+        {
+            subset = features
+                .OrderBy(feature => Math.Abs(feature.Value.Value - lastValue.Value))
+                .Take(subsetSize)
+                .ToList();
+        }
+        else
+        {
+            subset = features.Take(subsetSize).ToList();
+        }
+
+        return subset.OrderBy(_ => Guid.NewGuid()).FirstOrDefault();
     }
 }
