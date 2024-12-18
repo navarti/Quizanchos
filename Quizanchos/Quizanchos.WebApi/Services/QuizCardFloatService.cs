@@ -6,6 +6,7 @@ using Quizanchos.WebApi.Dto.Abstractions;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
+using Quizanchos.Domain.Repositories.Realizations;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -22,11 +23,16 @@ public class QuizCardFloatService : IQuizCardService
 
     public async Task<QuizCardAbstract> CreateCardForSession(SingleGameSession gameSession)
     {
+        float? previousValue = null;
+
         List<FeatureFloat> featureFloats = new List<FeatureFloat>();
         for (int i = 0; i < gameSession.OptionCountInt; i++)
         {
-            featureFloats.Add(await _featureFloatRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
-                ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later"));
+            FeatureFloat feature = await _featureFloatRepository.FindRandomByCategory(gameSession.QuizCategory.Id, gameSession.GameLevel.ToCoefficient(), previousValue)
+                ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later");
+
+            previousValue = feature.Value.Value;
+            featureFloats.Add(feature);
         }
 
         int correctOption = CorrectOptionPicker.PickCorrectOption(featureFloats);

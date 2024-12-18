@@ -2,11 +2,11 @@
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.Domain.Repositories.Realizations;
 using Quizanchos.WebApi.Dto.Abstractions;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
+using Quizanchos.Common.Enums;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -23,11 +23,16 @@ public class QuizCardIntService : IQuizCardService
 
     public async Task<QuizCardAbstract> CreateCardForSession(SingleGameSession gameSession)
     {
+        int? previousValue = null;
+
         List<FeatureInt> featureInts = new List<FeatureInt>();
         for (int i = 0; i < gameSession.OptionCountInt; i++)
         {
-            featureInts.Add(await _featureIntRepository.FindRandomByCategory(gameSession.QuizCategory.Id)
-                ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later"));
+            FeatureInt feature = await _featureIntRepository.FindRandomByCategory(gameSession.QuizCategory.Id, gameSession.GameLevel.ToCoefficient(), previousValue)
+                ?? throw HandledExceptionFactory.Create("Could not find any records for this category. Try again later");
+
+            previousValue = feature.Value.Value;
+            featureInts.Add(feature);
         }
 
         int correctOption = CorrectOptionPicker.PickCorrectOption(featureInts);
