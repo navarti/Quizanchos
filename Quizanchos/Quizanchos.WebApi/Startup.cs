@@ -72,8 +72,8 @@ public static class Startup
 
         services.ConfigureApplicationCookie(options =>
         {
-            options.LoginPath = new PathString("/QuizAuthorization/Login");
-            options.LogoutPath = "/Account/Logout";
+            options.LoginPath = new PathString("/Signin");
+            options.AccessDeniedPath = "/Signin";
             options.Cookie = new CookieBuilder
             {
                 Name = "QAuth",
