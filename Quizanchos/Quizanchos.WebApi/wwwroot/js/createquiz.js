@@ -22,11 +22,22 @@ document.getElementById('categoryForm').addEventListener('submit', async (e) => 
     };
 
     try {
-        const response = await fetch('/QuizCategory/Update', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(categoryData)
-        });
+        let response;
+
+        if (!isUpdating) {
+            response = await fetch('/QuizCategory/Create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(categoryData)
+            });
+        }
+        else {
+            response = await fetch('/QuizCategory/Update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(categoryData)
+            });
+        }
 
         if (!response.ok) throw new Error('Failed to update category');
         const result = await response.json();
