@@ -110,7 +110,7 @@ function logout() {
                     deleteCookie('Identity.External');
                     deleteCookie('QAuth');
                     document.getElementById('errorModal').style.display = 'none';
-                    window.location.reload();
+                    window.location.href = "/";
                 },
             },
             {
