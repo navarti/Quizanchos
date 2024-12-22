@@ -21,7 +21,7 @@ function closeModal(modalId) {
 }
 
 function fetchUsers(name = "", take = 15, skip = 0) {
-    const url = new URL('/Admin/GetUsers');
+    const url = new URL('/Admin/GetUsers', window.location.origin);
     url.searchParams.append('take', take);
     url.searchParams.append('skip', skip);
     if (name) url.searchParams.append('name', name);
