@@ -119,7 +119,7 @@ function logout() {
                     })
                         .then(() => {
                             document.getElementById('errorModal').style.display = 'none';
-                            window.location.reload();
+                            window.location.href = "/";
                         })
                         .catch((error) => {
                             console.error('Error during logout:', error);
