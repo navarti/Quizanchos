@@ -46,13 +46,13 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
             return null;
         }
 
-        int subsetSize = (int)Math.Ceiling(totalFeatures * coefficient);
-
         List<FeatureFloat> features = await query.OrderBy(feature => feature.Value).ToListAsync();
 
         List<FeatureFloat> subset;
         if (lastValue.HasValue)
         {
+            int subsetSize = (int)Math.Ceiling(totalFeatures * coefficient);
+
             subset = features
                 .OrderBy(feature => Math.Abs(feature.Value.Value - lastValue.Value))
                 .Take(subsetSize)
@@ -60,7 +60,7 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
         }
         else
         {
-            subset = features.Take(subsetSize).ToList();
+            subset = features.ToList();
         }
 
         return subset.OrderBy(_ => Guid.NewGuid()).FirstOrDefault();

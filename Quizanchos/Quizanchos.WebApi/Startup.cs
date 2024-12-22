@@ -72,8 +72,8 @@ public static class Startup
 
         services.ConfigureApplicationCookie(options =>
         {
-            options.LoginPath = new PathString("/QuizAuthorization/Login");
-            options.LogoutPath = "/Account/Logout";
+            options.LoginPath = new PathString("/Signin");
+            options.AccessDeniedPath = "/Signin";
             options.Cookie = new CookieBuilder
             {
                 Name = "QAuth",
@@ -181,7 +181,7 @@ public static class Startup
 
         if (configuration.GetOption("EmailConfirmation:ShouldUse") == "0")
         {
-            services.AddTransient<IUserPasswordUpdaterService, DummyPasswordUpdaterService>();
+            services.AddTransient<IUserPasswordUpdaterService, DefaultPasswordUpdaterService>();
             services.AddTransient<IUserRegistrationService, DefaultUserRegistrationService>();
             services.AddControllersWithViews(options =>
             {
