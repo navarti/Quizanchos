@@ -20,7 +20,7 @@ const uploadImage = async (file) => {
         }
     } catch (error) {
         console.error('Error uploading image:', error);
-        alert('Failed to upload avatar. Please try again.');
+        console.log('Failed to upload avatar. Please try again.');
     }
     return null;
 };
@@ -109,22 +109,6 @@ function logout() {
                 onClick: () => {
                     deleteCookie('Identity.External');
                     deleteCookie('QAuth');
-
-                    fetch('/Account/Logout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                    })
-                        .then(() => {
-                            document.getElementById('errorModal').style.display = 'none';
-                            window.location.href = "/";
-                        })
-                        .catch((error) => {
-                            console.error('Error during logout:', error);
-                            showModal('Error', 'Logout failed. Please try again.');
-                        });
                 },
             },
             {

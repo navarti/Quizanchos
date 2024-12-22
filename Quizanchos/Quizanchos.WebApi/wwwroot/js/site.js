@@ -60,7 +60,7 @@ startQuestButton.addEventListener("click", async function (event) {
             }
         } else {
             const errorData = await response.json();
-            alert(errorData.message || "An error occurred. Please try again.");
+            alert(errorData.Message || "An error occurred. Please try again.");
         }
     } catch (error) {
         console.error("Error:", error);
