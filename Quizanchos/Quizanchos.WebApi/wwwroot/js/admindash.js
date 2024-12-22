@@ -21,7 +21,7 @@ function closeModal(modalId) {
 }
 
 function fetchUsers(name = "", take = 15, skip = 0) {
-    const url = new URL('https://localhost:7020/Admin/GetUsers');
+    const url = new URL('/Admin/GetUsers');
     url.searchParams.append('take', take);
     url.searchParams.append('skip', skip);
     if (name) url.searchParams.append('name', name);
@@ -127,7 +127,7 @@ function closeModal(modalId) {
 }
 
 function fetchAndRenderCategories() {
-    fetch('https://localhost:7020/QuizCategory/GetAll', {
+    fetch('/QuizCategory/GetAll', {
         method: 'GET',
         headers: {
             'Accept': '*/*',
@@ -213,7 +213,7 @@ function renderCategoryTable() {
 
 
 function updateCategory(category) {
-    fetch('https://localhost:7020/QuizCategory/Update', {
+    fetch('/QuizCategory/Update', {
         method: 'POST',
         headers: {
             'Accept': '*/*',

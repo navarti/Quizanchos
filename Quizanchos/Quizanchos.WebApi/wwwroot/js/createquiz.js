@@ -145,7 +145,7 @@ document.getElementById('loadCategoryButton').addEventListener('click', async ()
     }
 
     try {
-        const response = await fetch(`https://localhost:7020/QuizCategory/GetById?id=${selectedCategoryId}`, {
+        const response = await fetch(`/QuizCategory/GetById?id=${selectedCategoryId}`, {
             method: 'GET',
             headers: { 'Accept': '*/*' }
         });
