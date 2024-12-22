@@ -181,7 +181,7 @@ public static class Startup
 
         if (configuration.GetOption("EmailConfirmation:ShouldUse") == "0")
         {
-            services.AddTransient<IUserPasswordUpdaterService, DummyPasswordUpdaterService>();
+            services.AddTransient<IUserPasswordUpdaterService, DefaultPasswordUpdaterService>();
             services.AddTransient<IUserRegistrationService, DefaultUserRegistrationService>();
             services.AddControllersWithViews(options =>
             {

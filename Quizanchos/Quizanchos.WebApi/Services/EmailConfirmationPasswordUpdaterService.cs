@@ -12,7 +12,10 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
     {
         public string UserId { get; set; }
         public string Password { get; set; }
+        public string Token { get; set; }
     }
+
+    private const int CodeLength = 6;
 
     private readonly EmailSenderService _emailSenderService;
     private readonly UserManager<ApplicationUser> _userManager;
@@ -29,12 +32,14 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
     {
         ApplicationUser? user = await _userManager.FindByEmailAsync(email);
         _ = user ?? throw HandledExceptionFactory.Create("User not found");
-        
-        string code = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        string code = StringGenerator.GenerateRandomString(_containerService.Random, CodeLength);
+        string token = await _userManager.GeneratePasswordResetTokenAsync(user);
         UserData userData = new()
         {
             UserId = user.Id,
             Password = newPassword,
+            Token = token
         };
 
         _containerService.PendingPasswordDictionary.Add(code, userData);
@@ -58,6 +63,6 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
 
         ApplicationUser? user = await _userManager.FindByIdAsync(userData.UserId);
         _ = user ?? throw HandledExceptionFactory.Create("User not found");
-        await _userManager.ResetPasswordAsync(user, code, userData.Password);
+        await _userManager.ResetPasswordAsync(user, userData.Token, userData.Password);
     }
 }
