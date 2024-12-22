@@ -18,7 +18,13 @@ internal class Program
     {
         using(IHost host = InitHost())
         {
-            Update(host);
+            while (true)
+            {
+                Update(host);
+
+                TimeSpan sleepTime = TimeSpan.FromDays(30);
+                Thread.Sleep(sleepTime);
+            }
         }
     }
 
