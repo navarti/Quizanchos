@@ -1,5 +1,7 @@
 <Solution>
-  <Project Path="Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
+  <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" Id="a35e2465-b737-4ecb-93f3-932f66870127" />
   <Project Path="Quizanchos.Core/Quizanchos.Core.csproj" />
   <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />
+  <Project Path="Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
+  <Project Path="Quizanchos.WebApi/Quizanchos.WebApi.csproj" />
 </Solution>

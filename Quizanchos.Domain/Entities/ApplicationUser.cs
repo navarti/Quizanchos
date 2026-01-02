@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Quizanchos.Quiz.Enums;
+using Quizanchos.Common.Enums;
 
 namespace Quizanchos.Domain.Entities;
 
