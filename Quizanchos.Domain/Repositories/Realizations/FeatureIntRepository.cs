@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Quizanchos.Quiz.Enums;
-using Quizanchos.Quiz.Util;
+using Quizanchos.Common.Enums;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 

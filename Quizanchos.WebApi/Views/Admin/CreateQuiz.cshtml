@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Category Creator</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/createquiz.css">
+</head>
+<body>
+<div class="container">
+    <div class="section">
+        <h2 class="section-title">Create or Update Quiz Category</h2>
+        
+        <div>
+            <select id="existingCategorySelect" class="form-input">
+                <option value="">Select Existing Category</option>
+            </select>
+            <button id="loadCategoryButton" class="form-button">Load Category</button>
+        </div>
+        <form id="categoryForm">
+            <input type="text" class="form-input" id="categoryName" placeholder="Category Name" required>
+            <select class="form-input" id="featureType" required>
+                <option value="1">Type 1</option>
+                <option value="2">Type 2</option>
+                <option value="3">Type 3</option>
+            </select>
+            <input type="text" class="form-input" id="imageUrl" placeholder="Image URL" required>
+            <input type="text" class="form-input" id="authorName" placeholder="Author Name" required>
+            <input type="text" class="form-input" id="questionToDisplay" placeholder="Question to Display" required>
+            <button type="submit" class="form-button">Save Category</button>
+            <button type="button" id="enableEditButton" class="form-button">Edit Category</button>
+        </form>
+    </div>
+    <div class="section">
+        <h2 class="section-title">Create Quiz Entities</h2>
+        <form id="entityForm">
+            <input type="text" class="form-input" id="entityName" placeholder="Entity Name" required>
+            <button type="submit" class="form-button">Add Entity</button>
+        </form>
+        <ul id="entityList" class="entity-list"></ul>
+    </div>
+    <div class="section">
+        <h2 class="section-title">Add Features</h2>
+        <form id="featureForm">
+            <select class="form-input" id="entitySelect" required>
+                <option value="">Select Entity</option>
+            </select>
+            <input type="number" class="form-input" id="featureValue" placeholder="Value" required>
+            <button type="submit" class="form-button">Add Feature</button>
+        </form>
+        <ul id="featureList" class="feature-list"></ul>
+    </div>
+</div>
+<script src="/js/createquiz.js"></script>
+</body>
+</html>

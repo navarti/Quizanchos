@@ -1,0 +1,206 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #6b46c1, #3b82f6);
+    min-height: 100vh;
+}
+.admin-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.admin-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.admin-card h2 {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+}
+.admin-card h2 svg {
+    margin-right: 0.5rem;
+}
+.admin-card p {
+    margin-bottom: 0.5rem;
+}
+.admin-card button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+.user-management-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+.user-management-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 0.5rem;
+    width: 80%;
+    max-width: 600px;
+}
+.modal-close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.user-table th, .user-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+.user-search-input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+}
+.user-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.user-pagination button {
+    margin: 0 0.25rem;
+}
+
+.category-management-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.category-management-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 0.5rem;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+.category-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.category-table th,
+.category-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.category-table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+}
+
+.category-table input {
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.category-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.category-pagination button {
+    margin: 0 0.25rem;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.category-pagination button:hover {
+    background-color: #0056b3;
+}
+
+.category-pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.edit-features-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.edit-features-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 0.5rem;
+    width: 80%;
+    max-width: 600px;
+}
+
+.features-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.features-table th, .features-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}

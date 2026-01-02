@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Quizanchos.Quiz.Enums;
+using Quizanchos.Common.Enums;
 using System.Linq.Expressions;
 
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Domain.Entities.Interfaces;
-using Quizanchos.Quiz.Util;
+using Quizanchos.Common.Util;
 
 namespace Quizanchos.Domain.Repositories.Realizations;
 

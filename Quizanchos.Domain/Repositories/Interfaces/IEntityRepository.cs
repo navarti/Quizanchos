@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Quizanchos.Quiz.Enums;
+using Quizanchos.Common.Enums;
 
 namespace Quizanchos.Domain.Repositories.Interfaces;
 
