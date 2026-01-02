@@ -19,7 +19,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> Create([FromBody] BaseSingleGameSessionDto baseSingleGameSessionDto)
     {
         SingleGameSessionDto singleGameSession = await _singleGameSessionService.Create(baseSingleGameSessionDto, User);
@@ -27,7 +27,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpGet]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> GetById(Guid sessionId)
     {
         SingleGameSessionDto singleGameSession = await _singleGameSessionService.GetById(User, sessionId);
@@ -35,7 +35,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpGet]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> GetAliveSession()
     {
         SingleGameSessionDto? singleGameSession = await _singleGameSessionService.FindAliveSession(User);
@@ -47,7 +47,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpGet]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> GetCurrentCardForSession(Guid sessionId)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.GetCurrentCardForSession(User, sessionId);
@@ -55,7 +55,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpGet]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> GetCardForSession(Guid sessionId, int cardIndex)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.GetCardForSession(User, sessionId, cardIndex);
@@ -63,7 +63,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> CreateNextCardForSession(Guid sessionId)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.CreateNextCardForSession(User, sessionId);
@@ -71,7 +71,7 @@ public class SingleGameSessionController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> PickAnswerForSession([FromBody] AnswerDto answerDto)
     {
         QuizCardDtoAbstract card = await _singleGameSessionService.PickAnswerForSession(User, answerDto);
