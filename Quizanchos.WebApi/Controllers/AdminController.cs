@@ -7,7 +7,7 @@ using Quizanchos.WebApi.Services;
 namespace Quizanchos.WebApi.Controllers;
 
 [Route("[controller]/[action]")]
-[Authorize(QuizPolicy.Admin)]
+[Authorize(QuizRole.Admin)]
 public class AdminController : Controller
 {
     private readonly AdminService _adminService;

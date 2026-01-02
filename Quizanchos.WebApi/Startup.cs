@@ -87,9 +87,9 @@ public static class Startup
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy(QuizPolicy.Owner, policy => policy.RequireRole(QuizRole.Owner));
-            options.AddPolicy(QuizPolicy.Admin, policy => policy.RequireRole(QuizRole.Owner, QuizRole.Admin));
-            options.AddPolicy(QuizPolicy.User, policy => policy.RequireRole(QuizRole.Owner, QuizRole.Admin, QuizRole.User));
+            options.AddPolicy(QuizRole.Owner, policy => policy.RequireRole(QuizRole.Owner));
+            options.AddPolicy(QuizRole.Admin, policy => policy.RequireRole(QuizRole.Owner, QuizRole.Admin));
+            options.AddPolicy(QuizRole.User, policy => policy.RequireRole(QuizRole.Owner, QuizRole.Admin, QuizRole.User));
         });
     }
 

@@ -17,7 +17,7 @@ public class QuizCategoryController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> Create([FromBody] BaseQuizCategoryDto baseQuizCategoryDto)
     {
         QuizCategoryDto quizCategoryDto = await _quizCategoryService.Create(baseQuizCategoryDto);
@@ -41,21 +41,21 @@ public class QuizCategoryController : Controller
     #region Test purposes
 #if DEBUG
     [HttpGet]
-    [Authorize(QuizPolicy.User)]
+    [Authorize(QuizRole.User)]
     public async Task<IActionResult> TestGetAllByUser()
     {
         return await GetAll();
     }
 
     [HttpGet]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> TestGetAllByAdmin()
     {
         return await GetAll();
     }
 
     [HttpGet]
-    [Authorize(QuizPolicy.Owner)]
+    [Authorize(QuizRole.Owner)]
     public async Task<IActionResult> TestGetAllByOwner()
     {
         return await GetAll();
@@ -64,7 +64,7 @@ public class QuizCategoryController : Controller
     #endregion
 
     [HttpPost]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> Update([FromBody] QuizCategoryDto quizCategoryDto)
     {
         QuizCategoryDto updatedQuizCategoryDto = await _quizCategoryService.Update(quizCategoryDto);
@@ -72,7 +72,7 @@ public class QuizCategoryController : Controller
     }
 
     [HttpDelete]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _quizCategoryService.Delete(id);

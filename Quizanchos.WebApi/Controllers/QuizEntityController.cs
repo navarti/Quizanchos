@@ -17,7 +17,7 @@ public class QuizEntityController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> Create([FromBody] BaseQuizEntityDto baseQuizEntityDto)
     {
         QuizEntityDto quizEntityDto = await _quizEntityService.Create(baseQuizEntityDto);
@@ -39,7 +39,7 @@ public class QuizEntityController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> Update([FromBody] QuizEntityDto quizEntityDto)
     {
         QuizEntityDto updatedQuizEntityDto = await _quizEntityService.Update(quizEntityDto);
@@ -47,7 +47,7 @@ public class QuizEntityController : Controller
     }
 
     [HttpDelete]
-    [Authorize(QuizPolicy.Admin)]
+    [Authorize(QuizRole.Admin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _quizEntityService.Delete(id);
