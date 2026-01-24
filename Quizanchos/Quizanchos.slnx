@@ -1,8 +1,10 @@
 <Solution>
-  <Folder Name="/Minigames/">
-    <Project Path="Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
+  <Folder Name="/Minigames/" />
+  <Folder Name="/Minigames/Quiz/">
+    <Project Path="Minigames/Quiz/Quizanchos.Quiz.DbUpdater/Quizanchos.Quiz.DbUpdater.csproj" />
+    <Project Path="Minigames/Quiz/Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
   </Folder>
-  <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" Id="a35e2465-b737-4ecb-93f3-932f66870127" />
+  <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" />
   <Project Path="Quizanchos.Core/Quizanchos.Core.csproj" />
   <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />
   <Project Path="Quizanchos.WebApi/Quizanchos.WebApi.csproj" />

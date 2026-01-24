@@ -25,9 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Minigames\Quiz\Quizanchos.Quiz\Quizanchos.Quiz.csproj" />
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
-    <ProjectReference Include="..\Quizanchos.Quiz\Quizanchos.Quiz.csproj" />
   </ItemGroup>
 
   <ItemGroup>
