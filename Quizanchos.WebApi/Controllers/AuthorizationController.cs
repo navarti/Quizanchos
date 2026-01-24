@@ -33,7 +33,7 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizRole.Admin)]
+    [Authorize(AppRole.Admin)]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModelDto registerModelDto)
     {
         await _authorizationService.RegisterAdmin(registerModelDto);

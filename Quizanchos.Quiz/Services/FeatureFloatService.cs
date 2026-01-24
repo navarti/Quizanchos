@@ -1,11 +1,10 @@
-﻿using Quizanchos.Common.FeatureTypes;
+using Quizanchos.Common.FeatureTypes;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.Domain.Repositories.Realizations;
-using Quizanchos.WebApi.Dto;
+using Quizanchos.Quiz.Dto;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.Quiz.Services;
 
 public class FeatureFloatService
 {

@@ -1,8 +1,8 @@
-﻿using Quizanchos.Common.Enums;
+using Quizanchos.Common.Enums;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 
-namespace Quizanchos.WebApi.Util;
+namespace Quizanchos.Quiz.Util;
 
 public static class PremiumQuizCategoryChecker
 {

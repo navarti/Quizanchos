@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Quizanchos.WebApi.Dto;
+using Quizanchos.Quiz.Dto;
 using Quizanchos.WebApi.Constants;
-using Quizanchos.WebApi.Services;
+using Quizanchos.Quiz.Services;
 
 namespace Quizanchos.WebApi.Controllers;
 
@@ -17,7 +17,7 @@ public class QuizCategoryController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizRole.Admin)]
+    [Authorize(AppRole.Admin)]
     public async Task<IActionResult> Create([FromBody] BaseQuizCategoryDto baseQuizCategoryDto)
     {
         QuizCategoryDto quizCategoryDto = await _quizCategoryService.Create(baseQuizCategoryDto);
@@ -41,21 +41,21 @@ public class QuizCategoryController : Controller
     #region Test purposes
 #if DEBUG
     [HttpGet]
-    [Authorize(QuizRole.User)]
+    [Authorize(AppRole.User)]
     public async Task<IActionResult> TestGetAllByUser()
     {
         return await GetAll();
     }
 
     [HttpGet]
-    [Authorize(QuizRole.Admin)]
+    [Authorize(AppRole.Admin)]
     public async Task<IActionResult> TestGetAllByAdmin()
     {
         return await GetAll();
     }
 
     [HttpGet]
-    [Authorize(QuizRole.Owner)]
+    [Authorize(AppRole.Owner)]
     public async Task<IActionResult> TestGetAllByOwner()
     {
         return await GetAll();
@@ -64,7 +64,7 @@ public class QuizCategoryController : Controller
     #endregion
 
     [HttpPost]
-    [Authorize(QuizRole.Admin)]
+    [Authorize(AppRole.Admin)]
     public async Task<IActionResult> Update([FromBody] QuizCategoryDto quizCategoryDto)
     {
         QuizCategoryDto updatedQuizCategoryDto = await _quizCategoryService.Update(quizCategoryDto);
@@ -72,7 +72,7 @@ public class QuizCategoryController : Controller
     }
 
     [HttpDelete]
-    [Authorize(QuizRole.Admin)]
+    [Authorize(AppRole.Admin)]
     public async Task<IActionResult> Delete(Guid id)
     {
         await _quizCategoryService.Delete(id);

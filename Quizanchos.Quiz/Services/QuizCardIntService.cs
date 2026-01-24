@@ -1,14 +1,13 @@
-﻿using Quizanchos.Common.Util;
+using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.WebApi.Dto.Abstractions;
-using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services.Interfaces;
-using Quizanchos.WebApi.Util;
-using Quizanchos.Common.Enums;
+using Quizanchos.Quiz.Dto.Abstractions;
+using Quizanchos.Quiz.Dto;
+using Quizanchos.Quiz.Services.Interfaces;
+using Quizanchos.Quiz.Util;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.Quiz.Services;
 
 public class QuizCardIntService : IQuizCardService
 {

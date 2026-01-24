@@ -1,4 +1,5 @@
 namespace Quizanchos.ViewModels;
+using Quizanchos.Quiz.Dto;
 using Quizanchos.WebApi.Dto;
 public class HomeViewModel
 {

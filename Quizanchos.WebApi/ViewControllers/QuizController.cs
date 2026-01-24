@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using Quizanchos.WebApi.Dto;
+using Quizanchos.Quiz.Dto;
 using Quizanchos.WebApi.Services;
 using Quizanchos.ViewModels;
-using Quizanchos.WebApi.Dto.Abstractions;
+using Quizanchos.Quiz.Dto.Abstractions;
+using Quizanchos.Quiz.Services;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Quizanchos.WebApi.ViewControllers;

@@ -9,7 +9,7 @@
 </head>
 <body>
 <div class="admin-layout">
-    @if (User.IsInRole(QuizRole.Owner)|| User.IsInRole(QuizRole.Admin))
+    @if (User.IsInRole(AppRole.Owner)|| User.IsInRole(AppRole.Admin))
     {
         <header class="admin-header">
             <div class="header-container">

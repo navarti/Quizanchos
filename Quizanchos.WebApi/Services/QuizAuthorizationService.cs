@@ -45,9 +45,9 @@ public class QuizAuthorizationService
         await _userPasswordUpdaterService.UpdatePasswordAsync(updatePasswordModelDto.Email, updatePasswordModelDto.NewPassword);
     }
 
-    public async Task<RegisterUserResult> RegisterUser(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, QuizRole.User, UserStatusEnum.Ordinary);
+    public async Task<RegisterUserResult> RegisterUser(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, AppRole.User, UserStatusEnum.Ordinary);
 
-    public async Task<RegisterUserResult> RegisterAdmin(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, QuizRole.Admin, UserStatusEnum.Premium);
+    public async Task<RegisterUserResult> RegisterAdmin(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, AppRole.Admin, UserStatusEnum.Premium);
 
     private async Task<RegisterUserResult> RegisterWithRole(RegisterModelDto registerModelDto, string roleName, UserStatusEnum userStatus)
     {

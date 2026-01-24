@@ -18,7 +18,7 @@ public static class DataSeeder
 
         IdentityResult roleResult;
 
-        foreach (var roleName in QuizRole.All)
+        foreach (var roleName in AppRole.All)
         {
             bool roleExist = await roleManager.RoleExistsAsync(roleName);
             if (!roleExist)
@@ -36,7 +36,7 @@ public static class DataSeeder
 
         UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        foreach (ApplicationUser ownerToDelete in await userManager.GetUsersInRoleAsync(QuizRole.Owner))
+        foreach (ApplicationUser ownerToDelete in await userManager.GetUsersInRoleAsync(AppRole.Owner))
         {
             await userManager.DeleteAsync(ownerToDelete);
         }
@@ -59,7 +59,7 @@ public static class DataSeeder
             throw CriticalExceptionFactory.CreateIdentityResultException(result);
         }
 
-        result = await userManager.AddToRoleAsync(owner, QuizRole.Owner);
+        result = await userManager.AddToRoleAsync(owner, AppRole.Owner);
         if (!result.Succeeded)
         {
             throw CriticalExceptionFactory.CreateIdentityResultException(result);

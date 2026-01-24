@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Dto.Abstractions;
+namespace Quizanchos.Quiz.Dto.Abstractions;
 
 public abstract record QuizCardDtoAbstract(
     Guid Id,

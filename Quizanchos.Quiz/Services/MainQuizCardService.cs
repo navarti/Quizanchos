@@ -1,30 +1,22 @@
-﻿using AutoMapper;
 using Quizanchos.Common.Enums;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
-using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.WebApi.Dto.Abstractions;
-using Quizanchos.WebApi.Services.Interfaces;
-using Quizanchos.WebApi.Util;
+using Quizanchos.Quiz.Dto.Abstractions;
+using Quizanchos.Quiz.Services.Interfaces;
+using Quizanchos.Quiz.Util;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.Quiz.Services;
 
 public class MainQuizCardService
 {
-    private readonly IMapper _mapper;
-    private readonly IQuizCategoryRepository _quizCategoryRepository;
     private readonly QuizCardFloatService _featureFloatService;
     private readonly QuizCardIntService _featureIntService;
 
     public MainQuizCardService(
-        IMapper mapper,
-        IQuizCategoryRepository quizCategoryRepository,
         QuizCardFloatService featureFloatService,
         QuizCardIntService featureIntService)
     {
-        _mapper = mapper;
-        _quizCategoryRepository = quizCategoryRepository;
         _featureFloatService = featureFloatService;
         _featureIntService = featureIntService;
     }

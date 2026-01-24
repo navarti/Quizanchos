@@ -1,6 +1,6 @@
-﻿using Quizanchos.Common.Enums;
+using Quizanchos.Common.Enums;
 
-namespace Quizanchos.WebApi.Dto;
+namespace Quizanchos.Quiz.Dto;
 
 public record BaseQuizCategoryDto(string Name, FeatureType FeatureType, string ImageUrl, string AuthorName, 
     DateTime CreationDate, string QuestionToDisplay, bool IsPremium);

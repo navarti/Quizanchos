@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Quizanchos.WebApi.Services;
+using Quizanchos.Quiz.Services;
 
 namespace Quizanchos.WebApi.Controllers;
 

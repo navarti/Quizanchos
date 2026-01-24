@@ -1,8 +1,8 @@
-﻿using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
-using Quizanchos.WebApi.Dto.Abstractions;
+using Quizanchos.Quiz.Dto.Abstractions;
 
-namespace Quizanchos.WebApi.Services.Interfaces;
+namespace Quizanchos.Quiz.Services.Interfaces;
 
 public interface IQuizCardService
 {

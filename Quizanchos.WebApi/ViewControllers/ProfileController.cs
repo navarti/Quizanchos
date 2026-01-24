@@ -20,7 +20,7 @@ public class ProfileController : Controller
     }
     
     [HttpGet("Profile")] // Обработка маршрута /Account/Profile
-    [Authorize(QuizRole.User)]
+    [Authorize(AppRole.User)]
     public async Task<IActionResult> Profile()
     {
         FullApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);

@@ -1,6 +1,6 @@
-﻿using Quizanchos.Common.Enums;
+using Quizanchos.Common.Enums;
 
-namespace Quizanchos.WebApi.Dto;
+namespace Quizanchos.Quiz.Dto;
 
 public record BaseSingleGameSessionDto(Guid QuizCategoryId, GameLevel GameLevel, CardCountEnum CardsCount, SecondsPerCardEnum SecondPerCard, OptionCountEnum OptionCount);
 

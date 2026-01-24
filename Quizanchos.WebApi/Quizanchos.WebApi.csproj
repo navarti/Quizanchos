@@ -32,4 +32,8 @@
     <ProjectReference Include="..\Quizanchos.Quiz\Quizanchos.Quiz.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dto\Abstractions\" />
+  </ItemGroup>
+
 </Project>

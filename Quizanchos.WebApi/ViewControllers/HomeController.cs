@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Quizanchos.ViewModels;
-using Quizanchos.WebApi.Dto;
+using Quizanchos.Quiz.Dto;
+using Quizanchos.Quiz.Services;
 using Quizanchos.WebApi.Services;
 using Microsoft.AspNetCore.Authentication;
 namespace Quizanchos.WebApi.ViewControllers;

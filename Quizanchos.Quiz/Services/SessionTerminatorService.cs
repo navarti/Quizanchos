@@ -1,8 +1,8 @@
-﻿using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.Quiz.Services;
 
 public class SessionTerminatorService
 {
