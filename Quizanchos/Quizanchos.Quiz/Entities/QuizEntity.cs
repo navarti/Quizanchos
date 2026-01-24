@@ -1,4 +1,4 @@
-using Quizanchos.Quiz.Entities.Interfaces;
+using Quizanchos.Domain.Entities.Interfaces;
 
 namespace Quizanchos.Quiz.Entities;
 

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Quizanchos.Common.Enums;
 using System.Linq.Expressions;
 using Quizanchos.Quiz.Repositories.Interfaces;
-using Quizanchos.Quiz.Entities.Interfaces;
+using Quizanchos.Domain.Entities.Interfaces;
 using Quizanchos.Common.Util;
 
 namespace Quizanchos.Quiz.Repositories.Realizations;
