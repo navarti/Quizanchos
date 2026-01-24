@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Dto;
+namespace Quizanchos.Quiz.Dto;
 
 public record BaseFeatureFloatDto(float Value, Guid QuizCategoryId, Guid QuizEntityId);
 

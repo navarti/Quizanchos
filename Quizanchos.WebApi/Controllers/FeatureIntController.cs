@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services;
+using Quizanchos.Quiz.Dto;
+using Quizanchos.Quiz.Services;
 
 namespace Quizanchos.WebApi.Controllers;
 

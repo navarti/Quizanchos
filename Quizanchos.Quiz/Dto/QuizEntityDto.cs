@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Dto;
+namespace Quizanchos.Quiz.Dto;
 
 public record BaseQuizEntityDto(string Name);
 

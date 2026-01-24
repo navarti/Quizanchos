@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.WebApi.Util;
+namespace Quizanchos.Quiz.Util;
 
 public static class CorrectOptionPicker
 {

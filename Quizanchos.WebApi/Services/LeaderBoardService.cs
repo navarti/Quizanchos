@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Util;
+using Quizanchos.Quiz.Util;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;

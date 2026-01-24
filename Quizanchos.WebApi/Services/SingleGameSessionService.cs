@@ -4,9 +4,10 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Entities.Abstractions;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Dto.Abstractions;
-using Quizanchos.WebApi.Util;
+using Quizanchos.Quiz.Dto;
+using Quizanchos.Quiz.Dto.Abstractions;
+using Quizanchos.Quiz.Services;
+using Quizanchos.Quiz.Util;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services;

@@ -1,6 +1,6 @@
-﻿using Quizanchos.Common.Enums;
+using Quizanchos.Common.Enums;
 
-namespace Quizanchos.WebApi.Util;
+namespace Quizanchos.Quiz.Util;
 
 public static class GameLevelHelper
 {

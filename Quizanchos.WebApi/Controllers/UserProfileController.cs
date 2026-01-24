@@ -17,7 +17,7 @@ public class UserProfileController : Controller
     }
 
     [HttpGet]
-    [Authorize(QuizRole.User)]
+    [Authorize(AppRole.User)]
     public async Task<IActionResult> GetUserInfo()
     {
         FullApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
@@ -25,7 +25,7 @@ public class UserProfileController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizRole.User)]
+    [Authorize(AppRole.User)]
     public async Task<IActionResult> UpdateAvatarUrl(string avatarUrl)
     {
         await _userProfileService.UpdateAvatarUrl(User, avatarUrl);
@@ -33,7 +33,7 @@ public class UserProfileController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizRole.User)]
+    [Authorize(AppRole.User)]
     public async Task<IActionResult> UpdateAvatar(IFormFile formFile)
     {
         await _userProfileService.UpdateAvatar(User, formFile);
@@ -41,7 +41,7 @@ public class UserProfileController : Controller
     }
 
     [HttpPost]
-    [Authorize(QuizRole.User)]
+    [Authorize(AppRole.User)]
     public async Task<IActionResult> UpdateNickname(string nickname)
     {
         await _userProfileService.UpdateNickname(User, nickname);

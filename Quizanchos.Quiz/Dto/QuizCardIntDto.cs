@@ -1,6 +1,6 @@
-﻿using Quizanchos.WebApi.Dto.Abstractions;
+using Quizanchos.Quiz.Dto.Abstractions;
 
-namespace Quizanchos.WebApi.Dto;
+namespace Quizanchos.Quiz.Dto;
 
 public record QuizCardIntDto(
     Guid Id,

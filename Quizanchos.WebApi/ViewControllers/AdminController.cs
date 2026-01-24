@@ -15,7 +15,7 @@ namespace Quizanchos.WebApi.ViewControllers
             _logger = logger;
         }
         [HttpGet("/Admin/Create")]
-        [Authorize(QuizRole.Admin)]
+        [Authorize(AppRole.Admin)]
         public IActionResult Signup()
         {
             return View();
@@ -29,21 +29,21 @@ namespace Quizanchos.WebApi.ViewControllers
         }
 
         [HttpGet("/Admin")]
-        [Authorize(QuizRole.Admin)]
+        [Authorize(AppRole.Admin)]
         public IActionResult Admin()
         {
             return View();
         }
 
         [HttpGet("/Admin/Users")]
-        [Authorize(QuizRole.Admin)]
+        [Authorize(AppRole.Admin)]
         public IActionResult Users()
         {
             return View();
         }
 
         [HttpGet("/Admin/CreateQuiz")]
-        [Authorize(QuizRole.Admin)]
+        [Authorize(AppRole.Admin)]
         public IActionResult CreateQuiz()
         {
             return View();

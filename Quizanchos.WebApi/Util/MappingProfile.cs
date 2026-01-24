@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Quiz.Dto;
 using Quizanchos.WebApi.Dto;
 
 namespace Quizanchos.WebApi.Util;
