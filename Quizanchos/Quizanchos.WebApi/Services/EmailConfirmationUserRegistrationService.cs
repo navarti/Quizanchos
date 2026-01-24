@@ -10,9 +10,9 @@ public class EmailConfirmationUserRegistrationService : IUserRegistrationService
 {
     public class UserData
     {
-        public ApplicationUser User { get; set; }
-        public string Password { get; set; }
-        public string RoleName { get; set; }
+        public required ApplicationUser User { get; set; }
+        public required string Password { get; set; }
+        public required string RoleName { get; set; }
         public DateTime RequestedTime { get; set; }
     }
 
@@ -45,14 +45,14 @@ public class EmailConfirmationUserRegistrationService : IUserRegistrationService
         string title = "Confirm your email";
         string content = $"Your code to confirm email: {code}";
 
-        await _emailSenderService.SendEmailAsync(user.Email, title, content);
+        await _emailSenderService.SendEmailAsync(user.Email!, title, content);
 
         return RegisterUserResult.PendingConfirmation;
     }
 
     public async Task ConfirmEmail([FromBody] string code)
     {
-        if (!_containerService.PendingUsersDictionary.TryGetValue(code, out UserData userData))
+        if (!_containerService.PendingUsersDictionary.TryGetValue(code, out UserData? userData))
         {
             throw HandledExceptionFactory.Create("The application with this code does not exist");
         }

@@ -19,7 +19,7 @@ public class DefaultUserRegistrationService : IUserRegistrationService
 
     public async Task<RegisterUserResult> RegisterUser(ApplicationUser user, string password, string roleName)
     {
-        ApplicationUser? existingUser = await _userManager.FindByEmailAsync(user.Email);
+        ApplicationUser? existingUser = await _userManager.FindByEmailAsync(user.Email!);
         if (existingUser is not null)
         {
             throw HandledExceptionFactory.Create("The user with this email exists");

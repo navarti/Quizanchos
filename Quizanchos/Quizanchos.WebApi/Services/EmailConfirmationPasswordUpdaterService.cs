@@ -10,9 +10,9 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
 {
     public class UserData
     {
-        public string UserId { get; set; }
-        public string Password { get; set; }
-        public string Token { get; set; }
+        public required string UserId { get; set; }
+        public required string Password { get; set; }
+        public required string Token { get; set; }
     }
 
     private const int CodeLength = 6;
@@ -47,14 +47,14 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
         string title = "Confirm your email";
         string content = $"Your code to confirm email: {code}";
 
-        await _emailSenderService.SendEmailAsync(user.Email, title, content);
+        await _emailSenderService.SendEmailAsync(user.Email!, title, content);
 
         return RegisterUserResult.PendingConfirmation;
     }
 
     public async Task ConfirmEmail(string code)
     {
-        if (!_containerService.PendingPasswordDictionary.TryGetValue(code, out UserData userData))
+        if (!_containerService.PendingPasswordDictionary.TryGetValue(code, out UserData? userData))
         {
             throw HandledExceptionFactory.Create("The application with this code does not exist");
         }

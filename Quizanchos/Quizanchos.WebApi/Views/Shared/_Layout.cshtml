@@ -27,7 +27,7 @@
             </ul>
         </nav>
             <div class="auth-buttons">
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity?.IsAuthenticated == true)
                 {
                     <a href="/Account/Profile" class="btn-profile">
                         <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">

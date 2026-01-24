@@ -4,7 +4,7 @@ namespace Quizanchos.ViewModels
     public class SingleGameSessionViewModel
     {
         public Guid Id { get; set; } 
-        public string UserId { get; set; } 
+        public required string UserId { get; set; } 
         public DateTime CreationTime { get; set; } 
         public int CurrentCardIndex { get; set; } 
         public int Score { get; set; } 
@@ -13,8 +13,8 @@ namespace Quizanchos.ViewModels
         public int CardsCount { get; set; } 
         public int SecondsPerCard { get; set; } 
         public Guid QuizCategoryId { get; set; } 
-        public string QuizCategoryName { get; set; } 
-        public string GameLevel { get; set; } 
+        public required string QuizCategoryName { get; set; } 
+        public required string GameLevel { get; set; } 
     }
 
 }
