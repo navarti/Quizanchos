@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
-    <ProjectReference Include="..\Quizanchos.Domain\Quizanchos.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Quizanchos.Common\Quizanchos.Common.csproj" />
+    <ProjectReference Include="..\..\..\Quizanchos.Domain\Quizanchos.Domain.csproj" />
   </ItemGroup>
 
 </Project>
