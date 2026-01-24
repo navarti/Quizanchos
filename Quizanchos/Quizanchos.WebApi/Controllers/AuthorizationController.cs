@@ -7,7 +7,6 @@ using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Controllers;
 
-[AllowAnonymous]
 [Route("[controller]/[action]")]
 public class AuthorizationController : Controller
 {
@@ -19,6 +18,7 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> SignIn([FromBody] LoginModelDto loginModelDto)
     {
         await _authorizationService.SignIn(loginModelDto);
@@ -26,6 +26,7 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> SignUp([FromBody] RegisterModelDto registerModelDto)
     {
         RegisterUserResult result = await _authorizationService.RegisterUser(registerModelDto);
@@ -41,6 +42,7 @@ public class AuthorizationController : Controller
     }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordModelDto passwordModelDto)
     {
         await _authorizationService.UpdatePassword(passwordModelDto);
