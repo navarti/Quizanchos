@@ -16,7 +16,7 @@ public class QuizController : Controller
     private readonly QuizCategoryService _quizCategoryService;
     private readonly QuizEntityService _QuizEntityService;
 
-    public QuizController(SingleGameSessionService singleGameSessionService, ILogger<QuizController>? logger, QuizCategoryService quizCategoryService,QuizEntityService quizEntityService)
+    public QuizController(SingleGameSessionService singleGameSessionService, ILogger<QuizController> logger, QuizCategoryService quizCategoryService,QuizEntityService quizEntityService)
     {
         _singleGameSessionService = singleGameSessionService;
         _logger = logger;
