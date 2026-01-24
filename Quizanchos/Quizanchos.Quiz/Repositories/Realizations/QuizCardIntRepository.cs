@@ -7,7 +7,7 @@ namespace Quizanchos.Quiz.Repositories.Realizations;
 
 public class QuizCardIntRepository : EntityRepositoryBase<Guid, QuizCardInt>, IQuizCardIntRepository
 {
-    public QuizCardIntRepository(QuizanchosDbContext dbContext) : base(dbContext)
+    public QuizCardIntRepository(QuizDbContext dbContext) : base(dbContext)
     {
     }
 

@@ -5,13 +5,13 @@ using Quizanchos.Quiz.Repositories.Interfaces;
 
 namespace Quizanchos.Quiz.Repositories.Realizations;
 
-public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, IFeatureFloatRepository
+public class FeatureIntRepository : EntityRepositoryBase<Guid, FeatureInt>, IFeatureIntRepository
 {
-    public FeatureFloatRepository(QuizanchosDbContext dbContext) : base(dbContext)
+    public FeatureIntRepository(QuizDbContext dbContext) : base(dbContext)
     {
     }
 
-    public async Task<FeatureFloat> GetByIdIncluding(Guid id)
+    public async Task<FeatureInt> GetByIdIncluding(Guid id)
     {
         return await _dbSet
             .Include(s => s.QuizEntity)
@@ -19,7 +19,7 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
             .FirstOrDefaultAsync(s => s.Id == id) ?? throw HandledExceptionFactory.CreateIdNotFoundException(id);
     }
 
-    public async Task<List<FeatureFloat>> GetByCategoryId(Guid categoryId)
+    public async Task<List<FeatureInt>> GetByCategoryId(Guid categoryId)
     {
         return await _dbSet
             .Include(s => s.QuizEntity)
@@ -28,17 +28,17 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
             .ToListAsync();
     }
 
-    public Task<FeatureFloat?> FindByCategoryAndEntity(Guid categoryId, Guid entityId)
+    public Task<FeatureInt?> FindByCategoryAndEntity(Guid categoryId, Guid entityId)
     {
         return _dbSet.FirstOrDefaultAsync(feature => feature.QuizCategory.Id == categoryId && feature.QuizEntity.Id == entityId);
     }
 
-    public async Task<FeatureFloat?> FindRandomByCategory(Guid categoryId, double coefficient, float? lastValue = null)
+    public async Task<FeatureInt?> FindRandomByCategory(Guid categoryId, double coefficient, int? lastValue = null)
     {
         var query = _dbSet
             .Include(feature => feature.QuizEntity)
             .Where(feature => feature.QuizCategory.Id == categoryId);
-
+        
         int totalFeatures = await query.CountAsync();
 
         if (totalFeatures == 0)
@@ -46,9 +46,9 @@ public class FeatureFloatRepository : EntityRepositoryBase<Guid, FeatureFloat>, 
             return null;
         }
 
-        List<FeatureFloat> features = await query.OrderBy(feature => feature.Value).ToListAsync();
+        List<FeatureInt> features = await query.OrderBy(feature => feature.Value).ToListAsync();
 
-        List<FeatureFloat> subset;
+        List<FeatureInt> subset;
         if (lastValue.HasValue)
         {
             int subsetSize = (int)Math.Ceiling(totalFeatures * coefficient);

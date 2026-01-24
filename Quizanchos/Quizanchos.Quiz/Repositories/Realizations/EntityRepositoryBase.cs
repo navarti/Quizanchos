@@ -10,10 +10,10 @@ namespace Quizanchos.Quiz.Repositories.Realizations;
 public class EntityRepositoryBase<TKey, TEntity> : IEntityRepository<TKey, TEntity>
     where TEntity : class, IKeyedEntity<TKey>
 {
-    protected readonly QuizanchosDbContext _dbContext;
+    protected readonly QuizDbContext _dbContext;
     protected readonly DbSet<TEntity> _dbSet;
 
-    public EntityRepositoryBase(QuizanchosDbContext dbContext)
+    public EntityRepositoryBase(QuizDbContext dbContext)
     {
         _dbContext = dbContext;
         _dbSet = _dbContext.Set<TEntity>();

@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
-    <ProjectReference Include="..\Quizanchos.Domain.Common\Quizanchos.Domain.Common.csproj" />
+    <ProjectReference Include="..\Quizanchos.Domain.Common\Quizanchos.Domain.csproj" />
   </ItemGroup>
 
 </Project>
