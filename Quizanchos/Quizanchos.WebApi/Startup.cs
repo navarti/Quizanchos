@@ -4,9 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Quiz;
-using Quizanchos.Quiz.Repositories.Interfaces;
-using Quizanchos.Quiz.Repositories.Realizations;
-using Quizanchos.Quiz.Services;
+using Quizanchos.Quiz.Extensions;
+using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Controllers;
 using Quizanchos.WebApi.Extensions;
@@ -66,9 +65,9 @@ public static class Startup
         .AddGoogle(googleOptions =>
         {
             googleOptions.ClientId = configuration.GetOption("Auth:Google:ClientId") 
-                ?? throw CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientId");
+                ?? throw Util.CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientId");
             googleOptions.ClientSecret = configuration.GetOption("Auth:Google:ClientSecret") 
-                ?? throw CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientSecret");
+                ?? throw Util.CriticalExceptionFactory.CreateConfigException("Auth:Google:ClientSecret");
         });
 
         services.ConfigureApplicationCookie(options =>
@@ -81,7 +80,7 @@ public static class Startup
             };
             if (!int.TryParse(configuration.GetOption("Auth:Cookie:TokenValidityInMinutes"), out int tokenValidityInMinutes))
             {
-                throw CriticalExceptionFactory.CreateConfigException("Auth:Cookie:TokenValidityInMinutes");
+                throw Util.CriticalExceptionFactory.CreateConfigException("Auth:Cookie:TokenValidityInMinutes");
             }
             options.ExpireTimeSpan = TimeSpan.FromMinutes(tokenValidityInMinutes);
         });
@@ -99,25 +98,17 @@ public static class Startup
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
 
-        services.AddDbContext<QuizDbContext>(options =>
-        {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
-                ?? throw CriticalExceptionFactory.CreateConfigException("DefaultConnection"));
-        });
+        string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+            ?? throw Util.CriticalExceptionFactory.CreateConfigException("DefaultConnection");
 
-        services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
-
-        services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
-        services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
-        services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
-        services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
-        services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
-        services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
-        services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
+        services.AddQuizDbContext(connectionString);
+        services.AddQuizRepositories();
+        services.AddQuizServices();
 
         services.AddAutoMapper(cfg => 
         { 
-            cfg.AddProfile<MappingProfile>(); 
+            cfg.AddProfile<MappingProfile>();
+            cfg.AddProfile<QuizMappingProfile>(); 
         });
 
         services.AddSingleton<ICloudinary>(serviceProvider =>
@@ -140,16 +131,6 @@ public static class Startup
         services.AddTransient<QuizAuthorizationService>(); 
         services.AddTransient<UserProfileService>(); 
         services.AddTransient<LeaderBoardService>(); 
-
-        services.AddSingleton<LockerService>();
-        services.AddTransient<QuizEntityService>();
-        services.AddTransient<QuizCategoryService>();
-        services.AddTransient<FeatureIntService>();
-        services.AddTransient<FeatureFloatService>();
-        services.AddTransient<QuizCardFloatService>();
-        services.AddTransient<QuizCardIntService>();
-        services.AddTransient<MainQuizCardService>();
-        services.AddTransient<SessionTerminatorService>();
         services.AddTransient<SingleGameSessionService>();
 
         services.AddQuartz(q =>

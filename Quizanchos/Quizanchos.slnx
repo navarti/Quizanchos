@@ -1,7 +1,9 @@
 <Solution>
+  <Folder Name="/Minigames/">
+    <Project Path="Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
+  </Folder>
   <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" Id="a35e2465-b737-4ecb-93f3-932f66870127" />
   <Project Path="Quizanchos.Core/Quizanchos.Core.csproj" />
-  <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" Id="8be20afd-cc9a-65ca-b670-8846f1cda9e2" />
-  <Project Path="Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
+  <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />
   <Project Path="Quizanchos.WebApi/Quizanchos.WebApi.csproj" />
 </Solution>

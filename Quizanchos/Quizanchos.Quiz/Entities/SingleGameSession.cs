@@ -1,6 +1,6 @@
 using Quizanchos.Common.Enums;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Quiz.Entities.Interfaces;
+using Quizanchos.Domain.Entities.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Quizanchos.Quiz.Entities;
