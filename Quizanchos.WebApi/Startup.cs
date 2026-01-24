@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
-using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.Domain.Repositories.Realizations;
+using Quizanchos.Quiz;
+using Quizanchos.Quiz.Repositories.Interfaces;
+using Quizanchos.Quiz.Repositories.Realizations;
 using Quizanchos.Quiz.Services;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Controllers;
@@ -58,7 +58,7 @@ public static class Startup
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequiredLength = 1;
         })
-        .AddEntityFrameworkStores<QuizDbContext>()
+        .AddEntityFrameworkStores<QuizanchosDbContext>()
         .AddDefaultTokenProviders();
 
         services.AddAuthentication()
@@ -99,7 +99,7 @@ public static class Startup
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
 
-        services.AddDbContext<QuizDbContext>(options =>
+        services.AddDbContext<QuizanchosDbContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
                 ?? throw CriticalExceptionFactory.CreateConfigException("DefaultConnection"));

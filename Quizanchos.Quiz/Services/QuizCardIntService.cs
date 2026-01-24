@@ -1,7 +1,7 @@
 using Quizanchos.Common.Util;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Entities.Abstractions;
-using Quizanchos.Domain.Repositories.Interfaces;
+using Quizanchos.Quiz.Entities;
+using Quizanchos.Quiz.Entities.Abstractions;
+using Quizanchos.Quiz.Repositories.Interfaces;
 using Quizanchos.Quiz.Dto.Abstractions;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services.Interfaces;

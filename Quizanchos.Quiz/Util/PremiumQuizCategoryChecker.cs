@@ -1,6 +1,7 @@
 using Quizanchos.Common.Enums;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Quiz.Entities;
 
 namespace Quizanchos.Quiz.Util;
 
