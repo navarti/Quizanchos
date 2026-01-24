@@ -58,7 +58,7 @@ public static class Startup
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequiredLength = 1;
         })
-        .AddEntityFrameworkStores<QuizanchosDbContext>()
+        .AddEntityFrameworkStores<QuizDbContext>()
         .AddDefaultTokenProviders();
 
         services.AddAuthentication()
@@ -99,7 +99,7 @@ public static class Startup
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
 
-        services.AddDbContext<QuizanchosDbContext>(options =>
+        services.AddDbContext<QuizDbContext>(options =>
         {
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") 
                 ?? throw CriticalExceptionFactory.CreateConfigException("DefaultConnection"));

@@ -7,7 +7,7 @@ namespace Quizanchos.Quiz.Repositories.Realizations;
 
 public class SingleGameSessionRepository : EntityRepositoryBase<Guid, SingleGameSession>, ISingleGameSessionRepository
 {
-    public SingleGameSessionRepository(QuizanchosDbContext dbContext) : base(dbContext)
+    public SingleGameSessionRepository(QuizDbContext dbContext) : base(dbContext)
     {
     }
 

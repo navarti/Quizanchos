@@ -6,7 +6,7 @@ namespace Quizanchos.Quiz.Repositories.Realizations;
 
 public class QuizCategoryRepository : EntityRepositoryBase<Guid, QuizCategory>, IQuizCategoryRepository
 {
-    public QuizCategoryRepository(QuizanchosDbContext dbContext) : base(dbContext)
+    public QuizCategoryRepository(QuizDbContext dbContext) : base(dbContext)
     {
     }
 
