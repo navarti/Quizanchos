@@ -46,7 +46,8 @@ public class HomeController : Controller
             QuizCategories = quizCategories,
             ActiveSession = singleGameSession,
             QuizName = quizName,
-            Users = users.ToList()
+            Users = users.ToList(),
+            CurrentUserName = User.Identity?.Name ?? "Guest"
         };
         return View(viewModel);
     }
@@ -61,8 +62,8 @@ public class HomeController : Controller
     public async Task<IActionResult> Leaderboard()
     {
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
-        var currentUser = users.FirstOrDefault(u => u.UserName == User.Identity.Name);
-        var currentUserName = User.Identity?.Name ?? "Guest"; 
+        var currentUserName = User.Identity?.Name ?? "Guest";
+        var currentUser = users.FirstOrDefault(u => u.UserName == currentUserName);
         int itemsPerPage = 10;
         int totalUsers = users.Count;
         int totalPages = (int)Math.Ceiling(totalUsers / (double)itemsPerPage);
@@ -80,6 +81,8 @@ public class HomeController : Controller
         }
         var viewModel = new HomeViewModel
         {
+            QuizCategories = new List<QuizCategoryDto>(),
+            QuizName = string.Empty,
             Users = users.ToList(),
             CurrentUserName = currentUserName,
             TotalPages = totalPages,
@@ -121,7 +124,9 @@ public class HomeController : Controller
         List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
         var viewModel = new HomeViewModel
         {
-            QuizCategories = quizCategories
+            QuizCategories = quizCategories,
+            QuizName = string.Empty,
+            CurrentUserName = User.Identity?.Name ?? "Guest"
         };
         return View(viewModel);
     }

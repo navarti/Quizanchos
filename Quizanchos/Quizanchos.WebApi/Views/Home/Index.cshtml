@@ -39,10 +39,10 @@
                     </div>
                 </div>
             }
+            </div>
         </div>
-    </div>
-    @if (User.Identity.IsAuthenticated)
-    {
+        @if (User.Identity?.IsAuthenticated == true)
+        {
         if (Model.ActiveSession != null)
         {
             <div class="sessions-card">

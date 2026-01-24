@@ -22,11 +22,11 @@ public class AdminService
 
         IQueryable<ApplicationUser> users = _userManager.Users;
 
-        if (!string.IsNullOrEmpty(name))
-            users = users.Where(u => u.UserName!.StartsWith(name));
+            if (!string.IsNullOrEmpty(name))
+                users = users.Where(u => u.UserName!.StartsWith(name));
 
-        return (await users.Skip(skip).Take(take).ToListAsync()).Select(u => new ApplicationUserDto(u!.UserName, u.AvatarUrl, u.Score, u.Status));
-    }
+            return (await users.Skip(skip).Take(take).ToListAsync()).Select(u => new ApplicationUserDto(u.UserName!, u.AvatarUrl, u.Score, u.Status));
+        }
 
     public async Task DeleteUser(string email)
     {

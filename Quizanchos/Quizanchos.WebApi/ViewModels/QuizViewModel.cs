@@ -12,14 +12,14 @@ namespace Quizanchos.ViewModels
         
         public int Score { get; set; } 
         public Guid CategoryId { get; set; }
-        public string QuizCategoryName { get; set; }
-        public string ImageUrl { get; set; }
-        
+        public required string QuizCategoryName { get; set; }
+        public required string ImageUrl { get; set; }
+
         public int CurrentCardIndex { get; set; }
-        
+
         public int TotalCards { get; set; }
-        
-        public string Question { get; set; }
+
+        public required string Question { get; set; }
         
         public QuizOptionViewModel[] Options { get; set; } = Array.Empty<QuizOptionViewModel>();
     }
@@ -27,6 +27,6 @@ namespace Quizanchos.ViewModels
     public class QuizOptionViewModel
     {
         public Guid Id { get; set; } 
-        public string Name { get; set; } 
+        public required string Name { get; set; } 
     }
 }
