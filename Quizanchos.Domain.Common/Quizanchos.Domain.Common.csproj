@@ -13,7 +13,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
-    <ProjectReference Include="..\Quizanchos.Domain.Common\Quizanchos.Domain.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\Abstractions\" />
+    <Folder Include="Repositories\Interfaces\" />
+    <Folder Include="Repositories\Realizations\" />
   </ItemGroup>
 
 </Project>

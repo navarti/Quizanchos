@@ -2,13 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Entities.Abstractions;
-using Quizanchos.Domain.Repositories.Interfaces;
+using Quizanchos.Quiz.Entities.Abstractions;
+using Quizanchos.Quiz.Repositories.Interfaces;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Dto.Abstractions;
 using Quizanchos.Quiz.Services;
 using Quizanchos.Quiz.Util;
 using System.Security.Claims;
+using SingleGameSession = Quizanchos.Quiz.Entities.SingleGameSession;
+using QuizCategory = Quizanchos.Quiz.Entities.QuizCategory;
 
 namespace Quizanchos.WebApi.Services;
 

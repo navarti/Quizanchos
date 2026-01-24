@@ -1,5 +1,5 @@
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Entities.Abstractions;
+using Quizanchos.Quiz.Entities;
+using Quizanchos.Quiz.Entities.Abstractions;
 using Quizanchos.Quiz.Dto.Abstractions;
 
 namespace Quizanchos.Quiz.Services.Interfaces;
