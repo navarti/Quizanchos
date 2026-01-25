@@ -1,0 +1,110 @@
+using System.Collections.Immutable;
+using Quizanchos.Core;
+
+namespace Quizanchos.Quiz.GameLogic;
+
+public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
+{
+    private readonly int _totalCards;
+
+    public QuizGameLogic(int totalCards = 10)
+    {
+        _totalCards = totalCards;
+    }
+
+    public QuizGameState CreateInitialState(Guid gameId, ImmutableArray<Guid> players)
+    {
+        var state = new QuizGameState
+        {
+            GameId = gameId,
+            Players = players.ToList(),
+            IsFinished = false,
+            Winner = null,
+            CurrentCardIndex = -1,
+            TotalCards = _totalCards
+        };
+
+        foreach (var playerId in players)
+        {
+            state.PlayerScores[playerId] = 0;
+        }
+
+        return state;
+    }
+
+    public MoveResult ValidateMove(QuizGameState state, QuizMove move, Guid playerId)
+    {
+        if (state.CurrentCardIndex < 0 || state.CurrentCardIndex >= state.Cards.Count)
+        {
+            return MoveResult.Failure("No current card available");
+        }
+
+        var currentCard = state.Cards[state.CurrentCardIndex];
+        
+        if (currentCard.PlayerAnswers.ContainsKey(playerId))
+        {
+            return MoveResult.Failure("Player has already answered this card");
+        }
+
+        if (move.OptionPicked < 0)
+        {
+            return MoveResult.Failure("Invalid option picked");
+        }
+
+        return MoveResult.Success;
+    }
+
+    public void ApplyMove(QuizGameState state, QuizMove move, Guid playerId)
+    {
+        var currentCard = state.Cards[state.CurrentCardIndex];
+        currentCard.PlayerAnswers[playerId] = move.OptionPicked;
+
+        if (move.OptionPicked == currentCard.CorrectOption)
+        {
+            state.PlayerScores[playerId]++;
+        }
+    }
+
+    public bool CheckFinished(QuizGameState state)
+    {
+        return state.CurrentCardIndex >= state.TotalCards - 1;
+    }
+
+    public Guid? DetermineWinner(QuizGameState state)
+    {
+        if (state.PlayerScores.Count == 0)
+            return null;
+
+        var maxScore = state.PlayerScores.Max(kvp => kvp.Value);
+        var winners = state.PlayerScores.Where(kvp => kvp.Value == maxScore).ToList();
+
+        if (winners.Count > 1)
+            return null; // Draw
+
+        return winners[0].Key;
+    }
+
+    public IEnumerable<Guid> GetExpectedPlayers(QuizGameState state)
+    {
+        if (state.CurrentCardIndex < 0 || state.CurrentCardIndex >= state.Cards.Count)
+        {
+            return Enumerable.Empty<Guid>();
+        }
+
+        var currentCard = state.Cards[state.CurrentCardIndex];
+        return state.Players.Where(p => !currentCard.PlayerAnswers.ContainsKey(p));
+    }
+
+    public void AddCard(QuizGameState state, Guid cardId, int correctOption, Guid[] entityIds)
+    {
+        state.CurrentCardIndex++;
+        state.Cards.Add(new QuizGameState.QuizCard
+        {
+            Id = cardId,
+            CardIndex = state.CurrentCardIndex,
+            CorrectOption = correctOption,
+            EntityIds = entityIds,
+            PlayerAnswers = new Dictionary<Guid, int?>()
+        });
+    }
+}
