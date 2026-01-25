@@ -21,7 +21,7 @@ internal class Program
             {
                 Update(host);
 
-                TimeSpan sleepTime = TimeSpan.FromDays(30);
+                TimeSpan sleepTime = TimeSpan.FromDays(15);
                 Thread.Sleep(sleepTime);
             }
         }
@@ -30,23 +30,30 @@ internal class Program
     private static IHost InitHost()
     {
         IHost host = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                // This ensures secrets.json is loaded during development
+                //if (hostingContext.HostingEnvironment.IsDevelopment())
+                {
+                    config.AddUserSecrets<Program>();
+                }
+            })
             .ConfigureServices((context, services) =>
             {
                 var config = context.Configuration;
                 var connectionString = config.GetConnectionString("DefaultConnection");
+
                 services.AddDbContext<QuizDbContext>(options =>
                 {
                     options.UseSqlServer(connectionString);
                 });
 
-                // TODO: Review lifetime of services and choose most appropriate one
                 services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
                 services.AddTransient<IQuizEntityRepository, QuizEntityRepository>();
                 services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
                 services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
 
                 services.AddTransient<FeatureUpdaterFactory>();
-
                 services.AddTransient<IDataUpdater, DataUpdater>();
             })
             .Build();
