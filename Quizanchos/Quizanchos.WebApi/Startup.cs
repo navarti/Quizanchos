@@ -126,7 +126,7 @@ public static class Startup
         AddControllers(builder);
 
         services.AddSingleton<GameEngineManager>();
-        services.AddSingleton<GameLogicFactory>();
+        services.AddSingleton<IGameLogicFactory, GameLogicFactory>();
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
@@ -173,7 +173,8 @@ public static class Startup
             services.AddControllersWithViews(options =>
             {
                 options.Conventions.Add(new SkipControllerConvention(typeof(EmailConfirmationController)));
-            });
+            })
+            .AddJsonOptions(ConfigureJsonOptions);
             return;
         }
 
@@ -187,6 +188,33 @@ public static class Startup
         services.AddTransient<IUserPasswordUpdaterService, EmailConfirmationPasswordUpdaterService>();
         services.AddTransient<IUserRegistrationService, EmailConfirmationUserRegistrationService>();
 
-        services.AddControllersWithViews();
+        services.AddControllersWithViews()
+            .AddJsonOptions(ConfigureJsonOptions);
+    }
+
+    private static void ConfigureJsonOptions(Microsoft.AspNetCore.Mvc.JsonOptions options)
+    {
+        options.JsonSerializerOptions.TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver
+        {
+            Modifiers =
+            {
+                (typeInfo) =>
+                {
+                    // Configure polymorphic serialization for GameMove
+                    if (typeInfo.Type == typeof(Quizanchos.Core.GameMove))
+                    {
+                        typeInfo.PolymorphismOptions = new System.Text.Json.Serialization.Metadata.JsonPolymorphismOptions
+                        {
+                            TypeDiscriminatorPropertyName = "gameType",
+                            UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor,
+                            DerivedTypes =
+                            {
+                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Quiz.GameLogic.QuizMove), "quiz")
+                            }
+                        };
+                    }
+                }
+            }
+        };
     }
 }

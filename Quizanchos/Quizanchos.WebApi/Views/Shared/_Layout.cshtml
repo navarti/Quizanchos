@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/site.css">
 </head>
-<body>
+<body data-user-id="@(User.Identity?.IsAuthenticated == true ? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) : "")">
 
 <header class="navbar">
     <div class="container">
@@ -63,9 +63,9 @@
     </div>
 </footer>
 
-<script src="js/common.js" asp-append-version="true"></script>
-<script src="js/site.js" asp-append-version="true"></script>
-<script src="js/profile.js" asp-append-version="true"></script>
+<script src="/js/common.js" asp-append-version="true"></script>
+<script src="/js/site.js" asp-append-version="true"></script>
+<script src="/js/profile.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -9,64 +9,68 @@
     const form = document.getElementById('signupForm');
     const submitButton = document.getElementById('submitButton');
     
-    form.addEventListener('submit', function (event) {
-        event.preventDefault();
-    });
+    if (form && submitButton) {
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+        });
+        
+        submitButton.removeEventListener('click', handleSubmit); 
+        submitButton.addEventListener('click', handleSubmit);
+    }
     
-    submitButton.removeEventListener('click', handleSubmit); 
-    submitButton.addEventListener('click', handleSubmit);
     const startQuestButton = document.getElementById("startQuestButton");
     
-});
+    if (startQuestButton) {
+        startQuestButton.addEventListener("click", async function (event) {
+            event.preventDefault();
 
-startQuestButton.addEventListener("click", async function (event) {
-    event.preventDefault();
+            const form = document.getElementById('gameSettingsForm');
+            const categoryId = form.getAttribute('data-category-id');
 
-    const categoryId = this.getAttribute("data-category-id");
-
-    if (!categoryId) {
-        alert("Quiz Category ID is missing.");
-        return;
-    }
-
-    const gameLevel = document.getElementById("gameLevel").value;
-    const cardsCount = document.getElementById("cardsCount").value;
-    const secondPerCard = document.getElementById("secondsPerCard").value;
-    const optionCount = document.getElementById("optionCount").value;
-
-    const data = {
-        quizCategoryId: categoryId,
-        gameLevel: parseInt(gameLevel, 10),
-        cardsCount: parseInt(cardsCount, 10),
-        SecondPerCard: parseInt(secondPerCard, 10),
-        optionCount: parseInt(optionCount, 10),
-    };
-
-    try {
-        const response = await fetch("/SingleGameSession/Create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-            const responseData = await response.json();
-            if (responseData && responseData.id) {
-                window.location.href = `/Quiz/${responseData.id}`;
-            } else {
-                alert("Unexpected response format. Please try again.");
+            if (!categoryId) {
+                alert("Quiz Category ID is missing.");
+                return;
             }
-        } else {
-            const errorData = await response.json();
-            alert(errorData.message || "An error occurred. Please try again.");
-        }
-    } catch (error) {
-        console.error("Error:", error);
-        alert("A network error occurred. Please try again later.");
+
+            const gameLevel = document.getElementById("gameLevel").value;
+            const cardsCount = document.getElementById("cardsCount").value;
+            const secondPerCard = document.getElementById("secondsPerCard").value;
+            const optionCount = document.getElementById("optionCount").value;
+
+            try {
+                // Get current user ID from the body element
+                const userId = document.body.getAttribute('data-user-id');
+                if (!userId) {
+                    alert("User information is missing. Please log in again.");
+                    return;
+                }
+
+                // Create game using the new universal GameController
+                const gameResponse = await quizClient.createQuizGame(
+                    userId,
+                    parseInt(cardsCount, 10),
+                    {
+                        gameLevel: parseInt(gameLevel, 10),
+                        secondsPerCard: parseInt(secondPerCard, 10),
+                        optionCount: parseInt(optionCount, 10),
+                        categoryId: categoryId
+                    }
+                );
+
+                if (gameResponse && gameResponse.gameId) {
+                    // Navigate to the quiz game page
+                    window.location.href = `/Quiz/${gameResponse.gameId}`;
+                } else {
+                    alert("Unexpected response format. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert(error.message || "An error occurred. Please try again later.");
+            }
+        });
     }
 });
+
 async function handleSubmit(event) {
     event.preventDefault();
     const verifyButton = document.getElementById("verifyButton");
@@ -179,11 +183,14 @@ function redirectToCategory(category) {
     window.location.href = `/QuizCategories?filter=${category}`;
 }
 
-document.getElementById('verifyModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeVerifyModal();
-    }
-});
+const verifyModal = document.getElementById('verifyModal');
+if (verifyModal) {
+    verifyModal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeVerifyModal();
+        }
+    });
+}
 
 const modalContent = document.querySelector('#verifyModal .verify-modal-content');
 if (modalContent) {
@@ -191,6 +198,11 @@ if (modalContent) {
         e.stopPropagation();
     });
 }
+
+
+
+
+
 
 
 
