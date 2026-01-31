@@ -130,7 +130,7 @@ public static class Startup
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
-        services.AddTransient<QuizAuthorizationService>(); 
+        services.AddTransient<AuthorizationService>(); 
         services.AddTransient<UserProfileService>(); 
         services.AddTransient<LeaderBoardService>(); 
         services.AddTransient<SingleGameSessionService>();

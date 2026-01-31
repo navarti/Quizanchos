@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\..\Quizanchos.Domain\Quizanchos.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Factories\" />
+  </ItemGroup>
+
 </Project>
