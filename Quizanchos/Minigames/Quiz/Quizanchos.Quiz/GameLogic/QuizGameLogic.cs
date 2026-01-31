@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
+using Quizanchos.Quiz.Services;
 
 namespace Quizanchos.Quiz.GameLogic;
 
@@ -11,19 +12,22 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
     private readonly GameLevel _gameLevel;
     private readonly int _secondsPerCard;
     private readonly int _optionCount;
+    private readonly QuizCardGeneratorService? _cardGenerator;
 
     public QuizGameLogic(
         int totalCards = 10,
         Guid? quizCategoryId = null,
         GameLevel gameLevel = GameLevel.Easy,
         int secondsPerCard = 30,
-        int optionCount = 4)
+        int optionCount = 4,
+        QuizCardGeneratorService? cardGenerator = null)
     {
         _totalCards = totalCards;
         _quizCategoryId = quizCategoryId ?? Guid.Empty;
         _gameLevel = gameLevel;
         _secondsPerCard = secondsPerCard;
         _optionCount = optionCount;
+        _cardGenerator = cardGenerator;
     }
 
     public QuizGameState CreateInitialState(Guid gameId, ImmutableArray<Guid> players)
@@ -86,10 +90,23 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         }
 
         // After answering, move to the next card (if not the last card)
-        // This allows the page to reload and show the next unanswered card
         if (state.CurrentCardIndex < state.TotalCards - 1)
         {
             state.CurrentCardIndex++;
+            
+            // Generate the next card if it doesn't exist yet and we have a card generator
+            if (_cardGenerator != null && state.CurrentCardIndex >= state.Cards.Count)
+            {
+                Task.Run(async () =>
+                {
+                    await _cardGenerator.GenerateSingleCard(
+                        state,
+                        state.QuizCategoryId,
+                        state.OptionCount,
+                        state.GameLevel
+                    );
+                }).GetAwaiter().GetResult();
+            }
         }
     }
 

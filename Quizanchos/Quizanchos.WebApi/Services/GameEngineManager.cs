@@ -1,42 +1,41 @@
 using System.Collections.Concurrent;
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 
 namespace Quizanchos.WebApi.Services;
 
 public class GameEngineManager
 {
-    private readonly ConcurrentDictionary<(Guid gameId, MinigameType type), IGameEngine> _gameEngines = new();
-    private readonly ConcurrentDictionary<Guid, (Guid gameId, MinigameType type)> _playerToGame = new();
+    private readonly ConcurrentDictionary<Guid, IGameEngine> _gameEngines = new();
+    private readonly ConcurrentDictionary<Guid, Guid> _playerToGame = new();
 
-    public IGameEngine? GetEngine(Guid gameId, MinigameType type)
+    public IGameEngine? GetEngine(Guid gameId)
     {
-        _gameEngines.TryGetValue((gameId, type), out IGameEngine? engine);
+        _gameEngines.TryGetValue(gameId, out IGameEngine? engine);
         return engine;
     }
 
     public IGameEngine? GetEngineByPlayer(Guid playerId)
     {
-        if (_playerToGame.TryGetValue(playerId, out (Guid gameId, MinigameType type) gameInfo))
+        if (_playerToGame.TryGetValue(playerId, out Guid gameId))
         {
-            return GetEngine(gameInfo.gameId, gameInfo.type);
+            return GetEngine(gameId);
         }
         return null;
     }
 
-    public void RegisterEngine(Guid gameId, MinigameType type, IGameEngine engine)
+    public void RegisterEngine(Guid gameId, IGameEngine engine)
     {
-        _gameEngines[(gameId, type)] = engine;
+        _gameEngines[gameId] = engine;
         
         foreach (Guid playerId in engine.Players)
         {
-            _playerToGame[playerId] = (gameId, type);
+            _playerToGame[playerId] = gameId;
         }
     }
 
-    public bool RemoveEngine(Guid gameId, MinigameType type)
+    public bool RemoveEngine(Guid gameId)
     {
-        if (_gameEngines.TryRemove((gameId, type), out IGameEngine? engine))
+        if (_gameEngines.TryRemove(gameId, out IGameEngine? engine))
         {
             foreach (Guid playerId in engine.Players)
             {
@@ -47,8 +46,9 @@ public class GameEngineManager
         return false;
     }
 
-    public bool HasEngine(Guid gameId, MinigameType type)
+    public bool HasEngine(Guid gameId)
     {
-        return _gameEngines.ContainsKey((gameId, type));
+        return _gameEngines.ContainsKey(gameId);
     }
 }
+

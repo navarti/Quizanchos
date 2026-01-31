@@ -1,5 +1,4 @@
 using Quizanchos.Core;
-using Quizanchos.Quiz.GameLogic;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -28,7 +27,7 @@ public class GameEngineWrapper<TState, TMove> : IGameEngine
         return _engine.MakeMove(playerId, typedMove);
     }
 
-    public object GetState()
+    public IGameState GetState()
     {
         return _engine.State;
     }
