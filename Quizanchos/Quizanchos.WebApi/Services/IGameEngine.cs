@@ -10,6 +10,6 @@ public interface IGameEngine
     Guid? Winner { get; }
     
     MoveResult MakeMove(Guid playerId, GameMove move);
-    object GetState();
+    IGameState GetState();
     IEnumerable<Guid> GetExpectedPlayers();
 }

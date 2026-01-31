@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
+  </ItemGroup>
+
 </Project>
