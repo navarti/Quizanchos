@@ -10,9 +10,9 @@ namespace Quizanchos.WebApi.Controllers;
 [Route("[controller]/[action]")]
 public class AuthorizationController : Controller
 {
-    private readonly QuizAuthorizationService _authorizationService;
+    private readonly AuthorizationService _authorizationService;
 
-    public AuthorizationController(QuizAuthorizationService authorizationService)
+    public AuthorizationController(AuthorizationService authorizationService)
     {
         _authorizationService = authorizationService;
     }

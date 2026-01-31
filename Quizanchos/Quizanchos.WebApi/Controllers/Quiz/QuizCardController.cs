@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Quiz.Services;
 
-namespace Quizanchos.WebApi.Controllers;
+namespace Quizanchos.WebApi.Controllers.Quiz;
 
 [Route("[controller]/[action]")]
 public class QuizCardController : Controller

@@ -24,10 +24,28 @@ public class GameLogicFactory : IGameLogicFactory
     {
         _logger.LogInformation("Creating game engine for type: {Type}, GameId: {GameId}, Players: {PlayerCount}", 
             type, gameId, playerIds.Length);
-
+        
         return type switch
         {
             MinigameType.Quiz => CreateQuizEngine(gameId, playerIds, parameters),
+            _ => throw new ArgumentException($"Unknown minigame type: {type}")
+        };
+    }
+
+    public Type GetStateType(MinigameType type)
+    {
+        return type switch
+        {
+            MinigameType.Quiz => typeof(QuizGameState),
+            _ => throw new ArgumentException($"Unknown minigame type: {type}")
+        };
+    }
+
+    public Type GetMoveType(MinigameType type)
+    {
+        return type switch
+        {
+            MinigameType.Quiz => typeof(QuizMove),
             _ => throw new ArgumentException($"Unknown minigame type: {type}")
         };
     }
@@ -43,50 +61,28 @@ public class GameLogicFactory : IGameLogicFactory
         _logger.LogInformation("Creating Quiz engine with: TotalCards={TotalCards}, CategoryId={CategoryId}, GameLevel={GameLevel}, SecondsPerCard={SecondsPerCard}, OptionCount={OptionCount}",
             totalCards, categoryId, gameLevel, secondsPerCard, optionCount);
 
-        // Get the card generator service
-        QuizCardGeneratorService? cardGenerator = null;
+        QuizEngineFactory? quizEngineFactory = null;
         using (var scope = _serviceProvider.CreateScope())
         {
-            cardGenerator = scope.ServiceProvider.GetService<QuizCardGeneratorService>();
+            quizEngineFactory = scope.ServiceProvider.GetService<QuizEngineFactory>();
         }
 
-        QuizGameLogic logic = new QuizGameLogic(
+        if (quizEngineFactory == null)
+        {
+            throw new InvalidOperationException("QuizEngineFactory service is not registered");
+        }
+
+        GameEngine<QuizGameState, QuizMove> engine = quizEngineFactory.CreateQuizEngine(
+            gameId,
+            playerIds,
             totalCards,
             categoryId,
             gameLevel,
             secondsPerCard,
-            optionCount,
-            cardGenerator
+            optionCount
         );
 
-        GameEngine<QuizGameState, QuizMove> engine = new GameEngine<QuizGameState, QuizMove>(logic, gameId, playerIds);
         GameEngineWrapper<QuizGameState, QuizMove> wrapper = new GameEngineWrapper<QuizGameState, QuizMove>(engine);
-        
-        QuizGameState state = engine.State;
-        _logger.LogInformation("Quiz engine created. Initial state: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
-            state.CurrentCardIndex, state.TotalCards, state.Cards.Count);
-
-        // Generate cards if categoryId is provided
-        if (categoryId.HasValue && categoryId.Value != Guid.Empty && cardGenerator != null)
-        {
-            _logger.LogInformation("Delegating card generation to QuizCardGeneratorService");
-            
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await cardGenerator.GenerateCardsForGame(state, categoryId.Value, totalCards, optionCount, gameLevel);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error generating cards for game {GameId}", gameId);
-                }
-            }).GetAwaiter().GetResult();
-        }
-        else
-        {
-            _logger.LogWarning("No category ID provided or card generator unavailable, cards will not be generated");
-        }
         
         return wrapper;
     }

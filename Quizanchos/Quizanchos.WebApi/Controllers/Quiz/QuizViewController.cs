@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Quizanchos.WebApi.Controllers;
+namespace Quizanchos.WebApi.Controllers.Quiz;
 
 [Route("Quiz")]
 public class QuizViewController : Controller

@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Quizanchos.Core;
 
 namespace Quizanchos.WebApi.Services;
 
@@ -44,11 +43,6 @@ public class GameEngineManager
             return true;
         }
         return false;
-    }
-
-    public bool HasEngine(Guid gameId)
-    {
-        return _gameEngines.ContainsKey(gameId);
     }
 }
 

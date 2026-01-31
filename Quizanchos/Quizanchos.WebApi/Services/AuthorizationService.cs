@@ -9,14 +9,14 @@ using Quizanchos.Common.Enums;
 
 namespace Quizanchos.WebApi.Services;
 
-public class QuizAuthorizationService
+public class AuthorizationService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IUserRegistrationService _userRegistrationService;
     private readonly IUserPasswordUpdaterService _userPasswordUpdaterService;
 
-    public QuizAuthorizationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, 
+    public AuthorizationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, 
         IUserRegistrationService userRegistrationService, IUserPasswordUpdaterService userPasswordUpdaterService)
     {
         _userManager = userManager;
