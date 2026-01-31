@@ -44,6 +44,7 @@ public static class QuizServiceExtensions
         services.AddTransient<QuizCardIntService>();
         services.AddTransient<MainQuizCardService>();
         services.AddTransient<SessionTerminatorService>();
+        services.AddTransient<QuizCardGeneratorService>();
 
         return services;
     }

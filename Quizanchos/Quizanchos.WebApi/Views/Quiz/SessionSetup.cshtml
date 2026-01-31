@@ -1,4 +1,3 @@
-@model QuizCategoryViewModel
 @{
     ViewData["Title"] = "Quiz Page";
 }
@@ -15,11 +14,11 @@
 <body>
 <div class="container game-session-container">
     <div class="header">
-        <h1 class="game-title">@Model.QuizCategoryName</h1>
+        <h1 class="game-title" id="categoryName">Loading...</h1>
         <p class="game-subtitle">Customize your quest below!</p>
     </div>
 
-    <form id="gameSettingsForm" class="game-settings-form">
+    <form id="gameSettingsForm" class="game-settings-form" data-category-id="@ViewBag.CategoryId">
         <div class="form-group">
             <label for="gameLevel">Game Level:</label>
             <select id="gameLevel" name="gameLevel" class="form-control">
@@ -60,14 +59,35 @@
             </select>
         </div>
         <div class="action-buttons">
-            <button type="button" id="startQuestButton" class="btn-start-quiz" data-category-id="@Model.CategoryId">Start Quest</button>
+            <button type="button" id="startQuestButton" class="btn-start-quiz">Start Quest</button>
             <a href="/" class="btn-back-to-quizzes">Back to Quizzes</a>
         </div>
     </form>
 </div>
 
+<script>
+    // Load category name on page load
+    document.addEventListener('DOMContentLoaded', async () => {
+        const form = document.getElementById('gameSettingsForm');
+        const categoryId = form.getAttribute('data-category-id');
+        
+        try {
+            const response = await fetch(`/QuizCategory/GetById?id=${categoryId}`);
+            if (response.ok) {
+                const category = await response.json();
+                document.getElementById('categoryName').textContent = category.name || 'Quiz';
+            }
+        } catch (error) {
+            console.error('Error loading category:', error);
+        }
+    });
+</script>
+<script src="/js/game-client.js" asp-append-version="true"></script>
+<script src="/js/quiz-client.js" asp-append-version="true"></script>
 <script src="/js/common.js" asp-append-version="true"></script>
 <script src="/js/site.js"></script>
 </body>
 </html>
+
+
 

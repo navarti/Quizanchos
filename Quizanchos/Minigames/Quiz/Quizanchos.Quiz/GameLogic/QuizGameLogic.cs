@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 
 namespace Quizanchos.Quiz.GameLogic;
@@ -6,25 +7,44 @@ namespace Quizanchos.Quiz.GameLogic;
 public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
 {
     private readonly int _totalCards;
+    private readonly Guid _quizCategoryId;
+    private readonly GameLevel _gameLevel;
+    private readonly int _secondsPerCard;
+    private readonly int _optionCount;
 
-    public QuizGameLogic(int totalCards = 10)
+    public QuizGameLogic(
+        int totalCards = 10,
+        Guid? quizCategoryId = null,
+        GameLevel gameLevel = GameLevel.Easy,
+        int secondsPerCard = 30,
+        int optionCount = 4)
     {
         _totalCards = totalCards;
+        _quizCategoryId = quizCategoryId ?? Guid.Empty;
+        _gameLevel = gameLevel;
+        _secondsPerCard = secondsPerCard;
+        _optionCount = optionCount;
     }
 
     public QuizGameState CreateInitialState(Guid gameId, ImmutableArray<Guid> players)
     {
-        var state = new QuizGameState
+        QuizGameState state = new QuizGameState
         {
             GameId = gameId,
             Players = players.ToList(),
             IsFinished = false,
             Winner = null,
             CurrentCardIndex = -1,
-            TotalCards = _totalCards
+            TotalCards = _totalCards,
+            QuizCategoryId = _quizCategoryId,
+            GameLevel = _gameLevel,
+            SecondsPerCard = _secondsPerCard,
+            OptionCount = _optionCount,
+            CreationTime = DateTime.UtcNow,
+            IsTerminatedByTime = false
         };
 
-        foreach (var playerId in players)
+        foreach (Guid playerId in players)
         {
             state.PlayerScores[playerId] = 0;
         }
@@ -58,10 +78,18 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
     {
         var currentCard = state.Cards[state.CurrentCardIndex];
         currentCard.PlayerAnswers[playerId] = move.OptionPicked;
+        currentCard.OptionPicked = move.OptionPicked;
 
         if (move.OptionPicked == currentCard.CorrectOption)
         {
             state.PlayerScores[playerId]++;
+        }
+
+        // After answering, move to the next card (if not the last card)
+        // This allows the page to reload and show the next unanswered card
+        if (state.CurrentCardIndex < state.TotalCards - 1)
+        {
+            state.CurrentCardIndex++;
         }
     }
 
@@ -95,7 +123,13 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         return state.Players.Where(p => !currentCard.PlayerAnswers.ContainsKey(p));
     }
 
-    public void AddCard(QuizGameState state, Guid cardId, int correctOption, Guid[] entityIds)
+    public void AddCard(
+        QuizGameState state,
+        Guid cardId,
+        int correctOption,
+        Guid[] entityIds,
+        string[] entityNames,
+        object[] optionValues)
     {
         state.CurrentCardIndex++;
         state.Cards.Add(new QuizGameState.QuizCard
@@ -104,7 +138,10 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
             CardIndex = state.CurrentCardIndex,
             CorrectOption = correctOption,
             EntityIds = entityIds,
-            PlayerAnswers = new Dictionary<Guid, int?>()
+            EntityNames = entityNames,
+            OptionValues = optionValues,
+            PlayerAnswers = new Dictionary<Guid, int?>(),
+            CreationTime = DateTime.UtcNow
         });
     }
 }

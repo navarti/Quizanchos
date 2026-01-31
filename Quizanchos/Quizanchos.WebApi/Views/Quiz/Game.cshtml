@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Quiz Game";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/quiz-options.css">
+</head>
+<body>
+<div class="quiz-container" data-game-id="@ViewBag.GameId" id="quiz-container" style="display:none;">
+    <div class="quiz-header" id="quiz-header">
+        <h1 id="quiz-question">Loading...</h1>
+        <div class="question-info">
+            <span id="question-number">Question <span data-current>1</span> of <span data-total>10</span></span>
+            <span id="score-display">Score: <span data-score>0</span></span>
+        </div>
+    </div>
+
+    <div class="timeline-container" id="timeline-container">
+        <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="quiz-options" id="quiz-options">
+        <!-- Options will be loaded dynamically -->
+    </div>
+</div>
+
+<div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <div id="loader"></div>
+</div>
+
+<div id="errorModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2 id="modalHeader">Error</h2>
+        <p id="modalErrorText"></p>
+        <div id="modalButtons" class="modal-buttons">
+            <button id="restartQuiz">Restart Quiz</button>
+            <button id="returnToMenu">Return to Menu</button>
+        </div>
+    </div>
+</div>
+
+<div id="finalStatsModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Quiz Complete!</h2>
+        <p>Your Score: <strong id="scoreDisplay"></strong> / <span id="totalCardsDisplay"></span></p>
+        <p>Thank you for participating!</p>
+        <button id="goToResults">Return to Main Menu</button>
+    </div>
+</div>
+
+<div id="preloader">
+    <div id="loader"></div>
+</div>
+
+<script src="/js/game-client.js" asp-append-version="true"></script>
+<script src="/js/quiz-client.js" asp-append-version="true"></script>
+<script src="/js/common.js" asp-append-version="true"></script>
+<script src="/js/quiz-game.js" asp-append-version="true"></script>
+</body>
+</html>

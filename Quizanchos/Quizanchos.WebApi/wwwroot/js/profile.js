@@ -1,5 +1,6 @@
 const avatarInput = document.getElementById('avatar-input');
 const avatarImg = document.getElementById('avatar');
+
 const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('formFile', file);
@@ -25,19 +26,21 @@ const uploadImage = async (file) => {
     return null;
 };
 
-avatarInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-        avatarImg.src = URL.createObjectURL(file);
-        const uploadResult = await uploadImage(file);
-        if (uploadResult && uploadResult.newAvatarUrl) {
-            avatarImg.src = uploadResult.newAvatarUrl;
-            console.log("Avatar updated to:", uploadResult.newAvatarUrl);
-        } else {
-            console.error("Failed to update avatar on the server.");
+if (avatarInput && avatarImg) {
+    avatarInput.addEventListener('change', async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            avatarImg.src = URL.createObjectURL(file);
+            const uploadResult = await uploadImage(file);
+            if (uploadResult && uploadResult.newAvatarUrl) {
+                avatarImg.src = uploadResult.newAvatarUrl;
+                console.log("Avatar updated to:", uploadResult.newAvatarUrl);
+            } else {
+                console.error("Failed to update avatar on the server.");
+            }
         }
-    }
-});
+    });
+}
 
 function toggleEdit(fieldId) {
     const field = document.getElementById(fieldId);
@@ -146,6 +149,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const usernameField = document.getElementById('username');
     const saveChangesBtn = document.querySelector('.save-button');
     const logoutBtn = document.getElementById('logout-btn');
+    const closeModalButton = document.getElementById('closeModal');
+    
+    // Initialize elements object
+    elements = {
+        closeModalButton: closeModalButton
+    };
+    
     const defaultView = 'profile';
     const defaultButton = document.querySelector(`.nav-button[onclick*="${defaultView}"]`);
     if (defaultButton) {
@@ -153,7 +163,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     switchView(defaultView, defaultButton);
 
-    elements.closeModalButton?.addEventListener('click', closeVerifyModal);
+    if (elements.closeModalButton) {
+        elements.closeModalButton.addEventListener('click', closeVerifyModal);
+    }
 });
 
 function switchView(view, button) {
