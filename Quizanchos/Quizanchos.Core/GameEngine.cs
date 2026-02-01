@@ -19,6 +19,14 @@ public class GameEngine<TState, TMove>
         State = _logic.CreateInitialState(gameId, players);
     }
 
+    public GameEngine(
+        IGameLogic<TState, TMove> logic,
+        TState existingState)
+    {
+        _logic = logic;
+        State = existingState;
+    }
+
     public MoveResult MakeMove(Guid playerId, TMove move)
     {
         if (State.IsFinished)

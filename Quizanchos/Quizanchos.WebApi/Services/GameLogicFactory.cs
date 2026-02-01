@@ -32,6 +32,34 @@ public class GameLogicFactory : IGameLogicFactory
         };
     }
 
+    public async Task<IGameEngine?> LoadGameEngine(MinigameType type, Guid gameId)
+    {
+        _logger.LogInformation("Loading game engine for type: {Type}, GameId: {GameId}", type, gameId);
+
+        return type switch
+        {
+            MinigameType.Quiz => await LoadQuizEngine(gameId),
+            _ => throw new ArgumentException($"Unknown minigame type: {type}")
+        };
+    }
+
+    public async Task SaveGameState(MinigameType type, Guid gameId, IGameState state)
+    {
+        _logger.LogInformation("Saving game state for type: {Type}, GameId: {GameId}", type, gameId);
+
+        switch (type)
+        {
+            case MinigameType.Quiz:
+                if (state is QuizGameState quizState)
+                {
+                    await _quizEngineFactory.SaveQuizStateAsync(gameId, quizState);
+                }
+                break;
+            default:
+                throw new ArgumentException($"Unknown minigame type: {type}");
+        }
+    }
+
     public Type GetStateType(MinigameType type)
     {
         return type switch
@@ -74,6 +102,15 @@ public class GameLogicFactory : IGameLogicFactory
         GameEngineWrapper<QuizGameState, QuizMove> wrapper = new GameEngineWrapper<QuizGameState, QuizMove>(engine);
         
         return wrapper;
+    }
+
+    private async Task<IGameEngine?> LoadQuizEngine(Guid gameId)
+    {
+        GameEngine<QuizGameState, QuizMove>? engine = await _quizEngineFactory.LoadQuizEngineAsync(gameId);
+        if (engine == null)
+            return null;
+
+        return new GameEngineWrapper<QuizGameState, QuizMove>(engine);
     }
 
     private T GetParameter<T>(Dictionary<string, object> parameters, string key, T defaultValue)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Repositories;
 using Quizanchos.Quiz;
 using Quizanchos.Quiz.Extensions;
 using Quizanchos.Quiz.Util;
@@ -125,7 +126,7 @@ public static class Startup
 
         AddControllers(builder);
 
-        services.AddSingleton<GameEngineManager>();
+        services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();

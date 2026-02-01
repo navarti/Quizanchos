@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
+using Quizanchos.Domain.Repositories;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Services;
 using System.Collections.Immutable;
@@ -13,17 +14,17 @@ namespace Quizanchos.WebApi.Controllers;
 [ApiController]
 public class GameController : ControllerBase
 {
-    private readonly GameEngineManager _gameEngineManager;
     private readonly IGameLogicFactory _gameLogicFactory;
+    private readonly IGameSessionRepository _gameSessionRepository;
     private readonly ILogger<GameController> _logger;
 
     public GameController(
-        GameEngineManager gameEngineManager, 
         IGameLogicFactory gameLogicFactory,
+        IGameSessionRepository gameSessionRepository,
         ILogger<GameController> logger)
     {
-        _gameEngineManager = gameEngineManager;
         _gameLogicFactory = gameLogicFactory;
+        _gameSessionRepository = gameSessionRepository;
         _logger = logger;
     }
 
@@ -45,8 +46,6 @@ public class GameController : ControllerBase
             request.PlayerIds.ToImmutableArray(), 
             parameters);
 
-        _gameEngineManager.RegisterEngine(gameId, engine);
-
         IGameState state = engine.GetState();
         _logger.LogInformation("Game created successfully: GameId={GameId}, State={State}", 
             gameId, 
@@ -62,12 +61,20 @@ public class GameController : ControllerBase
 
     [HttpPost("move")]
     [Authorize(AppRole.User)]
-    public IActionResult MakeMove([FromBody] GameRequest request)
+    public async Task<IActionResult> MakeMove([FromBody] GameRequest request)
     {
-        IGameEngine? engine = _gameEngineManager.GetEngine(request.GameId);
-        if (engine == null)
+        // Load game session from DB
+        var gameSession = await _gameSessionRepository.GetByIdAsync(request.GameId);
+        if (gameSession == null)
         {
             return NotFound(new { Message = "Game not found" });
+        }
+
+        // Load engine from DB state
+        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(gameSession.MinigameType, request.GameId);
+        if (engine == null)
+        {
+            return NotFound(new { Message = "Game state not found" });
         }
 
         MoveResult result = engine.MakeMove(request.PlayerId, request.Move);
@@ -77,7 +84,10 @@ public class GameController : ControllerBase
             return BadRequest(new { Message = result.Reason });
         }
 
+        // Save updated state to DB
         IGameState state = engine.GetState();
+        await _gameLogicFactory.SaveGameState(gameSession.MinigameType, request.GameId, state);
+
         return Ok(new GameMoveResponse
         {
             Success = true,
@@ -90,11 +100,12 @@ public class GameController : ControllerBase
 
     [HttpGet("{gameId}/state")]
     [Authorize(AppRole.User)]
-    public IActionResult GetGameState(Guid gameId, [FromQuery] MinigameType minigameType)
+    public async Task<IActionResult> GetGameState(Guid gameId, [FromQuery] MinigameType minigameType)
     {
         _logger.LogInformation("Getting game state: GameId={GameId}, Type={Type}", gameId, minigameType);
         
-        IGameEngine? engine = _gameEngineManager.GetEngine(gameId);
+        // Load engine from DB state
+        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(minigameType, gameId);
         if (engine == null)
         {
             _logger.LogWarning("Game not found: GameId={GameId}", gameId);
@@ -119,18 +130,24 @@ public class GameController : ControllerBase
 
     [HttpGet("my-active")]
     [Authorize(AppRole.User)]
-    public IActionResult GetMyActiveGame()
+    public async Task<IActionResult> GetMyActiveGame()
     {
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid playerGuid))
+        if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
         }
 
-        IGameEngine? engine = _gameEngineManager.GetEngineByPlayer(playerGuid);
-        if (engine == null)
+        var gameSession = await _gameSessionRepository.GetActiveByPlayerIdAsync(userId);
+        if (gameSession == null)
         {
             return NotFound(new { Message = "No active game found" });
+        }
+
+        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(gameSession.MinigameType, gameSession.Id);
+        if (engine == null)
+        {
+            return NotFound(new { Message = "Game state not found" });
         }
 
         return Ok(new
@@ -145,9 +162,9 @@ public class GameController : ControllerBase
 
     [HttpDelete("{gameId}")]
     [Authorize(AppRole.User)]
-    public IActionResult DeleteGame(Guid gameId, [FromQuery] MinigameType minigameType)
+    public async Task<IActionResult> DeleteGame(Guid gameId, [FromQuery] MinigameType minigameType)
     {
-        bool removed = _gameEngineManager.RemoveEngine(gameId);
+        bool removed = await _gameSessionRepository.DeleteAsync(gameId);
         if (!removed)
         {
             return NotFound(new { Message = "Game not found" });
