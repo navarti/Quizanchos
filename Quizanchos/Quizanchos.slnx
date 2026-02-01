@@ -7,5 +7,6 @@
   <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" />
   <Project Path="Quizanchos.Core/Quizanchos.Core.csproj" />
   <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />
+  <Project Path="Quizanchos.Migrations/Quizanchos.Migrations.csproj" />
   <Project Path="Quizanchos.WebApi/Quizanchos.WebApi.csproj" />
 </Solution>

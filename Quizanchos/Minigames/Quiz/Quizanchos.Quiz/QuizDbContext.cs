@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Quizanchos.Domain;
 using Quizanchos.Quiz.Configurations;
 using Quizanchos.Quiz.Entities;
 
 namespace Quizanchos.Quiz;
 
-public class QuizDbContext : QuizanchosDbContext
+public class QuizDbContext : DbContext
 {
     public QuizDbContext(DbContextOptions<QuizDbContext> options) : base(options)
     {
@@ -43,3 +42,4 @@ public class QuizDbContext : QuizanchosDbContext
         modelBuilder.ApplyConfiguration(new QuizSessionPlayerScoreConfiguration());
     }
 }
+
