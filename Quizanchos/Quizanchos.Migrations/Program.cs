@@ -20,7 +20,7 @@ var host = Host.CreateDefaultBuilder(args)
             options.UseSqlServer(connectionString, opt =>
             {
                 opt.MigrationsAssembly(migrationsAssembly);
-                opt.MigrationsHistoryTable("__EFMigrationsHistory", schema: "entity_framework");
+                opt.MigrationsHistoryTable("__EFMigrationsHistoryQuizanshos", schema: "entity_framework");
             });
         });
 
@@ -29,7 +29,7 @@ var host = Host.CreateDefaultBuilder(args)
             options.UseSqlServer(connectionString, opt =>
             {
                 opt.MigrationsAssembly(migrationsAssembly);
-                opt.MigrationsHistoryTable("__EFMigrationsHistory", schema: "entity_framework");
+                opt.MigrationsHistoryTable("__EFMigrationsHistoryQuiz", schema: "entity_framework");
             });
         });
     })

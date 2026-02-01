@@ -7,7 +7,7 @@ namespace Quizanchos.Domain;
 
 public class QuizanchosDbContext : IdentityDbContext<ApplicationUser>
 {
-    public QuizanchosDbContext(DbContextOptions options) : base(options)
+    public QuizanchosDbContext(DbContextOptions<QuizanchosDbContext> options) : base(options)
     {
     }
 
