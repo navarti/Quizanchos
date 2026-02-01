@@ -126,7 +126,7 @@ public static class Startup
         AddControllers(builder);
 
         services.AddSingleton<GameEngineManager>();
-        services.AddSingleton<IGameLogicFactory, GameLogicFactory>();
+        services.AddScoped<IGameLogicFactory, GameLogicFactory>();
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();

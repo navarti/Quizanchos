@@ -14,7 +14,7 @@ public static class QuizServiceExtensions
         services.AddDbContext<QuizDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
-        });
+        }, ServiceLifetime.Scoped);
 
         return services;
     }
@@ -36,16 +36,16 @@ public static class QuizServiceExtensions
     public static IServiceCollection AddQuizServices(this IServiceCollection services)
     {
         services.AddSingleton<LockerService>();
-        services.AddTransient<QuizEntityService>();
-        services.AddTransient<QuizCategoryService>();
-        services.AddTransient<FeatureIntService>();
-        services.AddTransient<FeatureFloatService>();
-        services.AddTransient<QuizCardFloatService>();
-        services.AddTransient<QuizCardIntService>();
-        services.AddTransient<MainQuizCardService>();
-        services.AddTransient<SessionTerminatorService>();
-        services.AddTransient<QuizCardGeneratorService>();
-        services.AddTransient<QuizEngineFactory>();
+        services.AddScoped<QuizEntityService>();
+        services.AddScoped<QuizCategoryService>();
+        services.AddScoped<FeatureIntService>();
+        services.AddScoped<FeatureFloatService>();
+        services.AddScoped<QuizCardFloatService>();
+        services.AddScoped<QuizCardIntService>();
+        services.AddScoped<MainQuizCardService>();
+        services.AddScoped<SessionTerminatorService>();
+        services.AddScoped<QuizCardGeneratorService>();
+        services.AddScoped<QuizEngineFactory>();
 
         return services;
     }

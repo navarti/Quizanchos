@@ -93,20 +93,6 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         if (state.CurrentCardIndex < state.TotalCards - 1)
         {
             state.CurrentCardIndex++;
-            
-            // Generate the next card if it doesn't exist yet and we have a card generator
-            if (_cardGenerator != null && state.CurrentCardIndex >= state.Cards.Count)
-            {
-                Task.Run(async () =>
-                {
-                    await _cardGenerator.GenerateSingleCard(
-                        state,
-                        state.QuizCategoryId,
-                        state.OptionCount,
-                        state.GameLevel
-                    );
-                }).GetAwaiter().GetResult();
-            }
         }
     }
 

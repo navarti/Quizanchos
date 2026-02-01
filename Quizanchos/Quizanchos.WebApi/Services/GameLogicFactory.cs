@@ -10,24 +10,24 @@ namespace Quizanchos.WebApi.Services;
 public class GameLogicFactory : IGameLogicFactory
 {
     private readonly ILogger<GameLogicFactory> _logger;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly QuizEngineFactory _quizEngineFactory;
 
     public GameLogicFactory(
         ILogger<GameLogicFactory> logger,
-        IServiceProvider serviceProvider)
+        QuizEngineFactory quizEngineFactory)
     {
         _logger = logger;
-        _serviceProvider = serviceProvider;
+        _quizEngineFactory = quizEngineFactory;
     }
 
-    public IGameEngine CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
+    public async Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
     {
         _logger.LogInformation("Creating game engine for type: {Type}, GameId: {GameId}, Players: {PlayerCount}", 
             type, gameId, playerIds.Length);
         
         return type switch
         {
-            MinigameType.Quiz => CreateQuizEngine(gameId, playerIds, parameters),
+            MinigameType.Quiz => await CreateQuizEngine(gameId, playerIds, parameters),
             _ => throw new ArgumentException($"Unknown minigame type: {type}")
         };
     }
@@ -50,7 +50,7 @@ public class GameLogicFactory : IGameLogicFactory
         };
     }
 
-    private IGameEngine CreateQuizEngine(Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
+    private async Task<IGameEngine> CreateQuizEngine(Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
     {
         int totalCards = GetParameter<int>(parameters, "totalCards", 10);
         Guid? categoryId = GetParameter<Guid?>(parameters, "categoryId", null);
@@ -61,18 +61,7 @@ public class GameLogicFactory : IGameLogicFactory
         _logger.LogInformation("Creating Quiz engine with: TotalCards={TotalCards}, CategoryId={CategoryId}, GameLevel={GameLevel}, SecondsPerCard={SecondsPerCard}, OptionCount={OptionCount}",
             totalCards, categoryId, gameLevel, secondsPerCard, optionCount);
 
-        QuizEngineFactory? quizEngineFactory = null;
-        using (var scope = _serviceProvider.CreateScope())
-        {
-            quizEngineFactory = scope.ServiceProvider.GetService<QuizEngineFactory>();
-        }
-
-        if (quizEngineFactory == null)
-        {
-            throw new InvalidOperationException("QuizEngineFactory service is not registered");
-        }
-
-        GameEngine<QuizGameState, QuizMove> engine = quizEngineFactory.CreateQuizEngine(
+        GameEngine<QuizGameState, QuizMove> engine = await _quizEngineFactory.CreateQuizEngineAsync(
             gameId,
             playerIds,
             totalCards,
