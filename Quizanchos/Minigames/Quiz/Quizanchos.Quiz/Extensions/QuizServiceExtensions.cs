@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quizanchos.Quiz.Repositories.Interfaces;
 using Quizanchos.Quiz.Repositories.Realizations;
@@ -26,9 +25,6 @@ public static class QuizServiceExtensions
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
         services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
         services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
-        services.AddTransient<ISingleGameSessionRepository, SingleGameSessionRepository>();
-        services.AddTransient<IQuizCardFloatRepository, QuizCardFloatRepository>();
-        services.AddTransient<IQuizCardIntRepository, QuizCardIntRepository>();
 
         return services;
     }
@@ -40,10 +36,6 @@ public static class QuizServiceExtensions
         services.AddScoped<QuizCategoryService>();
         services.AddScoped<FeatureIntService>();
         services.AddScoped<FeatureFloatService>();
-        services.AddScoped<QuizCardFloatService>();
-        services.AddScoped<QuizCardIntService>();
-        services.AddScoped<MainQuizCardService>();
-        services.AddScoped<SessionTerminatorService>();
         services.AddScoped<QuizCardGeneratorService>();
         services.AddScoped<QuizEngineFactory>();
 

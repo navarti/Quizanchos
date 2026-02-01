@@ -4,7 +4,7 @@ using Quizanchos.ViewModels;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services;
 using Quizanchos.WebApi.Services;
-using Microsoft.AspNetCore.Authentication;
+
 namespace Quizanchos.WebApi.ViewControllers;
 
 public class HomeController : Controller
@@ -12,12 +12,10 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     
     private readonly QuizCategoryService _quizCategoryService;
-    private readonly SingleGameSessionService _singleGameSessionService;
     private readonly LeaderBoardService _leaderBoardService;
     
-    public HomeController(SingleGameSessionService singleGameSessionService,LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService)
+    public HomeController(LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService)
     {
-        _singleGameSessionService = singleGameSessionService;
         _leaderBoardService = leaderBoardService;
         _logger = logger;
         _quizCategoryService = quizCategoryService ?? throw new ArgumentNullException(nameof(quizCategoryService));
@@ -27,24 +25,20 @@ public class HomeController : Controller
     public async Task<IActionResult> Index()
     {
         List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
-        SingleGameSessionDto? singleGameSession = null;
+        object? activeGameSession = null;
         string quizName = "Unknown Category";
 
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 3, skip: 0); 
         if (User.Identity?.IsAuthenticated == true)
         {
-            singleGameSession = await _singleGameSessionService.FindAliveSession(User);
-
-            if (singleGameSession != null)
-            {
-                var quizCategory = await _quizCategoryService.GetById(singleGameSession.QuizCategoryId);
-                quizName = quizCategory?.Name + " Quiz" ?? "Unknown Category";
-            }
+            // TODO:GameSession
+            // activeGameSession = ...
         }
+
         var viewModel = new HomeViewModel
         {
             QuizCategories = quizCategories,
-            ActiveSession = singleGameSession,
+            ActiveSession = activeGameSession,
             QuizName = quizName,
             Users = users.ToList(),
             CurrentUserName = User.Identity?.Name ?? "Guest"

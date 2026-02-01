@@ -133,7 +133,6 @@ public static class Startup
         services.AddTransient<AuthorizationService>(); 
         services.AddTransient<UserProfileService>(); 
         services.AddTransient<LeaderBoardService>(); 
-        services.AddTransient<SingleGameSessionService>();
 
         services.AddQuartz(q =>
         {

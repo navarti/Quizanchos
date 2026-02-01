@@ -4,14 +4,15 @@ using Quizanchos.WebApi.Dto;
 public class HomeViewModel
 {
     public required List<QuizCategoryDto> QuizCategories { get; set; }
-    public SingleGameSessionDto? ActiveSession { get; set; } 
+    // TODO:GameSession
+    public object? ActiveSession { get; set; } 
 
     public required string QuizName { get; set; }
-    public string FormattedCreationTime => ActiveSession?.CreationTime.ToString("g") ?? "N/A";
+    public string FormattedCreationTime => "N/A"; // ActiveSession?.CreationTime.ToString("g") ?? "N/A";
     public string Progress => ActiveSession != null
-        ? $"{ActiveSession.CurrentCardIndex}/{(int)ActiveSession.CardsCount}"
+        ? "N/A" //$"{ActiveSession.CurrentCardIndex}/{(int)ActiveSession.CardsCount}"
         : "N/A";
-    public int Score => ActiveSession?.Score ?? 0;
+    public int Score => 0; //ActiveSession?.Score ?? 0;
 
     public List<ApplicationUserInLeaderBoardDto> Users { get; set; } = new List<ApplicationUserInLeaderBoardDto>();
 
