@@ -12,10 +12,14 @@ public class QuizanchosDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    public DbSet<GameSession> GameSessions { get; set; }
+    public DbSet<GameSessionPlayer> GameSessionPlayers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
+        modelBuilder.ApplyConfiguration(new GameSessionConfiguration());
+        modelBuilder.ApplyConfiguration(new GameSessionPlayerConfiguration());
     }
 }

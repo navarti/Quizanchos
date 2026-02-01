@@ -17,6 +17,12 @@ public class QuizDbContext : QuizanchosDbContext
     public DbSet<FeatureFloat> FeatureFloats { get; set; }
     public DbSet<QuizCardFloat> QuizCardFloats { get; set; }
     public DbSet<QuizCardInt> QuizCardInts { get; set; }
+    
+    // Quiz game session entities
+    public DbSet<QuizGameSessionState> QuizGameSessionStates { get; set; }
+    public DbSet<QuizSessionCard> QuizSessionCards { get; set; }
+    public DbSet<QuizSessionCardAnswer> QuizSessionCardAnswers { get; set; }
+    public DbSet<QuizSessionPlayerScore> QuizSessionPlayerScores { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,5 +35,11 @@ public class QuizDbContext : QuizanchosDbContext
         modelBuilder.ApplyConfiguration(new FeatureFloatConfiguration());
         modelBuilder.ApplyConfiguration(new QuizCardFloatConfiguration());
         modelBuilder.ApplyConfiguration(new QuizCardIntConfiguration());
+        
+        // Quiz game session configurations
+        modelBuilder.ApplyConfiguration(new QuizGameSessionStateConfiguration());
+        modelBuilder.ApplyConfiguration(new QuizSessionCardConfiguration());
+        modelBuilder.ApplyConfiguration(new QuizSessionCardAnswerConfiguration());
+        modelBuilder.ApplyConfiguration(new QuizSessionPlayerScoreConfiguration());
     }
 }

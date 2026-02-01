@@ -25,6 +25,7 @@ public static class QuizServiceExtensions
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
         services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
         services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
+        services.AddScoped<IQuizGameSessionRepository, QuizGameSessionRepository>();
 
         return services;
     }
@@ -37,6 +38,7 @@ public static class QuizServiceExtensions
         services.AddScoped<FeatureIntService>();
         services.AddScoped<FeatureFloatService>();
         services.AddScoped<QuizCardGeneratorService>();
+        services.AddScoped<QuizGameStateService>();
         services.AddScoped<QuizEngineFactory>();
 
         return services;
