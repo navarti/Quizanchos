@@ -35,15 +35,19 @@ public class QuizCardGeneratorService
         int optionCount,
         GameLevel gameLevel)
     {
-        _logger.LogInformation("Generating first card for category {CategoryId}", categoryId);
+        _logger.LogInformation("Generating all {TotalCards} cards for category {CategoryId}", totalCards, categoryId);
 
-        // Generate only the first card when game is created
-        await GenerateSingleCard(state, categoryId, optionCount, gameLevel);
+        // Generate all cards upfront
+        for (int i = 0; i < totalCards; i++)
+        {
+            await GenerateSingleCard(state, categoryId, optionCount, gameLevel);
+            _logger.LogInformation("Generated card {CardIndex}/{TotalCards}", i + 1, totalCards);
+        }
         
         // Set CurrentCardIndex to 0 to start at the first card
         state.CurrentCardIndex = 0;
         
-        _logger.LogInformation("First card generated. Cards.Count={CardsCount}, CurrentCardIndex={CurrentCardIndex}", 
+        _logger.LogInformation("All cards generated. Cards.Count={CardsCount}, CurrentCardIndex={CurrentCardIndex}", 
             state.Cards.Count, state.CurrentCardIndex);
     }
 

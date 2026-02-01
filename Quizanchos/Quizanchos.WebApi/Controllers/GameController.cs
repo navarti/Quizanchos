@@ -29,7 +29,7 @@ public class GameController : ControllerBase
 
     [HttpPost("create")]
     [Authorize(AppRole.User)]
-    public IActionResult CreateGame([FromBody] CreateGameRequest request)
+    public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest request)
     {
         Guid gameId = Guid.NewGuid();
         
@@ -39,7 +39,7 @@ public class GameController : ControllerBase
             System.Text.Json.JsonSerializer.Serialize(request.Parameters));
         
         Dictionary<string, object> parameters = request.Parameters ?? new Dictionary<string, object>();
-        IGameEngine engine = _gameLogicFactory.CreateGameEngine(
+        IGameEngine engine = await _gameLogicFactory.CreateGameEngine(
             request.MinigameType, 
             gameId, 
             request.PlayerIds.ToImmutableArray(), 

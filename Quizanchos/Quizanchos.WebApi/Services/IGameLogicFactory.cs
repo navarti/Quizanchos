@@ -5,5 +5,5 @@ namespace Quizanchos.WebApi.Services;
 
 public interface IGameLogicFactory
 {
-    IGameEngine CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters);
+    Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters);
 }
