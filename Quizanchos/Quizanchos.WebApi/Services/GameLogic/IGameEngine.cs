@@ -11,5 +11,4 @@ public interface IGameEngine
     
     MoveResult MakeMove(Guid playerId, GameMove move);
     IGameState GetState();
-    IEnumerable<Guid> GetExpectedPlayers();
 }

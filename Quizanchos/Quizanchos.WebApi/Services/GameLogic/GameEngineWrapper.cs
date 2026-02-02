@@ -31,14 +31,4 @@ public class GameEngineWrapper<TState, TMove> : IGameEngine
     {
         return _engine.State;
     }
-
-    public IEnumerable<Guid> GetExpectedPlayers()
-    {
-        return _engine.State.Players.Where(p => !_engine.State.IsFinished);
-    }
-
-    public GameEngine<TState, TMove> GetTypedEngine()
-    {
-        return _engine;
-    }
 }

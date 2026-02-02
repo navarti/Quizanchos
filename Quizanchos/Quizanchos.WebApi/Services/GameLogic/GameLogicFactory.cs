@@ -60,24 +60,6 @@ public class GameLogicFactory : IGameLogicFactory
         }
     }
 
-    public Type GetStateType(MinigameType type)
-    {
-        return type switch
-        {
-            MinigameType.Quiz => typeof(QuizGameState),
-            _ => throw new ArgumentException($"Unknown minigame type: {type}")
-        };
-    }
-
-    public Type GetMoveType(MinigameType type)
-    {
-        return type switch
-        {
-            MinigameType.Quiz => typeof(QuizMove),
-            _ => throw new ArgumentException($"Unknown minigame type: {type}")
-        };
-    }
-
     private async Task<IGameEngine> CreateQuizEngine(Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
     {
         int totalCards = GetParameter<int>(parameters, "totalCards", 10);

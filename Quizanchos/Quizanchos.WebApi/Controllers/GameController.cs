@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
-using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Constants;
-using Quizanchos.WebApi.Services.GameLogic;
-using System.Collections.Immutable;
+using Quizanchos.WebApi.Services;
 using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Controllers;
@@ -14,118 +12,47 @@ namespace Quizanchos.WebApi.Controllers;
 [ApiController]
 public class GameController : ControllerBase
 {
-    private readonly IGameLogicFactory _gameLogicFactory;
-    private readonly IGameSessionRepository _gameSessionRepository;
-    private readonly ILogger<GameController> _logger;
+    private readonly GameService _gameService;
 
-    public GameController(
-        IGameLogicFactory gameLogicFactory,
-        IGameSessionRepository gameSessionRepository,
-        ILogger<GameController> logger)
+    public GameController(GameService gameService)
     {
-        _gameLogicFactory = gameLogicFactory;
-        _gameSessionRepository = gameSessionRepository;
-        _logger = logger;
+        _gameService = gameService;
     }
 
     [HttpPost("create")]
     [Authorize(AppRole.User)]
     public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest request)
     {
-        Guid gameId = Guid.NewGuid();
-        
-        _logger.LogInformation("Creating game: Type={Type}, PlayerIds={PlayerIds}, Parameters={Parameters}", 
-            request.MinigameType, 
-            string.Join(",", request.PlayerIds),
-            System.Text.Json.JsonSerializer.Serialize(request.Parameters));
-        
-        Dictionary<string, object> parameters = request.Parameters ?? new Dictionary<string, object>();
-        IGameEngine engine = await _gameLogicFactory.CreateGameEngine(
-            request.MinigameType, 
-            gameId, 
-            request.PlayerIds.ToImmutableArray(), 
-            parameters);
-
-        IGameState state = engine.GetState();
-        _logger.LogInformation("Game created successfully: GameId={GameId}, State={State}", 
-            gameId, 
-            System.Text.Json.JsonSerializer.Serialize(state));
-
-        return Ok(new CreateGameResponse
-        {
-            GameId = gameId,
-            MinigameType = request.MinigameType,
-            State = state
-        });
+        CreateGameResponse response = await _gameService.CreateGameAsync(request);
+        return Ok(response);
     }
 
     [HttpPost("move")]
     [Authorize(AppRole.User)]
     public async Task<IActionResult> MakeMove([FromBody] GameRequest request)
     {
-        // Load game session from DB
-        var gameSession = await _gameSessionRepository.GetByIdAsync(request.GameId);
-        if (gameSession == null)
-        {
-            return NotFound(new { Message = "Game not found" });
-        }
-
-        // Load engine from DB state
-        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(gameSession.MinigameType, request.GameId);
-        if (engine == null)
-        {
-            return NotFound(new { Message = "Game state not found" });
-        }
-
-        MoveResult result = engine.MakeMove(request.PlayerId, request.Move);
-
+        GameMoveResult result = await _gameService.MakeMoveAsync(request);
+        
         if (!result.IsSuccess)
         {
-            return BadRequest(new { Message = result.Reason });
+            return BadRequest(new { Message = result.ErrorMessage });
         }
 
-        // Save updated state to DB
-        IGameState state = engine.GetState();
-        await _gameLogicFactory.SaveGameState(gameSession.MinigameType, request.GameId, state);
-
-        return Ok(new GameMoveResponse
-        {
-            Success = true,
-            MinigameType = state.MinigameType,
-            State = state,
-            IsFinished = engine.IsFinished,
-            Winner = engine.Winner
-        });
+        return Ok(result.Response);
     }
 
     [HttpGet("{gameId}/state")]
     [Authorize(AppRole.User)]
     public async Task<IActionResult> GetGameState(Guid gameId, [FromQuery] MinigameType minigameType)
     {
-        _logger.LogInformation("Getting game state: GameId={GameId}, Type={Type}", gameId, minigameType);
+        GameStateResult result = await _gameService.GetGameStateAsync(gameId, minigameType);
         
-        // Load engine from DB state
-        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(minigameType, gameId);
-        if (engine == null)
+        if (!result.IsSuccess)
         {
-            _logger.LogWarning("Game not found: GameId={GameId}", gameId);
-            return NotFound(new { Message = "Game not found" });
+            return NotFound(new { Message = result.ErrorMessage });
         }
 
-        IGameState state = engine.GetState();
-        _logger.LogInformation("Game state retrieved: GameId={GameId}, State={State}", 
-            gameId, 
-            System.Text.Json.JsonSerializer.Serialize(state));
-
-        return Ok(new GameStateResponse
-        {
-            GameId = engine.GameId,
-            MinigameType = minigameType,
-            Players = engine.Players,
-            IsFinished = engine.IsFinished,
-            Winner = engine.Winner,
-            State = state
-        });
+        return Ok(result.Response);
     }
 
     [HttpGet("my-active")]
@@ -138,38 +65,27 @@ public class GameController : ControllerBase
             return Unauthorized();
         }
 
-        var gameSession = await _gameSessionRepository.GetActiveByPlayerIdAsync(userId);
-        if (gameSession == null)
+        ActiveGameResult result = await _gameService.GetActiveGameByPlayerIdAsync(userId);
+        
+        if (!result.IsSuccess)
         {
-            return NotFound(new { Message = "No active game found" });
+            return NotFound(new { Message = result.ErrorMessage });
         }
 
-        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(gameSession.MinigameType, gameSession.Id);
-        if (engine == null)
-        {
-            return NotFound(new { Message = "Game state not found" });
-        }
-
-        return Ok(new
-        {
-            GameId = engine.GameId,
-            Players = engine.Players,
-            IsFinished = engine.IsFinished,
-            Winner = engine.Winner,
-            State = engine.GetState()
-        });
+        return Ok(result.Response);
     }
 
     [HttpDelete("{gameId}")]
     [Authorize(AppRole.User)]
     public async Task<IActionResult> DeleteGame(Guid gameId, [FromQuery] MinigameType minigameType)
     {
-        bool removed = await _gameSessionRepository.DeleteAsync(gameId);
-        if (!removed)
+        DeleteGameResult result = await _gameService.DeleteGameAsync(gameId);
+        
+        if (!result.IsSuccess)
         {
-            return NotFound(new { Message = "Game not found" });
+            return NotFound(new { Message = result.Message });
         }
 
-        return Ok(new { Message = "Game deleted successfully" });
+        return Ok(new { Message = result.Message });
     }
 }

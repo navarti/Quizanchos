@@ -136,6 +136,7 @@ public static class Startup
 
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
+        services.AddScoped<GameService>();
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
