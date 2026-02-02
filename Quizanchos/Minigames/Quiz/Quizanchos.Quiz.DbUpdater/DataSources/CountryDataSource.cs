@@ -18,7 +18,6 @@ internal class CountryDataSource
 
     private async Task AddCountriesToListAsync()
     {
-        // TODO: Make wrapper for HttpClient
         HttpClient client = new HttpClient();
 
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, Url);

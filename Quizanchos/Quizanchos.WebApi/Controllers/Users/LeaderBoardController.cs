@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.Users;
 
-namespace Quizanchos.WebApi.Controllers;
+namespace Quizanchos.WebApi.Controllers.Users;
 
 [Route("[controller]/[action]")]
 public class LeaderBoardController : Controller

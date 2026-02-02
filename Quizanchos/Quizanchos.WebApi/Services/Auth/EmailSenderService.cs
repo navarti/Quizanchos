@@ -1,7 +1,7 @@
 ﻿using FluentEmail.Core;
 using FluentEmail.Core.Models;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Auth;
 
 public class EmailSenderService
 {

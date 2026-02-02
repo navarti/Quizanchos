@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Quizanchos.Domain.Entities;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 using Quizanchos.Common.Util;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Auth;
 
 public class DefaultUserRegistrationService : IUserRegistrationService
 {

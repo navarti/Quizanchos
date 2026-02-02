@@ -6,7 +6,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Users;
 
 public class UserProfileService
 {

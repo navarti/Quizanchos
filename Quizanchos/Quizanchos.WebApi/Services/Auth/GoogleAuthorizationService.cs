@@ -7,7 +7,7 @@ using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Util;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Auth;
 
 public class GoogleAuthorizationService
 {

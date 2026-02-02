@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Quizanchos.ViewModels;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services;
-using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.Users;
 
 namespace Quizanchos.WebApi.ViewControllers;
 

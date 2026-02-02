@@ -1,4 +1,6 @@
-﻿namespace Quizanchos.WebApi.Services;
+﻿using Quizanchos.WebApi.Services.Auth;
+
+namespace Quizanchos.WebApi.Services;
 
 public class ContainerService
 {

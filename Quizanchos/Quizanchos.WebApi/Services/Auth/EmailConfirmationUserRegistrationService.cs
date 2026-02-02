@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Auth;
 
 public class EmailConfirmationUserRegistrationService : IUserRegistrationService
 {

@@ -3,11 +3,10 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.Common.Util;
-using Quizanchos.WebApi.Services.Interfaces;
 using Quizanchos.WebApi.Util;
 using Quizanchos.Common.Enums;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Auth;
 
 public class AuthorizationService
 {

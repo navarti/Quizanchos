@@ -9,10 +9,12 @@ using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.Extensions;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
-using Quizanchos.WebApi.Controllers;
+using Quizanchos.WebApi.Controllers.Auth;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
-using Quizanchos.WebApi.Services.Interfaces;
+using Quizanchos.WebApi.Services.Auth;
+using Quizanchos.WebApi.Services.GameLogic;
+using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi;

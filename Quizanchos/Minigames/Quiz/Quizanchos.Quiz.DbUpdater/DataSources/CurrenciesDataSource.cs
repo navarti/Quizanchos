@@ -27,7 +27,6 @@ internal class CurrenciesDataSource
     {
         string urlWithApiKey = AddApiKeyToUrl();
 
-        // TODO: Make wrapper for HttpClient
         HttpClient client = new HttpClient();
 
         HttpRequestMessage httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, urlWithApiKey);

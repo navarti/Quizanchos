@@ -2,7 +2,7 @@ using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using System.Collections.Immutable;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.GameLogic;
 
 public interface IGameLogicFactory
 {

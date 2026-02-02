@@ -3,7 +3,7 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Users;
 
 public class UserRetrieverService
 {

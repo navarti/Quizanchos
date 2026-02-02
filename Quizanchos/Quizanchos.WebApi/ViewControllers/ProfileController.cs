@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.WebApi.Dto;
-using Quizanchos.WebApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Quizanchos.WebApi.Constants;
+using Quizanchos.WebApi.Services.Users;
 
 namespace Quizanchos.WebApi.ViewControllers;
 

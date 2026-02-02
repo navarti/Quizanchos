@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.Auth;
 
-namespace Quizanchos.WebApi.Controllers;
+namespace Quizanchos.WebApi.Controllers.Auth;
 
 [Route("[controller]/[action]")]
 [AllowAnonymous]

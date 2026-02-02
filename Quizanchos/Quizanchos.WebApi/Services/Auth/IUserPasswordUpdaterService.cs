@@ -1,6 +1,6 @@
 ﻿using Quizanchos.WebApi.Util;
 
-namespace Quizanchos.WebApi.Services.Interfaces;
+namespace Quizanchos.WebApi.Services.Auth;
 
 public interface IUserPasswordUpdaterService
 {

@@ -29,7 +29,6 @@ internal class MoviesDataSource
     {
         string urlWithApiKey = AddApiKeyToUrl(Url);
 
-        // TODO: Make wrapper for HttpClient
         HttpClient client = new HttpClient();
 
         bool stop = false;
