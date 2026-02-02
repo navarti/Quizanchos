@@ -18,6 +18,13 @@ public class QuizCardIntConfiguration : IEntityTypeConfiguration<QuizCardInt>
                 options => JsonSerializer.Serialize(options, (JsonSerializerOptions)null),
                 json => JsonSerializer.Deserialize<List<FeatureInt>>(json, (JsonSerializerOptions)null)
             )
+            .Metadata.SetValueComparer(
+                new ValueComparer<List<FeatureInt>>(
+                    (c1, c2) => c1.SequenceEqual(c2),
+                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+                    c => c.ToList()));
+
+        builder.Property(q => q.Options)
             .HasColumnType("nvarchar(max)");
     }
 }

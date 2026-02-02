@@ -61,7 +61,6 @@ public class QuizGameStateService
             {
                 existingCard = new QuizSessionCard
                 {
-                    Id = card.Id,
                     QuizGameSessionStateId = existingState.Id,
                     CardIndex = card.CardIndex,
                     CorrectOption = card.CorrectOption,
@@ -71,7 +70,7 @@ public class QuizGameStateService
                     EntityNamesJson = JsonSerializer.Serialize(card.EntityNames),
                     OptionValuesJson = JsonSerializer.Serialize(card.OptionValues)
                 };
-                existingState.Cards.Add(existingCard);
+                _context.QuizSessionCards.Add(existingCard);
             }
             else
             {
@@ -86,14 +85,14 @@ public class QuizGameStateService
                 
                 if (existingAnswer == null && answer.Value.HasValue)
                 {
-                    existingCard.PlayerAnswers.Add(new QuizSessionCardAnswer
+                    var newAnswer = new QuizSessionCardAnswer
                     {
-                        Id = Guid.NewGuid(),
                         QuizSessionCardId = existingCard.Id,
                         ApplicationUserId = answer.Key.ToString(),
                         OptionPicked = answer.Value,
                         AnsweredAt = DateTime.UtcNow
-                    });
+                    };
+                    _context.QuizSessionCardAnswers.Add(newAnswer);
                 }
                 else if (existingAnswer != null)
                 {

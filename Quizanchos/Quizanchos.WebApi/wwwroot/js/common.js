@@ -102,6 +102,7 @@ function openVerifyModal() {
 
 function closeVerifyModal() {
     const verifyModal = document.getElementById('verifyModal');
+    if (!verifyModal) return;
     const closeModalButton = document.querySelector('.modal-close');
     verifyModal.classList.remove('active'); 
     setTimeout(() => {
