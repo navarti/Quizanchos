@@ -8,7 +8,7 @@ using Quizanchos.WebApi.Services.GameLogic;
 using System.Collections.Immutable;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Controllers.Users;
+namespace Quizanchos.WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
