@@ -4,6 +4,7 @@ using Quizanchos.ViewModels;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services;
 using Quizanchos.WebApi.Services.Users;
+using Quizanchos.Domain.Repositories.Implementations;
 
 namespace Quizanchos.WebApi.ViewControllers;
 
@@ -13,12 +14,14 @@ public class HomeController : Controller
     
     private readonly QuizCategoryService _quizCategoryService;
     private readonly LeaderBoardService _leaderBoardService;
+    private readonly GameSessionRepository _gameSessionRepository;
     
-    public HomeController(LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService)
+    public HomeController(LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService, GameSessionRepository gameSessionRepository)
     {
         _leaderBoardService = leaderBoardService;
         _logger = logger;
-        _quizCategoryService = quizCategoryService ?? throw new ArgumentNullException(nameof(quizCategoryService));
+        _quizCategoryService = quizCategoryService;
+        _gameSessionRepository = gameSessionRepository;
     }
 
     [HttpGet("/")]
