@@ -266,7 +266,18 @@ let activeTimeline = null;
 
 function startTimeline(creationTime, secondsPerCard) {
     const timeline = document.getElementById('timeline');
-    const creationDate = new Date(creationTime);
+    
+    // Parse the creation time ensuring it's treated as UTC
+    // Backend sends DateTime.UtcNow, so we need to parse it correctly
+    let creationDate;
+    if (typeof creationTime === 'string') {
+        // Ensure the date string is parsed as UTC
+        creationDate = new Date(creationTime.endsWith('Z') ? creationTime : creationTime + 'Z');
+    } else {
+        creationDate = new Date(creationTime);
+    }
+    
+    console.log('[QUIZ-GAME] Timeline started - Creation time:', creationTime, 'Parsed as:', creationDate.toISOString(), 'Seconds per card:', secondsPerCard);
     
     function updateTimeline() {
         const now = new Date();
@@ -278,6 +289,7 @@ function startTimeline(creationTime, secondsPerCard) {
         if (progress < 100) {
             activeTimeline = requestAnimationFrame(updateTimeline);
         } else {
+            console.log('[QUIZ-GAME] Timeline expired - elapsed:', elapsed, 'seconds');
             showTimeUpModal();
         }
     }

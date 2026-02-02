@@ -89,16 +89,13 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
             state.PlayerScores[playerId]++;
         }
 
-        // After answering, move to the next card (if not the last card)
-        if (state.CurrentCardIndex < state.TotalCards - 1)
-        {
-            state.CurrentCardIndex++;
-        }
+        // After answering, move to the next card
+        state.CurrentCardIndex++;
     }
 
     public bool CheckFinished(QuizGameState state)
     {
-        return state.CurrentCardIndex >= state.TotalCards - 1;
+        return state.CurrentCardIndex >= state.TotalCards;
     }
 
     public Guid? DetermineWinner(QuizGameState state)
