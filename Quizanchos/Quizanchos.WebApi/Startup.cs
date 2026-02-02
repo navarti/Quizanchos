@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Quartz;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories;
-using Quizanchos.Quiz;
+using Quizanchos.Domain.Repositories.Implementations;
+using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.Extensions;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
@@ -103,12 +103,12 @@ public static class Startup
         string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
             ?? throw Util.CriticalExceptionFactory.CreateConfigException("DefaultConnection");
 
+        // Single unified DbContext for all entities
         services.AddDbContext<QuizanchosDbContext>(options =>
         {
             options.UseSqlServer(connectionString);
         }, ServiceLifetime.Scoped);
 
-        services.AddQuizDbContext(connectionString);
         services.AddQuizRepositories();
         services.AddQuizServices();
 

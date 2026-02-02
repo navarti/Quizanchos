@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Quizanchos.Domain;
-using Quizanchos.Quiz;
 
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
@@ -23,19 +22,9 @@ var host = Host.CreateDefaultBuilder(args)
                 opt.MigrationsHistoryTable("__EFMigrationsHistoryQuizanshos", schema: "entity_framework");
             });
         });
-
-        services.AddDbContext<QuizDbContext>(options =>
-        {
-            options.UseSqlServer(connectionString, opt =>
-            {
-                opt.MigrationsAssembly(migrationsAssembly);
-                opt.MigrationsHistoryTable("__EFMigrationsHistoryQuiz", schema: "entity_framework");
-            });
-        });
     })
     .Build();
 
 using var scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 
 scope.ServiceProvider.GetRequiredService<QuizanchosDbContext>().Database.Migrate();
-scope.ServiceProvider.GetRequiredService<QuizDbContext>().Database.Migrate();

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
-using Quizanchos.Domain.Repositories;
+using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Services;
 using System.Collections.Immutable;

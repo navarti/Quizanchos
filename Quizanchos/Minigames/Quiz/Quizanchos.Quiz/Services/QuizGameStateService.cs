@@ -1,18 +1,19 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Quiz.Entities;
+using Quizanchos.Domain.Entities.Quiz;
+using Quizanchos.Domain.Repositories.Quiz.Interfaces;
 using Quizanchos.Quiz.GameLogic;
-using Quizanchos.Quiz.Repositories.Interfaces;
 
 namespace Quizanchos.Quiz.Services;
 
 public class QuizGameStateService
 {
-    private readonly QuizDbContext _context;
+    private readonly QuizanchosDbContext _context;
     private readonly IQuizGameSessionRepository _repository;
 
-    public QuizGameStateService(QuizDbContext context, IQuizGameSessionRepository repository)
+    public QuizGameStateService(QuizanchosDbContext context, IQuizGameSessionRepository repository)
     {
         _context = context;
         _repository = repository;

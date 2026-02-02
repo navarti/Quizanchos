@@ -2,9 +2,8 @@ using Microsoft.Extensions.Logging;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories;
+using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.GameLogic;
-using Quizanchos.Quiz.Repositories.Interfaces;
 using System.Collections.Immutable;
 
 namespace Quizanchos.Quiz.Services;

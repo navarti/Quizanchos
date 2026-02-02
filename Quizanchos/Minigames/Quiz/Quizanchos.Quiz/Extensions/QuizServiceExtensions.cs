@@ -1,23 +1,14 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Quizanchos.Quiz.Repositories.Interfaces;
-using Quizanchos.Quiz.Repositories.Realizations;
+using Quizanchos.Domain.Repositories.Quiz.Interfaces;
+using Quizanchos.Domain.Repositories.Quiz.Implementations;
 using Quizanchos.Quiz.Services;
+using Quizanchos.Domain.Repositories.Interfaces;
+using Quizanchos.Domain.Repositories.Implementations;
 
 namespace Quizanchos.Quiz.Extensions;
 
 public static class QuizServiceExtensions
 {
-    public static IServiceCollection AddQuizDbContext(this IServiceCollection services, string connectionString)
-    {
-        services.AddDbContext<QuizDbContext>(options =>
-        {
-            options.UseSqlServer(connectionString);
-        }, ServiceLifetime.Scoped);
-
-        return services;
-    }
-
     public static IServiceCollection AddQuizRepositories(this IServiceCollection services)
     {
         services.AddTransient(typeof(IEntityRepository<,>), typeof(EntityRepositoryBase<,>));
