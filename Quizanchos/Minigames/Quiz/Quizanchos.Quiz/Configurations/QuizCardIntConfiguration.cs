@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Quizanchos.Quiz.Entities;
-using Quizanchos.Quiz.Entities.Abstractions;
+using Quizanchos.Domain.Entities.Quiz;
+using Quizanchos.Domain.Entities.Quiz.Abstractions;
 using System.Text.Json;
 
 namespace Quizanchos.Quiz.Configurations;

@@ -1,6 +1,6 @@
 using AutoMapper;
 using Quizanchos.Quiz.Dto;
-using Quizanchos.Quiz.Entities;
+using Quizanchos.Domain.Entities.Quiz;
 
 namespace Quizanchos.Quiz.Util;
 

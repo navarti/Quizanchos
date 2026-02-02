@@ -1,5 +1,5 @@
 ﻿using Quizanchos.Common.FeatureTypes;
-using Quizanchos.Quiz.Entities;
+using Quizanchos.Domain.Entities.Quiz;
 
 namespace Quizanchos.DbUpdater.Updater.FeatureUpdaters;
 

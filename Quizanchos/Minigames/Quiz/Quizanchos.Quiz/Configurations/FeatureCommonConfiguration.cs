@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Quizanchos.Quiz.Entities.Abstractions;
+using Quizanchos.Domain.Entities.Quiz.Abstractions;
 
 namespace Quizanchos.Quiz.Configurations;
 

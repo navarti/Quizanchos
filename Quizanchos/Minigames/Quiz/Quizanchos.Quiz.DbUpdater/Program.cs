@@ -5,9 +5,9 @@ using Microsoft.Extensions.Hosting;
 using Quizanchos.DbUpdater.SpecificUpdaters;
 using Quizanchos.DbUpdater.Updater;
 using Quizanchos.DbUpdater.Updater.FeatureUpdaters;
-using Quizanchos.Quiz.Repositories.Interfaces;
-using Quizanchos.Quiz;
-using Quizanchos.Quiz.Repositories.Realizations;
+using Quizanchos.Domain.Repositories.Quiz.Interfaces;
+using Quizanchos.Domain.Repositories.Quiz.Implementations;
+using Quizanchos.Domain;
 
 namespace Quizanchos.DbUpdater;
 
@@ -43,7 +43,7 @@ internal class Program
                 var config = context.Configuration;
                 var connectionString = config.GetConnectionString("DefaultConnection");
 
-                services.AddDbContext<QuizDbContext>(options =>
+                services.AddDbContext<QuizanchosDbContext>(options =>
                 {
                     options.UseSqlServer(connectionString);
                 });
