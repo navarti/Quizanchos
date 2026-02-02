@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.Common.Enums;
+﻿namespace Quizanchos.Common.Quiz.Enums;
 
 public enum OptionCountEnum
 {
