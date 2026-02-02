@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.Common.FeatureTypes;
+﻿namespace Quizanchos.Common.Quiz.FeatureTypes;
 
 public class FeatureValueFloat : FeatureValue
 {

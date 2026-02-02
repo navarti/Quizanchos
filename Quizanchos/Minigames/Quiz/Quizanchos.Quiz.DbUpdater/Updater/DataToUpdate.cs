@@ -1,4 +1,4 @@
-﻿using Quizanchos.Common.Enums;
+﻿using Quizanchos.Common.Quiz.Enums;
 
 namespace Quizanchos.DbUpdater.Updater;
 

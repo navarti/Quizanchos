@@ -1,4 +1,4 @@
-using Quizanchos.Common.FeatureTypes;
+using Quizanchos.Common.Quiz.FeatureTypes;
 using Quizanchos.Domain.Entities.Quiz.Abstractions;
 
 namespace Quizanchos.Domain.Entities.Quiz;

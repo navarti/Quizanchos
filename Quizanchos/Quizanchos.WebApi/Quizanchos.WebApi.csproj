@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dto\Abstractions\**" />
+    <Content Remove="Dto\Abstractions\**" />
+    <EmbeddedResource Remove="Dto\Abstractions\**" />
+    <None Remove="Dto\Abstractions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
     <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.2" />
@@ -27,10 +34,6 @@
     <ProjectReference Include="..\Minigames\Quiz\Quizanchos.Quiz\Quizanchos.Quiz.csproj" />
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\Quizanchos.Core\Quizanchos.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Dto\Abstractions\" />
   </ItemGroup>
 
 </Project>

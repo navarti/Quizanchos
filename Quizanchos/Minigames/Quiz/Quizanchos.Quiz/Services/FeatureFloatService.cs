@@ -1,8 +1,8 @@
-using Quizanchos.Common.FeatureTypes;
 using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities.Quiz;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Domain.Repositories.Quiz.Interfaces;
+using Quizanchos.Common.Quiz.FeatureTypes;
 
 namespace Quizanchos.Quiz.Services;
 
