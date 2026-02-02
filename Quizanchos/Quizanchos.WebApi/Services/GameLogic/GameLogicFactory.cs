@@ -5,7 +5,7 @@ using Quizanchos.Quiz.Services;
 using System.Collections.Immutable;
 using System.Text.Json;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.GameLogic;
 
 public class GameLogicFactory : IGameLogicFactory
 {

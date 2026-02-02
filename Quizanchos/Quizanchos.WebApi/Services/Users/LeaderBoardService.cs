@@ -5,7 +5,7 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.Quiz.Util;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Users;
 
 public class LeaderBoardService
 {

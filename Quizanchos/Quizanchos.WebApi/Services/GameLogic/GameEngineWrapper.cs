@@ -1,6 +1,6 @@
 using Quizanchos.Core;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.GameLogic;
 
 public class GameEngineWrapper<TState, TMove> : IGameEngine
     where TState : IGameState

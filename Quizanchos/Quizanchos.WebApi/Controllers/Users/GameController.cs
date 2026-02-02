@@ -4,11 +4,11 @@ using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Constants;
-using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.GameLogic;
 using System.Collections.Immutable;
 using System.Security.Claims;
 
-namespace Quizanchos.WebApi.Controllers;
+namespace Quizanchos.WebApi.Controllers.Users;
 
 [Route("api/[controller]")]
 [ApiController]

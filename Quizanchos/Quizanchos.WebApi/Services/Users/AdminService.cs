@@ -5,7 +5,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Dto;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Users;
 
 public class AdminService
 {

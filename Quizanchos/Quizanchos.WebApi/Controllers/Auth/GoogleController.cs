@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Quizanchos.Domain.Entities;
-using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Services.Auth;
 
-namespace Quizanchos.WebApi.Controllers;
+namespace Quizanchos.WebApi.Controllers.Auth;
 
 [Route("[controller]/[action]")]
 public class GoogleAuthController : Controller
@@ -38,7 +38,6 @@ public class GoogleAuthController : Controller
         AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(AuthScheme);
         if (!authenticateResult.Succeeded)
         {
-            // TODO: change this
             return RedirectToAction("Login", "Account");
         }
 

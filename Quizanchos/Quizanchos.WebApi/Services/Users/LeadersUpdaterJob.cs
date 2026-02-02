@@ -7,7 +7,7 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 
-namespace Quizanchos.WebApi.Services;
+namespace Quizanchos.WebApi.Services.Users;
 
 public class LeadersUpdaterJob : IJob
 {
