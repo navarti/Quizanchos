@@ -8,12 +8,12 @@ public class GameEngine<TState, TMove>
     private readonly IGameLogic<TState, TMove> _logic;
     public TState State { get; }
 
-    private readonly HashSet<Guid> _movesReceived = new();
+    private readonly HashSet<string> _movesReceived = new();
 
     public GameEngine(
         IGameLogic<TState, TMove> logic,
         Guid gameId,
-        ImmutableArray<Guid> players)
+        ImmutableArray<string> players)
     {
         _logic = logic;
         State = _logic.CreateInitialState(gameId, players);
@@ -27,7 +27,7 @@ public class GameEngine<TState, TMove>
         State = existingState;
     }
 
-    public MoveResult MakeMove(Guid playerId, TMove move)
+    public MoveResult MakeMove(string playerId, TMove move)
     {
         if (State.IsFinished)
             return MoveResult.Failure("Game is finished");

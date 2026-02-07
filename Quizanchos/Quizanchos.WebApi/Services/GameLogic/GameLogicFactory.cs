@@ -20,7 +20,7 @@ public class GameLogicFactory : IGameLogicFactory
         _quizEngineFactory = quizEngineFactory;
     }
 
-    public async Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
+    public async Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
     {
         _logger.LogInformation("Creating game engine for type: {Type}, GameId: {GameId}, Players: {PlayerCount}", 
             type, gameId, playerIds.Length);
@@ -60,7 +60,7 @@ public class GameLogicFactory : IGameLogicFactory
         }
     }
 
-    private async Task<IGameEngine> CreateQuizEngine(Guid gameId, ImmutableArray<Guid> playerIds, Dictionary<string, object> parameters)
+    private async Task<IGameEngine> CreateQuizEngine(Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
     {
         int totalCards = GetParameter<int>(parameters, "totalCards", 10);
         Guid? categoryId = GetParameter<Guid?>(parameters, "categoryId", null);

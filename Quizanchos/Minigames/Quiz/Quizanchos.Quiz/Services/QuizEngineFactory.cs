@@ -29,7 +29,7 @@ public class QuizEngineFactory
 
     public async Task<GameEngine<QuizGameState, QuizMove>> CreateQuizEngineAsync(
         Guid gameId, 
-        ImmutableArray<Guid> playerIds,
+        ImmutableArray<string> playerIds,
         int totalCards,
         Guid? categoryId,
         GameLevel gameLevel,
@@ -49,13 +49,13 @@ public class QuizEngineFactory
             CreatedAt = DateTime.UtcNow
         };
 
-        foreach (Guid playerId in playerIds)
+        foreach (string playerId in playerIds)
         {
             gameSession.Players.Add(new GameSessionPlayer
             {
                 Id = Guid.NewGuid(),
                 GameSessionId = gameId,
-                ApplicationUserId = playerId.ToString(),
+                ApplicationUserId = playerId,
                 JoinedAt = DateTime.UtcNow
             });
         }

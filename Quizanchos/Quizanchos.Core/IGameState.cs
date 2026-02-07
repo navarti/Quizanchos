@@ -6,8 +6,8 @@ public interface IGameState
 {
     Guid GameId { get; }
     MinigameType MinigameType { get; }
-    IReadOnlyList<Guid> Players { get; }
+    IReadOnlyList<string> Players { get; }
 
     bool IsFinished { get; set; }
-    Guid? Winner { get; set; }
+    string? Winner { get; set; }
 }

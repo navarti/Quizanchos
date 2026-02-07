@@ -8,13 +8,13 @@ public class QuizGameState : IGameState
     public MinigameType MinigameType => MinigameType.Quiz;
 
     public Guid GameId { get; set; }
-    public IReadOnlyList<Guid> Players { get; set; } = Array.Empty<Guid>();
+    public IReadOnlyList<string> Players { get; set; } = Array.Empty<string>();
     public bool IsFinished { get; set; }
-    public Guid? Winner { get; set; }
+    public string? Winner { get; set; }
 
     // Quiz-specific state
     public int CurrentCardIndex { get; set; } = -1;
-    public Dictionary<Guid, int> PlayerScores { get; set; } = new();
+    public Dictionary<string, int> PlayerScores { get; set; } = new();
     public List<QuizCard> Cards { get; set; } = new();
     public int TotalCards { get; set; }
     
@@ -31,7 +31,7 @@ public class QuizGameState : IGameState
         public Guid Id { get; set; }
         public int CardIndex { get; set; }
         public int CorrectOption { get; set; }
-        public Dictionary<Guid, int?> PlayerAnswers { get; set; } = new();
+        public Dictionary<string, int?> PlayerAnswers { get; set; } = new();
         public Guid[] EntityIds { get; set; } = Array.Empty<Guid>();
         public DateTime CreationTime { get; set; }
         public int? OptionPicked { get; set; }

@@ -8,5 +8,5 @@ public record GameMoveResponse
     public MinigameType MinigameType { get; init; }
     public object State { get; init; } = null!;
     public bool IsFinished { get; init; }
-    public Guid? Winner { get; init; }
+    public string? Winner { get; init; }
 }

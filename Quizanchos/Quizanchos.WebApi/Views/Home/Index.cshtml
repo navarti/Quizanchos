@@ -49,16 +49,9 @@
                 <h2>Your Active Session</h2>
                 <div class="session-item">
                     <div class="session-info">
-                        <p><strong>Quiz Name:</strong> @Model.QuizName</p>
-                        <p><strong>Start Time:</strong> @Model.FormattedCreationTime</p>
-                        <p><strong>Progress:</strong> @Model.Progress</p>
-                        <p><strong>Score:</strong> @Model.Score</p>
-                        // TODO:GameSession
-                        @* <p><strong>Game Level:</strong> @Model.ActiveSession.GameLevel</p> *@
-                        @* <p><strong>Time Per Card:</strong> @Model.ActiveSession.SecondPerCard seconds</p> *@
+                        <p><strong>Minigame:</strong> @Model.ActiveSession.MinigameType</p>
                     </div>
-                        @* TODO:GameSession *@
-                    @* <a href="/Quiz/@Model.ActiveSession.Id" class="join-btn">Continue →</a> *@
+                    <a href="/Quiz/@Model.ActiveSession.GameId" class="join-btn">Continue →</a>
                 </div>
             </div>
         }
