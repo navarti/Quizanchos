@@ -7,6 +7,7 @@ public interface IGameRules<TState, TMove>
     bool CheckFinished(TState state);
     string? DetermineWinner(TState state);
     IEnumerable<string> GetExpectedPlayers(TState state);
+    bool NeedToFinish(TState state);
     // ??? TicTacToe -> ???? ???????
     // ??? Quiz -> ??? ??????
 }

@@ -25,6 +25,15 @@ public class GameService
 
     public async Task<CreateGameResponse> CreateGameAsync(CreateGameRequest request)
     {
+        foreach (var playerId in request.PlayerIds)
+        {
+            var activeGame = await _gameSessionRepository.GetActiveByPlayerIdAsync(playerId);
+            if (activeGame != null)
+            {
+                throw new InvalidOperationException($"Player {playerId} already has an active game session (GameId: {activeGame.Id})");
+            }
+        }
+
         Guid gameId = Guid.NewGuid();
 
         _logger.LogInformation("Creating game: Type={Type}, PlayerIds={PlayerIds}, Parameters={Parameters}",
@@ -68,6 +77,20 @@ public class GameService
             return GameMoveResult.NotFound("Game state not found");
         }
 
+        // Check if game should be finished
+        var finishResult = await CheckFinish(engine, gameSession.MinigameType);
+        if (finishResult != null)
+        {
+            return GameMoveResult.Success(new GameMoveResponse
+            {
+                Success = true,
+                MinigameType = gameSession.MinigameType,
+                State = finishResult.Response!.State,
+                IsFinished = true,
+                Winner = finishResult.Response.Winner
+            });
+        }
+
         MoveResult result = engine.MakeMove(playerId, request.Move);
 
         if (!result.IsSuccess)
@@ -101,6 +124,13 @@ public class GameService
             return GameStateResult.NotFound("Game not found");
         }
 
+        // Check if game should be finished
+        var finishResult = await CheckFinish(engine, minigameType);
+        if (finishResult != null)
+        {
+            return finishResult;
+        }
+
         IGameState state = engine.GetState();
         _logger.LogInformation("Game state retrieved: GameId={GameId}, State={State}",
             gameId,
@@ -131,6 +161,20 @@ public class GameService
             return ActiveGameResult.NotFound("Game state not found");
         }
 
+        // Check if game should be finished
+        var finishResult = await CheckFinish(engine, gameSession.MinigameType);
+        if (finishResult != null)
+        {
+            return ActiveGameResult.Success(new ActiveGameResponse
+            {
+                GameId = finishResult.Response!.GameId,
+                Players = finishResult.Response.Players,
+                IsFinished = true,
+                Winner = finishResult.Response.Winner,
+                State = (IGameState)finishResult.Response.State
+            });
+        }
+
         return ActiveGameResult.Success(new ActiveGameResponse
         {
             GameId = engine.GameId,
@@ -150,6 +194,36 @@ public class GameService
         }
 
         return DeleteGameResult.Success("Game deleted successfully");
+    }
+
+    private async Task<GameStateResult?> CheckFinish(IGameEngine engine, MinigameType minigameType)
+    {
+        if (engine.NeedToFinish())
+        {
+            var gameSession = await _gameSessionRepository.GetByIdAsync(engine.GameId);
+            if (gameSession != null)
+            {
+                gameSession.IsFinished = true;
+                gameSession.IsActive = false;
+                await _gameSessionRepository.UpdateAsync(gameSession);
+            }
+
+            IGameState state = engine.GetState();
+            state.IsFinished = true;
+            await _gameLogicFactory.SaveGameState(minigameType, engine.GameId, state);
+
+            return GameStateResult.Success(new GameStateResponse
+            {
+                GameId = engine.GameId,
+                MinigameType = minigameType,
+                Players = engine.Players,
+                IsFinished = true,
+                Winner = engine.Winner,
+                State = state
+            });
+        }
+
+        return null;
     }
 }
 

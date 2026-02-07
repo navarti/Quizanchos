@@ -11,4 +11,5 @@ public interface IGameEngine
     
     MoveResult MakeMove(string playerId, GameMove move);
     IGameState GetState();
+    bool NeedToFinish();
 }

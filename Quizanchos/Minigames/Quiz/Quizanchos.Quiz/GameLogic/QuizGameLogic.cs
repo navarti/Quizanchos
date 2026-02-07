@@ -144,4 +144,16 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
             CreationTime = DateTime.UtcNow
         });
     }
+
+    public bool NeedToFinish(QuizGameState state)
+    {
+        if (state.CurrentCardIndex < 0 || state.CurrentCardIndex >= state.Cards.Count)
+        {
+            return false;
+        }
+
+        var currentCard = state.Cards[state.CurrentCardIndex];
+        var expirationTime = currentCard.CreationTime.AddSeconds(_secondsPerCard);
+        return DateTime.UtcNow > expirationTime;
+    }
 }
