@@ -30,7 +30,7 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         _cardGenerator = cardGenerator;
     }
 
-    public QuizGameState CreateInitialState(Guid gameId, ImmutableArray<Guid> players)
+    public QuizGameState CreateInitialState(Guid gameId, ImmutableArray<string> players)
     {
         QuizGameState state = new QuizGameState
         {
@@ -48,7 +48,7 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
             IsTerminatedByTime = false
         };
 
-        foreach (Guid playerId in players)
+        foreach (string playerId in players)
         {
             state.PlayerScores[playerId] = 0;
         }
@@ -56,7 +56,7 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         return state;
     }
 
-    public MoveResult ValidateMove(QuizGameState state, QuizMove move, Guid playerId)
+    public MoveResult ValidateMove(QuizGameState state, QuizMove move, string playerId)
     {
         if (state.CurrentCardIndex < 0 || state.CurrentCardIndex >= state.Cards.Count)
         {
@@ -78,7 +78,7 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         return MoveResult.Success;
     }
 
-    public void ApplyMove(QuizGameState state, QuizMove move, Guid playerId)
+    public void ApplyMove(QuizGameState state, QuizMove move, string playerId)
     {
         var currentCard = state.Cards[state.CurrentCardIndex];
         currentCard.PlayerAnswers[playerId] = move.OptionPicked;
@@ -98,7 +98,7 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         return state.CurrentCardIndex >= state.TotalCards;
     }
 
-    public Guid? DetermineWinner(QuizGameState state)
+    public string? DetermineWinner(QuizGameState state)
     {
         if (state.PlayerScores.Count == 0)
             return null;
@@ -112,11 +112,11 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         return winners[0].Key;
     }
 
-    public IEnumerable<Guid> GetExpectedPlayers(QuizGameState state)
+    public IEnumerable<string> GetExpectedPlayers(QuizGameState state)
     {
         if (state.CurrentCardIndex < 0 || state.CurrentCardIndex >= state.Cards.Count)
         {
-            return Enumerable.Empty<Guid>();
+            return Enumerable.Empty<string>();
         }
 
         var currentCard = state.Cards[state.CurrentCardIndex];
@@ -140,7 +140,7 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
             EntityIds = entityIds,
             EntityNames = entityNames,
             OptionValues = optionValues,
-            PlayerAnswers = new Dictionary<Guid, int?>(),
+            PlayerAnswers = new Dictionary<string, int?>(),
             CreationTime = DateTime.UtcNow
         });
     }

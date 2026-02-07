@@ -22,6 +22,7 @@ public class UserRetrieverService
 
     public async Task<ApplicationUser> GetUserByClaims(ClaimsPrincipal claimsPrincipal)
     {
+        ApplicationUser us;
         return await _userManager.GetUserAsync(claimsPrincipal) ?? throw HandledExceptionFactory.CreateNullException(nameof(ApplicationUser));
     }
 }

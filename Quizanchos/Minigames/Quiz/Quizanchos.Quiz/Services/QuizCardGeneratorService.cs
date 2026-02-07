@@ -136,7 +136,7 @@ public class QuizCardGeneratorService
             EntityIds = entityIds,
             EntityNames = entityNames,
             OptionValues = optionValues,
-            PlayerAnswers = new Dictionary<Guid, int?>(),
+            PlayerAnswers = new Dictionary<string, int?>(),
             CreationTime = DateTime.UtcNow
         });
         

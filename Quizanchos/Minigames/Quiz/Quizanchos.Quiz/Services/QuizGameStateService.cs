@@ -43,9 +43,9 @@ public class QuizGameStateService
 
         // Update game session
         existingState.GameSession.IsFinished = state.IsFinished;
-        if (state.Winner.HasValue)
+        if (!string.IsNullOrEmpty(state.Winner))
         {
-            existingState.GameSession.WinnerId = state.Winner.Value.ToString();
+            existingState.GameSession.WinnerId = state.Winner;
             existingState.GameSession.FinishedAt = DateTime.UtcNow;
         }
         if (state.IsFinished)
@@ -81,14 +81,14 @@ public class QuizGameStateService
             foreach (var answer in card.PlayerAnswers)
             {
                 QuizSessionCardAnswer? existingAnswer = existingCard.PlayerAnswers
-                    .FirstOrDefault(a => a.ApplicationUserId == answer.Key.ToString());
+                    .FirstOrDefault(a => a.ApplicationUserId == answer.Key);
                 
                 if (existingAnswer == null && answer.Value.HasValue)
                 {
                     var newAnswer = new QuizSessionCardAnswer
                     {
                         QuizSessionCardId = existingCard.Id,
-                        ApplicationUserId = answer.Key.ToString(),
+                        ApplicationUserId = answer.Key,
                         OptionPicked = answer.Value,
                         AnsweredAt = DateTime.UtcNow
                     };
@@ -105,7 +105,7 @@ public class QuizGameStateService
         foreach (var score in state.PlayerScores)
         {
             QuizSessionPlayerScore? existingScore = existingState.PlayerScores
-                .FirstOrDefault(s => s.ApplicationUserId == score.Key.ToString());
+                .FirstOrDefault(s => s.ApplicationUserId == score.Key);
             
             if (existingScore != null)
             {
@@ -159,9 +159,9 @@ public class QuizGameStateService
         QuizGameState state = new QuizGameState
         {
             GameId = sessionState.GameSessionId,
-            Players = sessionState.GameSession.Players.Select(p => Guid.Parse(p.ApplicationUserId)).ToList(),
+            Players = sessionState.GameSession.Players.Select(p => p.ApplicationUserId).ToList(),
             IsFinished = sessionState.GameSession.IsFinished,
-            Winner = sessionState.GameSession.WinnerId != null ? Guid.Parse(sessionState.GameSession.WinnerId) : null,
+            Winner = sessionState.GameSession.WinnerId,
             CurrentCardIndex = sessionState.CurrentCardIndex,
             TotalCards = sessionState.TotalCards,
             QuizCategoryId = sessionState.QuizCategoryId,
@@ -175,7 +175,7 @@ public class QuizGameStateService
         // Convert player scores
         foreach (var score in sessionState.PlayerScores)
         {
-            state.PlayerScores[Guid.Parse(score.ApplicationUserId)] = score.Score;
+            state.PlayerScores[score.ApplicationUserId] = score.Score;
         }
 
         // Convert cards
@@ -195,7 +195,7 @@ public class QuizGameStateService
 
             foreach (var answer in card.PlayerAnswers)
             {
-                gameCard.PlayerAnswers[Guid.Parse(answer.ApplicationUserId)] = answer.OptionPicked;
+                gameCard.PlayerAnswers[answer.ApplicationUserId] = answer.OptionPicked;
             }
 
             state.Cards.Add(gameCard);

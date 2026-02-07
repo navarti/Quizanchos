@@ -52,7 +52,7 @@ public class GameService
         };
     }
 
-    public async Task<GameMoveResult> MakeMoveAsync(GameRequest request)
+    public async Task<GameMoveResult> MakeMoveAsync(GameRequest request, string playerId)
     {
         // Load game session from DB
         var gameSession = await _gameSessionRepository.GetByIdAsync(request.GameId);
@@ -68,7 +68,7 @@ public class GameService
             return GameMoveResult.NotFound("Game state not found");
         }
 
-        MoveResult result = engine.MakeMove(request.PlayerId, request.Move);
+        MoveResult result = engine.MakeMove(playerId, request.Move);
 
         if (!result.IsSuccess)
         {
@@ -198,10 +198,10 @@ public record ActiveGameResult
 public record ActiveGameResponse
 {
     public Guid GameId { get; init; }
-    public IReadOnlyList<Guid> Players { get; init; } = Array.Empty<Guid>();
+    public IReadOnlyList<string> Players { get; init; } = Array.Empty<string>();
     public bool IsFinished { get; init; }
-    public Guid? Winner { get; init; }
-    public object State { get; init; } = null!;
+    public string? Winner { get; init; }
+    public IGameState State { get; init; } = null!;
 }
 
 public record DeleteGameResult

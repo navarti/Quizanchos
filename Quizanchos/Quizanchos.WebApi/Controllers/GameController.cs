@@ -31,7 +31,13 @@ public class GameController : ControllerBase
     [Authorize(AppRole.User)]
     public async Task<IActionResult> MakeMove([FromBody] GameRequest request)
     {
-        GameMoveResult result = await _gameService.MakeMoveAsync(request);
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        GameMoveResult result = await _gameService.MakeMoveAsync(request, userId);
         
         if (!result.IsSuccess)
         {

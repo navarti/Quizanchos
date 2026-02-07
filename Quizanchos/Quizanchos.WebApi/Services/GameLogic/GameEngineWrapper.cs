@@ -13,11 +13,11 @@ public class GameEngineWrapper<TState, TMove> : IGameEngine
     }
 
     public Guid GameId => _engine.State.GameId;
-    public IReadOnlyList<Guid> Players => _engine.State.Players;
+    public IReadOnlyList<string> Players => _engine.State.Players;
     public bool IsFinished => _engine.State.IsFinished;
-    public Guid? Winner => _engine.State.Winner;
+    public string? Winner => _engine.State.Winner;
 
-    public MoveResult MakeMove(Guid playerId, GameMove move)
+    public MoveResult MakeMove(string playerId, GameMove move)
     {
         if (move is not TMove typedMove)
         {

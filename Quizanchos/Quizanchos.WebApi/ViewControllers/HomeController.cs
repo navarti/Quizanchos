@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using Quizanchos.ViewModels;
+using Quizanchos.Core;
+using Quizanchos.Domain.Repositories.Implementations;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services;
+using Quizanchos.ViewModels;
+using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Services.Users;
-using Quizanchos.Domain.Repositories.Implementations;
+using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Quizanchos.WebApi.ViewControllers;
 
@@ -14,28 +17,29 @@ public class HomeController : Controller
     
     private readonly QuizCategoryService _quizCategoryService;
     private readonly LeaderBoardService _leaderBoardService;
-    private readonly GameSessionRepository _gameSessionRepository;
+    private readonly GameService _gameService;
     
-    public HomeController(LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService, GameSessionRepository gameSessionRepository)
+    public HomeController(LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService, GameService gameService)
     {
         _leaderBoardService = leaderBoardService;
         _logger = logger;
         _quizCategoryService = quizCategoryService;
-        _gameSessionRepository = gameSessionRepository;
+        _gameService = gameService;
     }
 
     [HttpGet("/")]
     public async Task<IActionResult> Index()
     {
         List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
-        object? activeGameSession = null;
+        IGameState? activeGameSession = null;
         string quizName = "Unknown Category";
 
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 3, skip: 0); 
         if (User.Identity?.IsAuthenticated == true)
         {
-            // TODO:GameSession
-            // activeGameSession = ...
+            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is not null)
+                activeGameSession = (await _gameService.GetActiveGameByPlayerIdAsync(userId)).Response?.State;
         }
 
         var viewModel = new HomeViewModel
