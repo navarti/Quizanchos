@@ -31,4 +31,9 @@ public class GameEngineWrapper<TState, TMove> : IGameEngine
     {
         return _engine.State;
     }
+
+    public bool NeedToFinish()
+    {
+        return _engine.NeedToFinish();
+    }
 }

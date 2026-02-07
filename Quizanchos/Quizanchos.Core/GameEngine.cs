@@ -58,4 +58,12 @@ public class GameEngine<TState, TMove>
 
         return MoveResult.Success;
     }
+
+    public bool NeedToFinish()
+    {
+        if (State.IsFinished)
+            return false;
+
+        return _logic.NeedToFinish(State);
+    }
 }
