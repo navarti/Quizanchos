@@ -148,11 +148,11 @@ function setupButtons(gameId, userId) {
     const newGameBtn = document.getElementById('newGameBtn');
     const playAgainBtn = document.getElementById('playAgainBtn');
     const returnHomeBtn = document.getElementById('returnHomeBtn');
+    const finishGameBtn = document.getElementById('finishGameBtn');
 
-    async function startNewGame() {
+    async function finishAndStartNew() {
         try {
-            // Delete current game first
-            await game2048Client.deleteGame(gameId);
+            await game2048Client.finishGame(gameId);
         } catch (_) { /* ignore */ }
 
         try {
@@ -165,7 +165,23 @@ function setupButtons(gameId, userId) {
         }
     }
 
-    if (newGameBtn) newGameBtn.addEventListener('click', startNewGame);
-    if (playAgainBtn) playAgainBtn.addEventListener('click', startNewGame);
+    async function finishCurrentGame() {
+        try {
+            const result = await game2048Client.finishGame(gameId);
+            if (result) {
+                const state = result.state || {};
+                const score = state.score ?? state.Score ?? 0;
+                const bestTile = state.bestTile ?? state.BestTile ?? 0;
+                const moveCount = state.moveCount ?? state.MoveCount ?? 0;
+                showGameOver(score, bestTile, moveCount);
+            }
+        } catch (error) {
+            alert('Failed to finish game: ' + error.message);
+        }
+    }
+
+    if (finishGameBtn) finishGameBtn.addEventListener('click', finishCurrentGame);
+    if (newGameBtn) newGameBtn.addEventListener('click', finishAndStartNew);
+    if (playAgainBtn) playAgainBtn.addEventListener('click', finishAndStartNew);
     if (returnHomeBtn) returnHomeBtn.addEventListener('click', () => { window.location.href = '/'; });
 }

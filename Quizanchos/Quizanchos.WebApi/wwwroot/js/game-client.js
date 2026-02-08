@@ -110,13 +110,13 @@ class GameClient {
     }
 
     /**
-     * Delete a game session
+     * Finish a game session
      * @param {string} gameId - Game session ID
-     * @returns {Promise<void>}
+     * @returns {Promise<Object>} - Finish response with final state
      */
-    async deleteGame(gameId) {
-        const response = await fetch(`${this.baseUrl}/${gameId}?minigameType=${this.minigameType}`, {
-            method: 'DELETE',
+    async finishGame(gameId) {
+        const response = await fetch(`${this.baseUrl}/${gameId}/finish?minigameType=${this.minigameType}`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -124,7 +124,7 @@ class GameClient {
 
         if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.message || 'Failed to delete game');
+            throw new Error(error.message || 'Failed to finish game');
         }
 
         return await response.json();

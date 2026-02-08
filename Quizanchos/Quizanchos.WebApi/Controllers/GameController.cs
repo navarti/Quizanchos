@@ -81,17 +81,17 @@ public class GameController : ControllerBase
         return Ok(result.Response);
     }
 
-    [HttpDelete("{gameId}")]
+    [HttpPost("{gameId}/finish")]
     [Authorize(AppRole.User)]
-    public async Task<IActionResult> DeleteGame(Guid gameId, [FromQuery] MinigameType minigameType)
+    public async Task<IActionResult> FinishGame(Guid gameId, [FromQuery] MinigameType minigameType)
     {
-        DeleteGameResult result = await _gameService.DeleteGameAsync(gameId);
+        GameStateResult result = await _gameService.FinishGameAsync(gameId, minigameType);
         
         if (!result.IsSuccess)
         {
-            return NotFound(new { Message = result.Message });
+            return NotFound(new { Message = result.ErrorMessage });
         }
 
-        return Ok(new { Message = result.Message });
+        return Ok(result.Response);
     }
 }
