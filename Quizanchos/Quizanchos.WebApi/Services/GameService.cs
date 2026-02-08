@@ -1,5 +1,6 @@
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Controllers;
 using Quizanchos.WebApi.Services.GameLogic;
@@ -75,6 +76,11 @@ public class GameService
         if (engine == null)
         {
             return GameMoveResult.NotFound("Game state not found");
+        }
+
+        if (engine.IsFinished)
+        {
+            return GameMoveResult.InvalidMove("Game is already finished");
         }
 
         // Check if game should be finished
@@ -185,45 +191,50 @@ public class GameService
         });
     }
 
-    public async Task<DeleteGameResult> DeleteGameAsync(Guid gameId)
+    public async Task<GameStateResult> FinishGameAsync(Guid gameId, MinigameType minigameType)
     {
-        bool removed = await _gameSessionRepository.DeleteAsync(gameId);
-        if (!removed)
+        IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(minigameType, gameId);
+        if (engine == null)
         {
-            return DeleteGameResult.NotFound("Game not found");
+            return GameStateResult.NotFound("Game not found");
         }
 
-        return DeleteGameResult.Success("Game deleted successfully");
+        return await FinishGameSessionAsync(engine, minigameType);
     }
 
     private async Task<GameStateResult?> CheckFinish(IGameEngine engine, MinigameType minigameType)
     {
         if (engine.NeedToFinish())
         {
-            var gameSession = await _gameSessionRepository.GetByIdAsync(engine.GameId);
-            if (gameSession != null)
-            {
-                gameSession.IsFinished = true;
-                gameSession.IsActive = false;
-                await _gameSessionRepository.UpdateAsync(gameSession);
-            }
-
-            IGameState state = engine.GetState();
-            state.IsFinished = true;
-            await _gameLogicFactory.SaveGameState(minigameType, engine.GameId, state);
-
-            return GameStateResult.Success(new GameStateResponse
-            {
-                GameId = engine.GameId,
-                MinigameType = minigameType,
-                Players = engine.Players,
-                IsFinished = true,
-                Winner = engine.Winner,
-                State = state
-            });
+            return await FinishGameSessionAsync(engine, minigameType);
         }
 
         return null;
+    }
+
+    private async Task<GameStateResult> FinishGameSessionAsync(IGameEngine engine, MinigameType minigameType)
+    {
+        GameSession? gameSession = await _gameSessionRepository.GetByIdAsync(engine.GameId);
+        if (gameSession != null)
+        {
+            gameSession.IsFinished = true;
+            gameSession.IsActive = false;
+            await _gameSessionRepository.UpdateAsync(gameSession);
+        }
+
+        IGameState state = engine.GetState();
+        state.IsFinished = true;
+        await _gameLogicFactory.SaveGameState(minigameType, engine.GameId, state);
+
+        return GameStateResult.Success(new GameStateResponse
+        {
+            GameId = engine.GameId,
+            MinigameType = minigameType,
+            Players = engine.Players,
+            IsFinished = true,
+            Winner = engine.Winner,
+            State = state
+        });
     }
 }
 
@@ -276,16 +287,4 @@ public record ActiveGameResponse
     public bool IsFinished { get; init; }
     public string? Winner { get; init; }
     public IGameState State { get; init; } = null!;
-}
-
-public record DeleteGameResult
-{
-    public bool IsSuccess { get; init; }
-    public string Message { get; init; } = string.Empty;
-
-    public static DeleteGameResult Success(string message) =>
-        new() { IsSuccess = true, Message = message };
-
-    public static DeleteGameResult NotFound(string message) =>
-        new() { IsSuccess = false, Message = message };
 }

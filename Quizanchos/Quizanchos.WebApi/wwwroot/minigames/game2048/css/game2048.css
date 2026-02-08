@@ -66,6 +66,22 @@
     background-color: #7a6758;
 }
 
+.btn-finish-game {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 8px;
+    background-color: #e74c3c;
+    color: #f9f6f2;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-finish-game:hover {
+    background-color: #c0392b;
+}
+
 .btn-back {
     padding: 12px 28px;
     border-radius: 8px;

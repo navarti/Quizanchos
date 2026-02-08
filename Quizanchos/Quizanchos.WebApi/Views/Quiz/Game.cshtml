@@ -12,13 +12,14 @@
 </head>
 <body>
 <div class="quiz-container" data-game-id="@ViewBag.GameId" id="quiz-container" style="display:none;">
-    <div class="quiz-header" id="quiz-header">
-        <h1 id="quiz-question">Loading...</h1>
-        <div class="question-info">
-            <span id="question-number">Question <span data-current>1</span> of <span data-total>10</span></span>
-            <span id="score-display">Score: <span data-score>0</span></span>
-        </div>
+<div class="quiz-header" id="quiz-header">
+    <h1 id="quiz-question">Loading...</h1>
+    <div class="question-info">
+        <span id="question-number">Question <span data-current>1</span> of <span data-total>10</span></span>
+        <span id="score-display">Score: <span data-score>0</span></span>
     </div>
+    <button id="finishQuizBtn" class="btn-finish-quiz">Finish Game</button>
+</div>
 
     <div class="timeline-container" id="timeline-container">
         <div class="timeline" id="timeline"></div>

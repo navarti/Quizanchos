@@ -49,6 +49,9 @@ async function initializeQuizGame(gameState, gameId, userId) {
     // Setup event listeners
     setupQuizEventListeners(gameState, gameId, userId);
 
+    // Setup finish button
+    setupFinishButton(gameId);
+
     // Start timeline if there's a current card
     const state = gameState.state || gameState;
     const currentCardIndex = state.currentCardIndex ?? state.CurrentCardIndex ?? 0;
@@ -330,5 +333,28 @@ function showError(message) {
     
     document.getElementById('returnToMenu').addEventListener('click', () => {
         window.location.href = '/';
+    });
+}
+
+function setupFinishButton(gameId) {
+    const finishBtn = document.getElementById('finishQuizBtn');
+    if (!finishBtn) return;
+
+    finishBtn.addEventListener('click', async () => {
+        try {
+            stopTimeline();
+            const result = await quizClient.finishGame(gameId);
+            if (result) {
+                const state = result.state || result.State || {};
+                const playerScores = state.playerScores || state.PlayerScores || {};
+                const firstPlayerId = Object.keys(playerScores)[0];
+                const score = firstPlayerId ? playerScores[firstPlayerId] : 0;
+                const totalCards = state.totalCards ?? state.TotalCards ?? 0;
+                showFinalStats(score, totalCards);
+            }
+        } catch (error) {
+            console.error('[QUIZ-GAME] Error finishing game:', error);
+            alert('Failed to finish game: ' + error.message);
+        }
     });
 }
