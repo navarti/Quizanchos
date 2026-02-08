@@ -1,4 +1,5 @@
 ﻿@model HomeViewModel
+@using Quizanchos.Common.Enums
 @{
     ViewData["Title"] = "Home";
 }
@@ -41,17 +42,41 @@
             }
             </div>
         </div>
+
+        <div class="hero-section" style="margin-top: 40px;">
+            <h1>Minigames</h1>
+            <p class="subtitle">Try other fun games!</p>
+            <div class="featured-quizzes">
+                <div class="quiz-card">
+                    <div class="quiz-image" style="background: linear-gradient(135deg, #edc22e 0%, #f2b179 100%);">
+                        <div class="quiz-content">
+                            <div class="quiz-header">
+                                <h2>2048</h2>
+                                <p>Join the tiles, get to 2048!</p>
+                            </div>
+                            <a href="/Game2048" class="quiz-btn">PLAY →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         @if (User.Identity?.IsAuthenticated == true)
         {
         if (Model.ActiveSession != null)
         {
+            var sessionUrl = Model.ActiveSession.MinigameType switch
+            {
+                MinigameType.Quiz => $"/Quiz/{Model.ActiveSession.GameId}",
+                MinigameType.Game2048 => $"/Game2048/{Model.ActiveSession.GameId}",
+                _ => $"/Quiz/{Model.ActiveSession.GameId}"
+            };
             <div class="sessions-card">
                 <h2>Your Active Session</h2>
                 <div class="session-item">
                     <div class="session-info">
                         <p><strong>Minigame:</strong> @Model.ActiveSession.MinigameType</p>
                     </div>
-                    <a href="/Quiz/@Model.ActiveSession.GameId" class="join-btn">Continue →</a>
+                    <a href="@sessionUrl" class="join-btn">Continue →</a>
                 </div>
             </div>
         }

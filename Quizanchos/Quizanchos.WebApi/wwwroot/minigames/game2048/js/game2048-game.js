@@ -1,0 +1,171 @@
+// 2048 Game Page - API-driven
+document.addEventListener('DOMContentLoaded', async () => {
+    const wrapper = document.getElementById('game2048-wrapper');
+    const gameId = wrapper.getAttribute('data-game-id');
+    const userId = document.body.getAttribute('data-user-id');
+    const loadingContainer = document.getElementById('loading-container');
+
+    if (!gameId || !userId) {
+        alert('Missing game or user information');
+        window.location.href = '/';
+        return;
+    }
+
+    try {
+        const gameState = await game2048Client.getGame2048State(gameId);
+
+        if (!gameState) {
+            throw new Error('Failed to load game state');
+        }
+
+        loadingContainer.style.display = 'none';
+        wrapper.style.display = 'block';
+
+        initializeGame(gameState, gameId, userId);
+    } catch (error) {
+        console.error('[2048] Error loading game:', error);
+        loadingContainer.innerHTML = '<p>Failed to load game. <a href="/Game2048">Try again</a></p>';
+    }
+});
+
+let currentBoard = [];
+let boardSize = 4;
+let isProcessing = false;
+
+function initializeGame(gameState, gameId, userId) {
+    boardSize = gameState.size || 4;
+    currentBoard = gameState.board || [];
+    updateUI(gameState);
+    renderBoard(currentBoard);
+    setupControls(gameId, userId);
+    setupButtons(gameId, userId);
+}
+
+function updateUI(gameState) {
+    document.getElementById('current-score').textContent = gameState.score || 0;
+    document.getElementById('best-tile').textContent = gameState.bestTile || 0;
+    document.getElementById('move-count').textContent = gameState.moveCount || 0;
+}
+
+function renderBoard(board) {
+    const boardEl = document.getElementById('game2048-board');
+    boardEl.innerHTML = '';
+    boardEl.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+    boardEl.style.gridTemplateRows = `repeat(${boardSize}, 1fr)`;
+
+    for (let r = 0; r < boardSize; r++) {
+        for (let c = 0; c < boardSize; c++) {
+            const value = board[r] ? board[r][c] : 0;
+            const cell = document.createElement('div');
+            cell.className = 'game2048-cell';
+            if (value > 0) {
+                cell.classList.add('tile-' + Math.min(value, 8192));
+                cell.textContent = value;
+            }
+            boardEl.appendChild(cell);
+        }
+    }
+}
+
+// Direction enum: Up=0, Down=1, Left=2, Right=3
+const DIRECTIONS = { ArrowUp: 0, ArrowDown: 1, ArrowLeft: 2, ArrowRight: 3 };
+
+function setupControls(gameId, userId) {
+    document.addEventListener('keydown', async (e) => {
+        if (!(e.key in DIRECTIONS) || isProcessing) return;
+        e.preventDefault();
+        await submitDirection(gameId, userId, DIRECTIONS[e.key]);
+    });
+
+    // Touch/swipe support
+    let touchStartX = 0, touchStartY = 0;
+    const boardEl = document.getElementById('game2048-board');
+
+    boardEl.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    boardEl.addEventListener('touchend', async (e) => {
+        if (isProcessing) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+
+        if (Math.max(absDx, absDy) < 30) return; // too short
+
+        let direction;
+        if (absDx > absDy) {
+            direction = dx > 0 ? 3 : 2; // Right : Left
+        } else {
+            direction = dy > 0 ? 1 : 0; // Down : Up
+        }
+        await submitDirection(gameId, userId, direction);
+    }, { passive: true });
+}
+
+async function submitDirection(gameId, userId, direction) {
+    isProcessing = true;
+    try {
+        const result = await game2048Client.submitMove(gameId, userId, direction);
+
+        if (result && result.state) {
+            const state = result.state;
+            currentBoard = state.board || state.Board || currentBoard;
+            const score = state.score ?? state.Score ?? 0;
+            const bestTile = state.bestTile ?? state.BestTile ?? 0;
+            const moveCount = state.moveCount ?? state.MoveCount ?? 0;
+
+            document.getElementById('current-score').textContent = score;
+            document.getElementById('best-tile').textContent = bestTile;
+            document.getElementById('move-count').textContent = moveCount;
+
+            renderBoard(currentBoard);
+
+            if (result.isFinished) {
+                showGameOver(score, bestTile, moveCount);
+            }
+        }
+    } catch (error) {
+        // "No tiles can be moved" is expected, not a real error
+        if (!error.message.includes('No tiles')) {
+            console.error('[2048] Move error:', error);
+        }
+    } finally {
+        isProcessing = false;
+    }
+}
+
+function showGameOver(score, bestTile, moveCount) {
+    document.getElementById('finalScoreDisplay').textContent = score;
+    document.getElementById('finalBestTile').textContent = bestTile;
+    document.getElementById('finalMoveCount').textContent = moveCount;
+    document.getElementById('gameOverModal').style.display = 'flex';
+}
+
+function setupButtons(gameId, userId) {
+    const newGameBtn = document.getElementById('newGameBtn');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    const returnHomeBtn = document.getElementById('returnHomeBtn');
+
+    async function startNewGame() {
+        try {
+            // Delete current game first
+            await game2048Client.deleteGame(gameId);
+        } catch (_) { /* ignore */ }
+
+        try {
+            const result = await game2048Client.createGame([userId], { size: boardSize });
+            if (result && result.gameId) {
+                window.location.href = '/Game2048/' + result.gameId;
+            }
+        } catch (error) {
+            alert('Failed to create new game: ' + error.message);
+        }
+    }
+
+    if (newGameBtn) newGameBtn.addEventListener('click', startNewGame);
+    if (playAgainBtn) playAgainBtn.addEventListener('click', startNewGame);
+    if (returnHomeBtn) returnHomeBtn.addEventListener('click', () => { window.location.href = '/'; });
+}
