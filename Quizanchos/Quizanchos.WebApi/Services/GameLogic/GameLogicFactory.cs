@@ -1,5 +1,7 @@
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
+using Quizanchos.Game2048.GameLogic;
+using Quizanchos.Game2048.Services;
 using Quizanchos.Quiz.GameLogic;
 using Quizanchos.Quiz.Services;
 using System.Collections.Immutable;
@@ -11,13 +13,16 @@ public class GameLogicFactory : IGameLogicFactory
 {
     private readonly ILogger<GameLogicFactory> _logger;
     private readonly QuizEngineFactory _quizEngineFactory;
+    private readonly Game2048EngineFactory _game2048EngineFactory;
 
     public GameLogicFactory(
         ILogger<GameLogicFactory> logger,
-        QuizEngineFactory quizEngineFactory)
+        QuizEngineFactory quizEngineFactory,
+        Game2048EngineFactory game2048EngineFactory)
     {
         _logger = logger;
         _quizEngineFactory = quizEngineFactory;
+        _game2048EngineFactory = game2048EngineFactory;
     }
 
     public async Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
@@ -28,6 +33,7 @@ public class GameLogicFactory : IGameLogicFactory
         return type switch
         {
             MinigameType.Quiz => await CreateQuizEngine(gameId, playerIds, parameters),
+            MinigameType.Game2048 => await CreateGame2048Engine(gameId, playerIds, parameters),
             _ => throw new ArgumentException($"Unknown minigame type: {type}")
         };
     }
@@ -39,6 +45,7 @@ public class GameLogicFactory : IGameLogicFactory
         return type switch
         {
             MinigameType.Quiz => await LoadQuizEngine(gameId),
+            MinigameType.Game2048 => await LoadGame2048Engine(gameId),
             _ => throw new ArgumentException($"Unknown minigame type: {type}")
         };
     }
@@ -53,6 +60,12 @@ public class GameLogicFactory : IGameLogicFactory
                 if (state is QuizGameState quizState)
                 {
                     await _quizEngineFactory.SaveQuizStateAsync(gameId, quizState);
+                }
+                break;
+            case MinigameType.Game2048:
+                if (state is Game2048State game2048State)
+                {
+                    await _game2048EngineFactory.SaveGame2048StateAsync(gameId, game2048State);
                 }
                 break;
             default:
@@ -93,6 +106,30 @@ public class GameLogicFactory : IGameLogicFactory
             return null;
 
         return new GameEngineWrapper<QuizGameState, QuizMove>(engine);
+    }
+
+    private async Task<IGameEngine> CreateGame2048Engine(Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
+    {
+        int size = GetParameter<int>(parameters, "size", 4);
+
+        _logger.LogInformation("Creating 2048 engine with: Size={Size}", size);
+
+        GameEngine<Game2048State, Game2048Move> engine = await _game2048EngineFactory.CreateGame2048EngineAsync(
+            gameId,
+            playerIds,
+            size
+        );
+
+        return new GameEngineWrapper<Game2048State, Game2048Move>(engine);
+    }
+
+    private async Task<IGameEngine?> LoadGame2048Engine(Guid gameId)
+    {
+        GameEngine<Game2048State, Game2048Move>? engine = await _game2048EngineFactory.LoadGame2048EngineAsync(gameId);
+        if (engine == null)
+            return null;
+
+        return new GameEngineWrapper<Game2048State, Game2048Move>(engine);
     }
 
     private T GetParameter<T>(Dictionary<string, object> parameters, string key, T defaultValue)

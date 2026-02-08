@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Quizanchos.Domain.Configurations.Game2048;
 using Quizanchos.Domain.Configurations.Quiz;
 using Quizanchos.Domain.Entities;
+using Quizanchos.Domain.Entities.Game2048;
 using Quizanchos.Domain.Entities.Quiz;
 
 namespace Quizanchos.Domain;
@@ -31,10 +33,15 @@ public class QuizanchosDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<QuizSessionPlayerScore> QuizSessionPlayerScores { get; set; }
     #endregion
 
+    #region Game2048 Domain Entities
+    public DbSet<Game2048SessionState> Game2048SessionStates { get; set; }
+    #endregion
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyQuizConfiguration();
+        modelBuilder.ApplyConfiguration(new Game2048SessionStateConfiguration());
     }
 }

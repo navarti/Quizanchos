@@ -7,6 +7,7 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Implementations;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.Extensions;
+using Quizanchos.Game2048.Extensions;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Controllers.Auth;
@@ -114,6 +115,9 @@ public static class Startup
         services.AddQuizRepositories();
         services.AddQuizServices();
 
+        services.AddGame2048Repositories();
+        services.AddGame2048Services();
+
         services.AddAutoMapper(cfg => 
         { 
             cfg.AddProfile<MappingProfile>();
@@ -218,7 +222,8 @@ public static class Startup
                             UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor,
                             DerivedTypes =
                             {
-                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Quiz.GameLogic.QuizMove), "quiz")
+                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Quiz.GameLogic.QuizMove), "quiz"),
+                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Game2048.GameLogic.Game2048Move), "game2048")
                             }
                         };
                     }

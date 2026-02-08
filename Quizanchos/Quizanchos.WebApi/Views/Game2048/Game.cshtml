@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "2048 Game";
+}
+
+<link rel="stylesheet" href="/minigames/game2048/css/game2048.css">
+
+<div class="game2048-wrapper" data-game-id="@ViewBag.GameId" id="game2048-wrapper" style="display:none;">
+    <div class="game2048-header">
+        <h1>2048</h1>
+        <div class="game2048-scores">
+            <div class="score-box">
+                <span class="score-label">Score</span>
+                <span class="score-value" id="current-score">0</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">Best Tile</span>
+                <span class="score-value" id="best-tile">0</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label">Moves</span>
+                <span class="score-value" id="move-count">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="game2048-board" id="game2048-board">
+        <!-- Grid cells generated dynamically -->
+    </div>
+
+    <p class="game2048-hint">Use <strong>arrow keys</strong> or <strong>swipe</strong> to move tiles.</p>
+
+    <div class="game2048-actions">
+        <button id="newGameBtn" class="btn-new-game">New Game</button>
+        <a href="/" class="btn-back">Back to Home</a>
+    </div>
+</div>
+
+<div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 60vh;">
+    <p>Loading game...</p>
+</div>
+
+<div id="gameOverModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Game Over!</h2>
+        <p>Your Score: <strong id="finalScoreDisplay">0</strong></p>
+        <p>Best Tile: <strong id="finalBestTile">0</strong></p>
+        <p>Total Moves: <strong id="finalMoveCount">0</strong></p>
+        <div class="modal-buttons">
+            <button id="playAgainBtn">Play Again</button>
+            <button id="returnHomeBtn">Return to Home</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/game-client.js" asp-append-version="true"></script>
+<script src="/minigames/game2048/js/game2048-client.js" asp-append-version="true"></script>
+<script src="/minigames/game2048/js/game2048-game.js" asp-append-version="true"></script>
