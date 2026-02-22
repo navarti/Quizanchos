@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Minigames\Quiz\Quizanchos.Quiz\Quizanchos.Quiz.csproj" />
+    <ProjectReference Include="..\Minigames\QuizMultiplayer\Quizanchos.QuizMultiplayer\Quizanchos.QuizMultiplayer.csproj" />
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\Quizanchos.Core\Quizanchos.Core.csproj" />
     <ProjectReference Include="..\Quizanchos.Game2048\Quizanchos.Game2048.csproj" />

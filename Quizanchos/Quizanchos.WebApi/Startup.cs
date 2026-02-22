@@ -8,6 +8,7 @@ using Quizanchos.Domain.Repositories.Implementations;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.Extensions;
 using Quizanchos.Game2048.Extensions;
+using Quizanchos.QuizMultiplayer.Extensions;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Controllers.Auth;
@@ -122,6 +123,9 @@ public static class Startup
         services.AddGame2048Repositories();
         services.AddGame2048Services();
 
+        services.AddQuizMultiplayerRepositories();
+        services.AddQuizMultiplayerServices();
+
         services.AddAutoMapper(cfg => 
         { 
             cfg.AddProfile<MappingProfile>();
@@ -232,7 +236,8 @@ public static class Startup
                             DerivedTypes =
                             {
                                 new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Quiz.GameLogic.QuizMove), "quiz"),
-                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Game2048.GameLogic.Game2048Move), "game2048")
+                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Game2048.GameLogic.Game2048Move), "game2048"),
+                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.QuizMultiplayer.GameLogic.QuizMultiplayerMove), "quizMultiplayer")
                             }
                         };
                     }

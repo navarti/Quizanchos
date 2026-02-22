@@ -92,6 +92,18 @@ public class GameService
 
         Dictionary<string, object> gameParams = parameters ?? new Dictionary<string, object>();
 
+        // Inject team composition into parameters so engine factories can use it
+        if (teams.Count > 0)
+        {
+            var teamsData = teams.Select(t => new
+            {
+                teamIndex = t.TeamIndex,
+                name = t.Name,
+                playerIds = t.PlayerIds
+            }).ToList();
+            gameParams["teams"] = System.Text.Json.JsonSerializer.Serialize(teamsData);
+        }
+
         IGameEngine engine = await _gameLogicFactory.CreateGameEngine(
             minigameType,
             gameId,

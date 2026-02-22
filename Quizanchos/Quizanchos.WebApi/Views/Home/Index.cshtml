@@ -58,6 +58,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="quiz-card">
+                    <div class="quiz-image" style="background: linear-gradient(135deg, #7b61ff 0%, #4fc3f7 100%);">
+                        <div class="quiz-content">
+                            <div class="quiz-header">
+                                <h2>Quiz Multiplayer</h2>
+                                <p>Team up and compete in real-time quizzes!</p>
+                            </div>
+                            <a href="/QuizMultiplayer" class="quiz-btn">FIND ROOM →</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         @if (User.Identity?.IsAuthenticated == true)
@@ -68,6 +79,7 @@
             {
                 MinigameType.Quiz => $"/Quiz/{Model.ActiveSession.GameId}",
                 MinigameType.Game2048 => $"/Game2048/{Model.ActiveSession.GameId}",
+                MinigameType.QuizMultiplayer => $"/QuizMultiplayer/{Model.ActiveSession.GameId}",
                 _ => $"/Quiz/{Model.ActiveSession.GameId}"
             };
             <div class="sessions-card">
