@@ -17,6 +17,7 @@ using Quizanchos.WebApi.Services.Auth;
 using Quizanchos.WebApi.Services.GameLogic;
 using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
+using Quizanchos.WebApi.Hubs;
 
 namespace Quizanchos.WebApi;
 
@@ -44,6 +45,7 @@ public static class Startup
         app.UseAuthorization();
 
         app.MapControllers();
+        app.MapHub<GameHub>("/hubs/game");
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -141,6 +143,8 @@ public static class Startup
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
         services.AddScoped<GameService>();
+        services.AddSignalR();
+        services.AddScoped<Quizanchos.Core.IGameNotifier, SignalRGameNotifier>();
         services.AddTransient<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
