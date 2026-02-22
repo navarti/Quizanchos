@@ -12,15 +12,18 @@ public class GameService
 {
     private readonly IGameLogicFactory _gameLogicFactory;
     private readonly IGameSessionRepository _gameSessionRepository;
+    private readonly IGameNotifier _gameNotifier;
     private readonly ILogger<GameService> _logger;
 
     public GameService(
         IGameLogicFactory gameLogicFactory,
         IGameSessionRepository gameSessionRepository,
+        IGameNotifier gameNotifier,
         ILogger<GameService> logger)
     {
         _gameLogicFactory = gameLogicFactory;
         _gameSessionRepository = gameSessionRepository;
+        _gameNotifier = gameNotifier;
         _logger = logger;
     }
 
@@ -107,6 +110,16 @@ public class GameService
         // Save updated state to DB
         IGameState state = engine.GetState();
         await _gameLogicFactory.SaveGameState(gameSession.MinigameType, request.GameId, state);
+
+        // Notify connected players about the move via real-time channel
+        if (engine.IsFinished)
+        {
+            await _gameNotifier.NotifyGameFinished(request.GameId, state, engine.Winner);
+        }
+        else
+        {
+            await _gameNotifier.NotifyMoveMade(request.GameId, playerId, state);
+        }
 
         return GameMoveResult.Success(new GameMoveResponse
         {
@@ -225,6 +238,9 @@ public class GameService
         IGameState state = engine.GetState();
         state.IsFinished = true;
         await _gameLogicFactory.SaveGameState(minigameType, engine.GameId, state);
+
+        // Notify connected players that the game has finished
+        await _gameNotifier.NotifyGameFinished(engine.GameId, state, engine.Winner);
 
         return GameStateResult.Success(new GameStateResponse
         {
