@@ -3,6 +3,7 @@ using Quizanchos.Core;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Controllers;
+using Quizanchos.WebApi.Models.Rooms;
 using Quizanchos.WebApi.Services.GameLogic;
 using System.Collections.Immutable;
 
@@ -61,6 +62,51 @@ public class GameService
         {
             GameId = gameId,
             MinigameType = request.MinigameType,
+            State = state
+        };
+    }
+
+    public async Task<CreateGameResponse> CreateMultiPlayerGameAsync(
+        MinigameType minigameType,
+        IReadOnlyList<string> playerIds,
+        Dictionary<string, object>? parameters,
+        IReadOnlyList<TeamInfo> teams)
+    {
+        foreach (var playerId in playerIds)
+        {
+            var activeGame = await _gameSessionRepository.GetActiveByPlayerIdAsync(playerId);
+            if (activeGame != null)
+            {
+                throw new InvalidOperationException(
+                    $"Player {playerId} already has an active game session (GameId: {activeGame.Id})");
+            }
+        }
+
+        Guid gameId = Guid.NewGuid();
+
+        _logger.LogInformation(
+            "Creating multiplayer game: Type={Type}, PlayerIds={PlayerIds}, Teams={TeamCount}",
+            minigameType,
+            string.Join(",", playerIds),
+            teams.Count);
+
+        Dictionary<string, object> gameParams = parameters ?? new Dictionary<string, object>();
+
+        IGameEngine engine = await _gameLogicFactory.CreateGameEngine(
+            minigameType,
+            gameId,
+            playerIds.ToImmutableArray(),
+            gameParams);
+
+        IGameState state = engine.GetState();
+        _logger.LogInformation("Multiplayer game created: GameId={GameId}, State={State}",
+            gameId,
+            System.Text.Json.JsonSerializer.Serialize(state));
+
+        return new CreateGameResponse
+        {
+            GameId = gameId,
+            MinigameType = minigameType,
             State = state
         };
     }
