@@ -7,6 +7,9 @@
     <Project Path="Minigames/Quiz/Quizanchos.Quiz.DbUpdater/Quizanchos.Quiz.DbUpdater.csproj" />
     <Project Path="Minigames/Quiz/Quizanchos.Quiz/Quizanchos.Quiz.csproj" />
   </Folder>
+  <Folder Name="/Minigames/QuizMultiplayer/">
+    <Project Path="Minigames/QuizMultiplayer/Quizanchos.QuizMultiplayer/Quizanchos.QuizMultiplayer.csproj" />
+  </Folder>
   <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" />
   <Project Path="Quizanchos.Core/Quizanchos.Core.csproj" />
   <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />

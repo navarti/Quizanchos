@@ -4,6 +4,8 @@ using Quizanchos.Game2048.GameLogic;
 using Quizanchos.Game2048.Services;
 using Quizanchos.Quiz.GameLogic;
 using Quizanchos.Quiz.Services;
+using Quizanchos.QuizMultiplayer.GameLogic;
+using Quizanchos.QuizMultiplayer.Services;
 using System.Collections.Immutable;
 using System.Text.Json;
 
@@ -14,15 +16,18 @@ public class GameLogicFactory : IGameLogicFactory
     private readonly ILogger<GameLogicFactory> _logger;
     private readonly QuizEngineFactory _quizEngineFactory;
     private readonly Game2048EngineFactory _game2048EngineFactory;
+    private readonly QuizMultiplayerEngineFactory _quizMultiplayerEngineFactory;
 
     public GameLogicFactory(
         ILogger<GameLogicFactory> logger,
         QuizEngineFactory quizEngineFactory,
-        Game2048EngineFactory game2048EngineFactory)
+        Game2048EngineFactory game2048EngineFactory,
+        QuizMultiplayerEngineFactory quizMultiplayerEngineFactory)
     {
         _logger = logger;
         _quizEngineFactory = quizEngineFactory;
         _game2048EngineFactory = game2048EngineFactory;
+        _quizMultiplayerEngineFactory = quizMultiplayerEngineFactory;
     }
 
     public async Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
@@ -34,6 +39,7 @@ public class GameLogicFactory : IGameLogicFactory
         {
             MinigameType.Quiz => await CreateQuizEngine(gameId, playerIds, parameters),
             MinigameType.Game2048 => await CreateGame2048Engine(gameId, playerIds, parameters),
+            MinigameType.QuizMultiplayer => await CreateQuizMultiplayerEngine(gameId, playerIds, parameters),
             _ => throw new ArgumentException($"Unknown minigame type: {type}")
         };
     }
@@ -46,6 +52,7 @@ public class GameLogicFactory : IGameLogicFactory
         {
             MinigameType.Quiz => await LoadQuizEngine(gameId),
             MinigameType.Game2048 => await LoadGame2048Engine(gameId),
+            MinigameType.QuizMultiplayer => await LoadQuizMultiplayerEngine(gameId),
             _ => throw new ArgumentException($"Unknown minigame type: {type}")
         };
     }
@@ -66,6 +73,12 @@ public class GameLogicFactory : IGameLogicFactory
                 if (state is Game2048State game2048State)
                 {
                     await _game2048EngineFactory.SaveGame2048StateAsync(gameId, game2048State);
+                }
+                break;
+            case MinigameType.QuizMultiplayer:
+                if (state is QuizMultiplayerGameState quizMultiplayerState)
+                {
+                    await _quizMultiplayerEngineFactory.SaveStateAsync(gameId, quizMultiplayerState);
                 }
                 break;
             default:
@@ -130,6 +143,51 @@ public class GameLogicFactory : IGameLogicFactory
             return null;
 
         return new GameEngineWrapper<Game2048State, Game2048Move>(engine);
+    }
+
+    private async Task<IGameEngine> CreateQuizMultiplayerEngine(Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
+    {
+        int totalCards = GetParameter<int>(parameters, "totalCards", 10);
+        Guid? categoryId = GetParameter<Guid?>(parameters, "categoryId", null);
+        GameLevel gameLevel = GetParameter<GameLevel>(parameters, "gameLevel", GameLevel.Easy);
+        int secondsPerCard = GetParameter<int>(parameters, "secondsPerCard", 30);
+        int optionCount = GetParameter<int>(parameters, "optionCount", 4);
+
+        // Extract team data from parameters (injected by GameService.CreateMultiPlayerGameAsync)
+        var teams = new List<QuizMultiplayerGameState.TeamData>();
+        if (parameters.TryGetValue("teams", out object? teamsObj))
+        {
+            string? teamsJson = teamsObj switch
+            {
+                string s => s,
+                JsonElement je => je.GetRawText(),
+                _ => null
+            };
+
+            if (!string.IsNullOrEmpty(teamsJson))
+            {
+                teams = JsonSerializer.Deserialize<List<QuizMultiplayerGameState.TeamData>>(teamsJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+            }
+        }
+
+        _logger.LogInformation(
+            "Creating QuizMultiplayer engine: TotalCards={TotalCards}, CategoryId={CategoryId}, GameLevel={GameLevel}, Teams={TeamCount}",
+            totalCards, categoryId, gameLevel, teams.Count);
+
+        var engine = await _quizMultiplayerEngineFactory.CreateEngineAsync(
+            gameId, playerIds, totalCards, categoryId, gameLevel, secondsPerCard, optionCount, teams);
+
+        return new GameEngineWrapper<QuizMultiplayerGameState, QuizMultiplayerMove>(engine);
+    }
+
+    private async Task<IGameEngine?> LoadQuizMultiplayerEngine(Guid gameId)
+    {
+        var engine = await _quizMultiplayerEngineFactory.LoadEngineAsync(gameId);
+        if (engine == null)
+            return null;
+
+        return new GameEngineWrapper<QuizMultiplayerGameState, QuizMultiplayerMove>(engine);
     }
 
     private T GetParameter<T>(Dictionary<string, object> parameters, string key, T defaultValue)
