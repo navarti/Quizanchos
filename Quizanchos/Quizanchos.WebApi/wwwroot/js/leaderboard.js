@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const leaderboardItems = document.querySelectorAll('.leaderboard-item');
     const currentUserItem = document.querySelector('.leaderboard-item.current-user');
+    const leaderboardContainer = document.querySelector('.leaderboard');
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -10,32 +11,35 @@ document.addEventListener('DOMContentLoaded', () => {
             // Add active class to clicked button
             btn.classList.add('active');
 
-            const category = btn.dataset.category;
+            const minigame = btn.dataset.minigame;
 
-            // Filter leaderboard items
-            leaderboardItems.forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = 'grid';
-                    setTimeout(() => {
-                        item.style.opacity = '1';
-                        item.style.transform = 'translateY(0)';
-                    }, 10);
-                } else {
-                    item.style.opacity = '0';
-                    item.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                        item.style.display = 'none';
-                    }, 300);
-                }
-            });
-            
-            if (category !== 'all' && currentUserItem.dataset.category !== category) {
-                currentUserItem.style.display = 'grid';
-                setTimeout(() => {
-                    currentUserItem.style.opacity = '1';
-                    currentUserItem.style.transform = 'translateY(0)';
-                }, 10);
-            }
+            // fetch leaderboard for selected minigame
+            (async () => {
+                const take = 100; // adjust as needed
+                const skip = 0;
+                const url = `/LeaderBoard/GetLeaderBoardAsync?take=${take}&skip=${skip}${minigame ? `&minigameType=${minigame}` : ''}`;
+                const resp = await fetch(url);
+                const users = await resp.json();
+
+                // Update leaderboard DOM
+                const leaderboard = leaderboardContainer;
+                leaderboard.innerHTML = '';
+                users.forEach(u => {
+                    const div = document.createElement('div');
+                    div.className = 'leaderboard-item' + (u.UserName === leaderboard.getAttribute('data-current-user') ? ' current-user' : '');
+                    div.innerHTML = `
+                        <div class="rank">${u.Position}</div>
+                        <div class="player-info">
+                            <img src="${u.AvatarUrl}" alt="${u.UserName}" class="player-avatar">
+                            <span class="player-name">${u.UserName}</span>
+                        </div>
+                        <div class="score">
+                            <span class="trophy">${u.Position === 1 ? '??' : ''}</span>
+                            ${u.Score}
+                        </div>`;
+                    leaderboard.appendChild(div);
+                });
+            })();
         });
     });
 

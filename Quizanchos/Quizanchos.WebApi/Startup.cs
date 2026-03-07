@@ -1,4 +1,4 @@
-﻿using CloudinaryDotNet;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
@@ -148,17 +148,19 @@ public static class Startup
 
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
+        services.AddScoped<IUserMinigameScoreRepository, UserMinigameScoreRepository>();
+        services.AddScoped<UserScoreService>();
         services.AddScoped<GameService>();
         services.AddSignalR();
         services.AddScoped<Quizanchos.Core.IGameNotifier, SignalRGameNotifier>();
         services.AddSingleton<IGameRoomManager, InMemoryGameRoomManager>();
         services.AddScoped<Quizanchos.Core.IRoomNotifier, SignalRRoomNotifier>();
         services.AddScoped<GameRoomService>();
-        services.AddTransient<AdminService>();
+        services.AddScoped<AdminService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<AuthorizationService>(); 
-        services.AddTransient<UserProfileService>(); 
+        services.AddScoped<UserProfileService>(); 
         services.AddTransient<LeaderBoardService>(); 
 
         services.AddQuartz(q =>

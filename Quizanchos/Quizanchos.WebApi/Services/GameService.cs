@@ -5,6 +5,7 @@ using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.WebApi.Controllers;
 using Quizanchos.WebApi.Models.Rooms;
 using Quizanchos.WebApi.Services.GameLogic;
+using Quizanchos.WebApi.Services.Users;
 using System.Collections.Immutable;
 
 namespace Quizanchos.WebApi.Services;
@@ -15,17 +16,20 @@ public class GameService
     private readonly IGameSessionRepository _gameSessionRepository;
     private readonly IGameNotifier _gameNotifier;
     private readonly ILogger<GameService> _logger;
+    private readonly UserScoreService _userScoreService;
 
     public GameService(
         IGameLogicFactory gameLogicFactory,
         IGameSessionRepository gameSessionRepository,
         IGameNotifier gameNotifier,
-        ILogger<GameService> logger)
+        ILogger<GameService> logger,
+        UserScoreService userScoreService)
     {
         _gameLogicFactory = gameLogicFactory;
         _gameSessionRepository = gameSessionRepository;
         _gameNotifier = gameNotifier;
         _logger = logger;
+        _userScoreService = userScoreService;
     }
 
     public async Task<CreateGameResponse> CreateGameAsync(CreateGameRequest request)
@@ -296,6 +300,12 @@ public class GameService
         IGameState state = engine.GetState();
         state.IsFinished = true;
         await _gameLogicFactory.SaveGameState(minigameType, engine.GameId, state);
+
+        // Update winner's score
+        if (!string.IsNullOrEmpty(engine.Winner))
+        {
+            await _userScoreService.IncrementScoreAsync(engine.Winner, minigameType, 10).ConfigureAwait(false);
+        }
 
         // Notify connected players that the game has finished
         await _gameNotifier.NotifyGameFinished(engine.GameId, state, engine.Winner);

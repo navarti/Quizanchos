@@ -13,18 +13,21 @@ public class UserProfileService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly UserRetrieverService _userRetrieverService;
     private readonly ICloudinary _cloudinary;
+    private readonly UserScoreService _userScoreService;
 
-    public UserProfileService(UserManager<ApplicationUser> userManager, UserRetrieverService userRetrieverService, ICloudinary cloudinary)
+    public UserProfileService(UserManager<ApplicationUser> userManager, UserRetrieverService userRetrieverService, ICloudinary cloudinary, UserScoreService userScoreService)
     {
         _userManager = userManager;
         _userRetrieverService = userRetrieverService;
         _cloudinary = cloudinary;
+        _userScoreService = userScoreService;
     }
 
     public async Task<FullApplicationUserDto> GetUserInfo(ClaimsPrincipal claimsPrincipal)
     {
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
-        return new FullApplicationUserDto(user.Email!, user.UserName!, user.AvatarUrl, user.Score, user.Status);
+        int totalScore = await _userScoreService.GetTotalScoreAsync(user.Id).ConfigureAwait(false);
+        return new FullApplicationUserDto(user.Email!, user.UserName!, user.AvatarUrl, totalScore, user.Status);
     }
 
     public async Task UpdateNickname(ClaimsPrincipal claimsPrincipal, string nickNameToUpdate)
