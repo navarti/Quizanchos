@@ -15,16 +15,33 @@ public class LeaderBoardController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetLeaderBoardAsync(int take, int skip)
+    public async Task<IActionResult> GetLeaderBoardAsync(int take, int skip, int? minigameType)
     {
-        List<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip);
+        Quizanchos.Common.Enums.MinigameType? type = null;
+        if (minigameType.HasValue)
+        {
+            type = System.Enum.IsDefined(typeof(Quizanchos.Common.Enums.MinigameType), minigameType.Value)
+                ? (Quizanchos.Common.Enums.MinigameType?)minigameType.Value
+                : null;
+        }
+
+        List<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip, type);
         return Ok(result);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserPositionAsync()
+    public async Task<IActionResult> GetUserPositionAsync(int? minigameType)
     {
-        ApplicationUserInLeaderBoardDto result = await _leaderBoardService.GetUserPositionAsync(User);
+        Quizanchos.Common.Enums.MinigameType? type = null;
+        if (minigameType.HasValue)
+        {
+            type = System.Enum.IsDefined(typeof(Quizanchos.Common.Enums.MinigameType), minigameType.Value)
+                ? (Quizanchos.Common.Enums.MinigameType?)minigameType.Value
+                : null;
+        }
+
+        ApplicationUserInLeaderBoardDto result = await _leaderBoardService.GetUserPositionAsync(User, type);
         return Ok(result);
     }
+
 }

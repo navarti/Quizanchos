@@ -19,10 +19,13 @@
 
     <div class="leaderboard-container">
         <div class="filters">
-            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn active" data-minigame="">All</button>
+            <button class="filter-btn" data-minigame="1">Quiz</button>
+            <button class="filter-btn" data-minigame="2">2048</button>
+            <button class="filter-btn" data-minigame="3">Quiz Multiplayer</button>
         </div>
 
-        <div class="leaderboard">
+        <div class="leaderboard" data-current-user="@Model.CurrentUserName">
             @foreach (var user in Model.Users.Select(user => new { User = user, Rank = user.Position }))
             {
                 <div class="leaderboard-item @(Model.CurrentUserName == user.User.UserName ? "current-user" : "")">
