@@ -85,6 +85,16 @@ public class Game2048Logic : IGameLogic<Game2048State, Game2048Move>
         return false;
     }
 
+    public IReadOnlyDictionary<string, int> GetPlayerScores(Game2048State state)
+    {
+        // Single-player game: award the final board score to the player
+        if (state.Players.Count > 0)
+        {
+            return new Dictionary<string, int> { { state.Players[0], state.Score } };
+        }
+        return new Dictionary<string, int>();
+    }
+
     // --- Board helpers ---
 
     private static int[][] CreateEmptyBoard(int size)
