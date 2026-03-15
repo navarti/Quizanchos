@@ -156,4 +156,19 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
         var expirationTime = currentCard.CreationTime.AddSeconds(_secondsPerCard);
         return DateTime.UtcNow > expirationTime;
     }
+
+    public IReadOnlyDictionary<string, int> GetPlayerScores(QuizGameState state)
+    {
+        // Coefficient increases with more cards: 2 cards = 1.0x, 4 cards = 2.0x, etc.
+        double coefficient = state.OptionCount / 2.0;
+
+        var scores = new Dictionary<string, int>();
+        foreach (var kvp in state.PlayerScores)
+        {
+            int finalScore = (int)(kvp.Value * coefficient);
+            scores[kvp.Key] = finalScore;
+        }
+
+        return scores;
+    }
 }

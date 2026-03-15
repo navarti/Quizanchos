@@ -164,4 +164,44 @@ public class QuizMultiplayerGameLogic : IGameLogic<QuizMultiplayerGameState, Qui
         var expirationTime = currentCard.CreationTime.AddSeconds(_secondsPerCard);
         return DateTime.UtcNow > expirationTime;
     }
+
+    public IReadOnlyDictionary<string, int> GetPlayerScores(QuizMultiplayerGameState state)
+    {
+        var scores = new Dictionary<string, int>();
+
+        if (state.TeamScores.Count == 0)
+            return scores;
+
+        // Determine if there's a winner or draw
+        int maxScore = state.TeamScores.Max(kvp => kvp.Value);
+        var winners = state.TeamScores.Where(kvp => kvp.Value == maxScore).ToList();
+
+        bool isDraw = winners.Count > 1;
+        int? winningTeamIndex = isDraw ? null : winners[0].Key;
+
+        // Award points to each player based on their team's result
+        foreach (var team in state.Teams)
+        {
+            int points = 0;
+
+            if (isDraw)
+            {
+                // All players in draw teams get 1 point
+                points = 1;
+            }
+            else if (team.TeamIndex == winningTeamIndex)
+            {
+                // Winning team players get 3 points
+                points = 3;
+            }
+            // Losing team players get 0 points (already initialized)
+
+            foreach (var playerId in team.PlayerIds)
+            {
+                scores[playerId] = points;
+            }
+        }
+
+        return scores;
+    }
 }

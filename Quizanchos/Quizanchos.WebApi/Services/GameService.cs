@@ -176,6 +176,7 @@ public class GameService
         // Notify connected players about the move via real-time channel
         if (engine.IsFinished)
         {
+            await FinishGameSessionAsync(engine, gameSession.MinigameType);
             await _gameNotifier.NotifyGameFinished(request.GameId, state, engine.Winner);
         }
         else
