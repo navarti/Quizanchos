@@ -301,10 +301,11 @@ public class GameService
         state.IsFinished = true;
         await _gameLogicFactory.SaveGameState(minigameType, engine.GameId, state);
 
-        // Update winner's score
-        if (!string.IsNullOrEmpty(engine.Winner))
+        // Award scores to players based on game outcome (supports draws, participation, etc.)
+        var playerScores = engine.GetPlayerScores();
+        foreach (var (playerId, points) in playerScores)
         {
-            await _userScoreService.IncrementScoreAsync(engine.Winner, minigameType, 10).ConfigureAwait(false);
+            await _userScoreService.IncrementScoreAsync(playerId, minigameType, points).ConfigureAwait(false);
         }
 
         // Notify connected players that the game has finished

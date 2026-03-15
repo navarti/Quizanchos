@@ -66,4 +66,9 @@ public class GameEngine<TState, TMove>
 
         return _logic.NeedToFinish(State);
     }
+
+    public IReadOnlyDictionary<string, int> GetPlayerScores()
+    {
+        return _logic.GetPlayerScores(State);
+    }
 }
