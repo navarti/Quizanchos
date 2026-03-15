@@ -36,4 +36,9 @@ public class GameEngineWrapper<TState, TMove> : IGameEngine
     {
         return _engine.NeedToFinish();
     }
+
+    public IReadOnlyDictionary<string, int> GetPlayerScores()
+    {
+        return _engine.GetPlayerScores();
+    }
 }
