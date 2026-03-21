@@ -156,19 +156,29 @@ document.addEventListener('DOMContentLoaded', function () {
         closeModalButton: closeModalButton
     };
     
-    const defaultView = 'profile';
-    const defaultButton = document.querySelector(`.nav-button[onclick*="${defaultView}"]`);
-    if (defaultButton) {
-        defaultButton.classList.add('active');
+    const navButtons = document.querySelectorAll('.nav-button');
+    const viewSections = document.querySelectorAll('.view-section');
+
+    if (navButtons.length > 0 && viewSections.length > 0) {
+        const hashView = window.location.hash ? window.location.hash.substring(1) : '';
+        const fallbackView = 'profile';
+        const defaultView = document.getElementById(`${hashView}-view`) ? hashView : fallbackView;
+        const defaultButton = document.querySelector(`.nav-button[onclick*="'${defaultView}'"]`)
+            || document.querySelector(`.nav-button[onclick*="\"${defaultView}\""]`);
+
+        if (defaultButton) {
+            defaultButton.classList.add('active');
+        }
+
+        switchView(defaultView, defaultButton, true);
     }
-    switchView(defaultView, defaultButton);
 
     if (elements.closeModalButton) {
         elements.closeModalButton.addEventListener('click', closeVerifyModal);
     }
 });
 
-function switchView(view, button) {
+function switchView(view, button, replaceHistory = false) {
     const buttons = document.querySelectorAll('.nav-button');
     buttons.forEach(btn => btn.classList.remove('active'));
     if (button) {
@@ -182,8 +192,15 @@ function switchView(view, button) {
     if (selectedView) {
         selectedView.style.display = 'block';
     }
-    
-    history.pushState(null, '', `#${view}`);
+
+    const targetHash = `#${view}`;
+    if (window.location.hash !== targetHash) {
+        if (replaceHistory) {
+            history.replaceState(null, '', targetHash);
+        } else {
+            history.pushState(null, '', targetHash);
+        }
+    }
 }
 
 function handlePasswordSubmit(event) {
