@@ -1,9 +1,8 @@
-@{
-    ViewData["Title"] = "2048";
-}
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('minigame-root');
+    if (!root) return;
 
-<link rel="stylesheet" href="/minigames/game2048/css/game2048.css">
-
+    root.innerHTML = `
 <div class="game2048-landing">
     <h1>2048</h1>
     <p class="subtitle">Join the tiles, get to <strong>2048!</strong></p>
@@ -12,9 +11,9 @@
         <div class="form-group">
             <label for="boardSize">Board Size:</label>
             <select id="boardSize" class="form-control">
-                <option value="4" selected>4 × 4</option>
-                <option value="5">5 × 5</option>
-                <option value="6">6 × 6</option>
+                <option value="4" selected>4 Ã— 4</option>
+                <option value="5">5 Ã— 5</option>
+                <option value="6">6 Ã— 6</option>
             </select>
         </div>
         <div class="action-buttons">
@@ -22,20 +21,10 @@
             <a href="/" class="btn-back">Back to Home</a>
         </div>
     </div>
-</div>
+</div>`;
 
-<script>
-    window.minigameConfig = {
-        minigameTypeId: @ViewBag.MinigameTypeId,
-        gameUrlTemplate: '@ViewBag.GameUrlTemplate',
-        lobbyUrl: '@ViewBag.LobbyUrl'
-    };
-</script>
-<script src="/js/game-client.js" asp-append-version="true"></script>
-<script src="/minigames/game2048/js/game2048-client.js" asp-append-version="true"></script>
-<script>
-    document.getElementById('startGame2048').addEventListener('click', async () => {
-        const size = parseInt(document.getElementById('boardSize').value);
+    document.getElementById('startGame2048')?.addEventListener('click', async () => {
+        const size = parseInt(document.getElementById('boardSize').value, 10);
         const userId = document.body.getAttribute('data-user-id');
         if (!userId) {
             alert('Please log in to play.');
@@ -43,12 +32,12 @@
         }
 
         try {
-            const result = await game2048Client.createGame([userId], { size: size });
-            if (result && result.gameId) {
+            const result = await game2048Client.createGame([userId], { size });
+            if (result?.gameId) {
                 window.location.href = window.minigameConfig.gameUrlTemplate.replace('{gameId}', result.gameId);
             }
         } catch (error) {
             alert('Failed to create game: ' + error.message);
         }
     });
-</script>
+});

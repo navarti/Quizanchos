@@ -2,6 +2,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.game2048GameUrlTemplate;
     const lobbyUrl = window.minigameConfig?.lobbyUrl ?? window.game2048LobbyUrl;
+    ensureGame2048Layout();
+
     const wrapper = document.getElementById('game2048-wrapper');
     const gameId = wrapper.getAttribute('data-game-id');
     const userId = document.body.getAttribute('data-user-id');
@@ -29,6 +31,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingContainer.innerHTML = `<p>Failed to load game. <a href="${lobbyUrl}">Try again</a></p>`;
     }
 });
+
+function ensureGame2048Layout() {
+    if (document.getElementById('game2048-wrapper')) return;
+
+    const root = document.getElementById('minigame-root');
+    if (!root) return;
+
+    root.innerHTML = `
+<div class="game2048-wrapper" data-game-id="${window.minigameConfig?.gameId ?? ''}" id="game2048-wrapper" style="display:none;">
+    <div class="game2048-header">
+        <h1>2048</h1>
+        <div class="game2048-scores">
+            <div class="score-box"><span class="score-label">Score</span><span class="score-value" id="current-score">0</span></div>
+            <div class="score-box"><span class="score-label">Best Tile</span><span class="score-value" id="best-tile">0</span></div>
+            <div class="score-box"><span class="score-label">Moves</span><span class="score-value" id="move-count">0</span></div>
+        </div>
+    </div>
+    <div class="game2048-board" id="game2048-board"></div>
+    <p class="game2048-hint">Use <strong>arrow keys</strong> or <strong>swipe</strong> to move tiles.</p>
+    <div class="game2048-actions">
+        <button id="finishGameBtn" class="btn-finish-game">Finish Game</button>
+        <button id="newGameBtn" class="btn-new-game">New Game</button>
+        <a href="${window.minigameConfig?.lobbyUrl ?? '/'}" class="btn-back">Back</a>
+    </div>
+</div>
+<div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 60vh;"><p>Loading game...</p></div>
+<div id="gameOverModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Game Over!</h2>
+        <p>Your Score: <strong id="finalScoreDisplay">0</strong></p>
+        <p>Best Tile: <strong id="finalBestTile">0</strong></p>
+        <p>Total Moves: <strong id="finalMoveCount">0</strong></p>
+        <div class="modal-buttons">
+            <button id="playAgainBtn">Play Again</button>
+            <button id="returnHomeBtn">Return to Home</button>
+        </div>
+    </div>
+</div>`;
+}
 
 let currentBoard = [];
 let boardSize = 4;

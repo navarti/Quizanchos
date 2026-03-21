@@ -2,6 +2,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('[QM] Page loaded, initializing...');
 
+    ensureQuizMultiplayerGameLayout();
+
     const container = document.getElementById('qm-container');
     const gameId = container.getAttribute('data-game-id');
     const userId = document.body.getAttribute('data-user-id');
@@ -29,6 +31,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('[QM] MoveMade received — refreshing state');
         await refreshGameState(gameId, userId);
     });
+
+function ensureQuizMultiplayerGameLayout() {
+    if (document.getElementById('qm-container')) return;
+
+    const root = document.getElementById('minigame-root');
+    if (!root) return;
+
+    root.innerHTML = `
+<div class="qm-container" data-game-id="${window.minigameConfig?.gameId ?? ''}" id="qm-container" style="display:none;">
+    <div class="qm-header" id="qm-header">
+        <h1 id="qm-question">Loading...</h1>
+        <div class="question-info"><span id="question-number">Question <span data-current>1</span> of <span data-total>10</span></span></div>
+    </div>
+    <div class="qm-scoreboard" id="qm-scoreboard"></div>
+    <div class="qm-waiting" id="qm-waiting" style="display:none;"><p>Waiting for other players... <span id="qm-answered-count">0</span>/<span id="qm-total-players">0</span></p></div>
+    <div class="timeline-container" id="timeline-container"><div class="timeline" id="timeline"></div></div>
+    <div class="quiz-options" id="qm-options"></div>
+</div>
+<div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 100vh;"><div id="loader"></div></div>
+<div id="errorModal" class="modal" style="display: none;"><div class="modal-content"><span class="close-btn" id="closeModal">&times;</span><h2 id="modalHeader">Error</h2><p id="modalErrorText"></p><div id="modalButtons" class="modal-buttons"><button id="returnToMenu">Return to Menu</button></div></div></div>
+<div id="roundResultModal" class="modal" style="display: none;"><div class="modal-content"><h2>Round Results</h2><div id="roundResultBody"></div></div></div>
+<div id="finalStatsModal" class="modal" style="display: none;"><div class="modal-content"><h2 id="finalTitle">Game Over!</h2><div id="finalScoreboard"></div><p id="winnerText"></p><button id="goToResults">Return to Main Menu</button></div></div>
+<div id="preloader"><div id="loader"></div></div>`;
+}
 
     connection.on('GameStateChanged', async (_payload) => {
         console.log('[QM] GameStateChanged received — refreshing state');
