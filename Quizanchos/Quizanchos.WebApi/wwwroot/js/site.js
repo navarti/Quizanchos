@@ -59,7 +59,8 @@
 
                 if (gameResponse && gameResponse.gameId) {
                     // Navigate to the quiz game page
-                    window.location.href = `/Quiz/${gameResponse.gameId}`;
+                    const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.quizGameUrlTemplate;
+                    window.location.href = gameUrlTemplate.replace('{gameId}', gameResponse.gameId);
                 } else {
                     alert("Unexpected response format. Please try again.");
                 }

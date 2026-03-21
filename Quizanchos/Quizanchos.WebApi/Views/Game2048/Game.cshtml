@@ -32,7 +32,7 @@
     <div class="game2048-actions">
         <button id="finishGameBtn" class="btn-finish-game">Finish Game</button>
         <button id="newGameBtn" class="btn-new-game">New Game</button>
-        <a href="/" class="btn-back">Back to Home</a>
+        <a href="@ViewBag.LobbyUrl" class="btn-back">Back</a>
     </div>
 </div>
 
@@ -54,7 +54,11 @@
 </div>
 
 <script>
-    window.game2048MinigameTypeId = @ViewBag.MinigameTypeId;
+    window.minigameConfig = {
+        minigameTypeId: @ViewBag.MinigameTypeId,
+        gameUrlTemplate: '@ViewBag.GameUrlTemplate',
+        lobbyUrl: '@ViewBag.LobbyUrl'
+    };
 </script>
 <script src="/js/game-client.js" asp-append-version="true"></script>
 <script src="/minigames/game2048/js/game2048-client.js" asp-append-version="true"></script>

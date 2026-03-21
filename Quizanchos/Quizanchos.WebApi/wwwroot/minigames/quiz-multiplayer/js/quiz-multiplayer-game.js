@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!gameId || !userId) {
         console.error('[QM] Missing game or user information');
         alert('Missing game or user information');
-        window.location.href = '/';
+        window.location.href = window.minigameConfig?.lobbyUrl ?? window.quizMultiplayerLobbyUrl;
         return;
     }
 
@@ -130,10 +130,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Return to menu from modals
     document.getElementById('returnToMenu')?.addEventListener('click', () => {
-        window.location.href = '/';
+        window.location.href = window.minigameConfig?.lobbyUrl ?? window.quizMultiplayerLobbyUrl;
     });
     document.getElementById('goToResults')?.addEventListener('click', () => {
-        window.location.href = '/';
+        window.location.href = window.minigameConfig?.lobbyUrl ?? window.quizMultiplayerLobbyUrl;
     });
 });
 

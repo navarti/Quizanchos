@@ -8,6 +8,7 @@ namespace Quizanchos.WebApi.Controllers.Quiz;
 public class QuizViewController : Controller
 {
     private readonly IMinigameFrontendRegistry _minigameFrontendRegistry;
+    private const string GameKey = "Quiz";
 
     public QuizViewController(IMinigameFrontendRegistry minigameFrontendRegistry)
     {
@@ -18,20 +19,34 @@ public class QuizViewController : Controller
     [Authorize(Roles = "User")]
     public IActionResult Setup(Guid categoryId)
     {
+        var descriptor = GetRequiredDescriptor();
+
         // Pass only the category ID to the view
         // The view will load all data via API
         ViewBag.CategoryId = categoryId;
-        ViewBag.MinigameTypeId = _minigameFrontendRegistry.GetDescriptor("Quiz")?.MinigameTypeId ?? 1;
+        ViewBag.MinigameTypeId = descriptor.MinigameTypeId;
+        ViewBag.GameUrlTemplate = descriptor.GameUrlTemplate;
+        ViewBag.LobbyUrl = descriptor.LobbyUrl;
         return View("~/Views/Quiz/SessionSetup.cshtml");
     }
 
     [HttpGet("{gameId:guid}")]
     public IActionResult Game(Guid gameId)
     {
+        var descriptor = GetRequiredDescriptor();
+
         // Pass only the game ID to the view
         // The view will load all data via API
         ViewBag.GameId = gameId;
-        ViewBag.MinigameTypeId = _minigameFrontendRegistry.GetDescriptor("Quiz")?.MinigameTypeId ?? 1;
+        ViewBag.MinigameTypeId = descriptor.MinigameTypeId;
+        ViewBag.GameUrlTemplate = descriptor.GameUrlTemplate;
+        ViewBag.LobbyUrl = descriptor.LobbyUrl;
         return View("~/Views/Quiz/Game.cshtml");
+    }
+
+    private IMinigameFrontendDescriptor GetRequiredDescriptor()
+    {
+        return _minigameFrontendRegistry.GetDescriptor(GameKey)
+            ?? throw new InvalidOperationException($"Frontend descriptor '{GameKey}' is not registered.");
     }
 }

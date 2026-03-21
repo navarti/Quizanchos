@@ -24,6 +24,12 @@ public class MinigameRegistry : IMinigameRegistry
 
         lock (_lockObject)
         {
+            if (_descriptors.ContainsKey(descriptor.GameKey))
+                throw new InvalidOperationException($"A minigame with GameKey '{descriptor.GameKey}' is already registered.");
+
+            if (_descriptorsByTypeId.ContainsKey(descriptor.MinigameTypeId))
+                throw new InvalidOperationException($"A minigame with MinigameTypeId '{descriptor.MinigameTypeId}' is already registered.");
+
             _descriptors[descriptor.GameKey] = descriptor;
             _descriptorsByTypeId[descriptor.MinigameTypeId] = descriptor;
         }

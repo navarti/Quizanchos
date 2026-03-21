@@ -60,7 +60,11 @@
 </div>
 
 <script>
-    window.quizMinigameTypeId = @ViewBag.MinigameTypeId;
+    window.minigameConfig = {
+        minigameTypeId: @ViewBag.MinigameTypeId,
+        gameUrlTemplate: '@ViewBag.GameUrlTemplate',
+        lobbyUrl: '@ViewBag.LobbyUrl'
+    };
 </script>
 <script src="/js/game-client.js" asp-append-version="true"></script>
 <script src="/minigames/quiz/js/quiz-client.js" asp-append-version="true"></script>

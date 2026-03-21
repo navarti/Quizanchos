@@ -25,6 +25,17 @@ public interface IMinigameDescriptor
     string DisplayName { get; }
 
     /// <summary>
+    /// Concrete move type for this minigame used for polymorphic serialization.
+    /// Must derive from <see cref="GameMove"/>.
+    /// </summary>
+    Type MoveType { get; }
+
+    /// <summary>
+    /// Type discriminator value used in JSON payloads for this minigame move type.
+    /// </summary>
+    string MoveDiscriminator { get; }
+
+    /// <summary>
     /// Register this minigame's services with the DI container.
     /// This method is called during application startup.
     /// </summary>

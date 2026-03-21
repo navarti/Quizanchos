@@ -16,6 +16,7 @@ The platform now uses a **plugin-based architecture** for minigame integration. 
   - Creating game engine instances (`CreateGameEngineAsync`)
   - Loading saved games (`LoadGameEngineAsync`)
   - Persisting game state (`SaveGameStateAsync`)
+  - Declaring move serialization metadata (`MoveType`, `MoveDiscriminator`)
 
 #### `IMinigameRegistry`
 - Manages registration and retrieval of minigame descriptors
@@ -54,6 +55,8 @@ public class QuizMinigameDescriptor : IMinigameDescriptor
     public int MinigameTypeId => 1;
     public string GameKey => "Quiz";
     public string DisplayName => "Quiz";
+    public Type MoveType => typeof(QuizMove);
+    public string MoveDiscriminator => "quiz";
     
     // Calls Quiz extension methods to register services
     public void RegisterServices(IServiceCollection services)
@@ -80,8 +83,12 @@ Similar descriptors exist for:
 1. **Initialization** (in `Startup.cs`):
    ```csharp
    var pluginAssemblies = LoadPluginAssemblies();
-   var registry = BuildMinigameRegistry(services, pluginAssemblies);
+   var minigameDescriptors = CreateDescriptors<IMinigameDescriptor>(pluginAssemblies).ToList();
+   var registry = BuildMinigameRegistry(services, minigameDescriptors);
    services.AddSingleton<IMinigameRegistry>(registry);
+
+   // Polymorphic GameMove serialization is built dynamically from descriptor metadata
+   AddControllers(builder, minigameDescriptors);
 
    var frontendRegistry = BuildFrontendRegistry(pluginAssemblies);
    services.AddSingleton<IMinigameFrontendRegistry>(frontendRegistry);
@@ -254,6 +261,22 @@ public class YourGameFrontendDescriptor : IMinigameFrontendDescriptor
 
 No other WebApi code needs modification. Your minigame is now fully integrated and available through the standard game creation API.
 
+### Frontend bootstrap convention
+
+Minigame views should expose a single bootstrap object:
+
+```html
+<script>
+  window.minigameConfig = {
+    minigameTypeId: 4,
+    gameUrlTemplate: "/YourGame/{gameId}",
+    lobbyUrl: "/YourGame"
+  };
+</script>
+```
+
+Client scripts should read this object instead of minigame-specific globals.
+
 ## Benefits of This Architecture
 
 | Benefit | Details |
@@ -309,6 +332,13 @@ Different minigames have different state and move types (`QuizGameState`/`QuizMo
 - In `CreateGameEngineAsync`, properly extract and convert parameters
 - Use `ContainsKey` to check before accessing parameters
 - Provide sensible defaults for missing parameters
+
+### Issue: Descriptor receives `JsonElement` values instead of primitive types
+**Cause:** Request parameter bag is deserialized from JSON
+**Solution:**
+- Parse descriptor parameters defensively (`int`, `string`, `JsonElement`, etc.)
+- Support both numeric and string enum/guid representations
+- Keep defaults for missing or invalid values
 
 ## Testing
 
