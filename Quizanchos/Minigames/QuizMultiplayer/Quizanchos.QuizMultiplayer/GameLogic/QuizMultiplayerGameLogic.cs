@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
+using Quizanchos.Quiz.GameLogic;
+using Quizanchos.Quiz.Services;
 
 namespace Quizanchos.QuizMultiplayer.GameLogic;
 
@@ -12,6 +14,7 @@ public class QuizMultiplayerGameLogic : IGameLogic<QuizMultiplayerGameState, Qui
     private readonly int _secondsPerCard;
     private readonly int _optionCount;
     private readonly List<QuizMultiplayerGameState.TeamData> _teams;
+    private readonly QuizCardGeneratorService? _cardGenerator;
 
     public QuizMultiplayerGameLogic(
         int totalCards = 10,
@@ -19,7 +22,8 @@ public class QuizMultiplayerGameLogic : IGameLogic<QuizMultiplayerGameState, Qui
         GameLevel gameLevel = GameLevel.Easy,
         int secondsPerCard = 30,
         int optionCount = 4,
-        List<QuizMultiplayerGameState.TeamData>? teams = null)
+        List<QuizMultiplayerGameState.TeamData>? teams = null,
+        QuizCardGeneratorService? cardGenerator = null)
     {
         _totalCards = totalCards;
         _quizCategoryId = quizCategoryId ?? Guid.Empty;
@@ -27,6 +31,7 @@ public class QuizMultiplayerGameLogic : IGameLogic<QuizMultiplayerGameState, Qui
         _secondsPerCard = secondsPerCard;
         _optionCount = optionCount;
         _teams = teams ?? new List<QuizMultiplayerGameState.TeamData>();
+        _cardGenerator = cardGenerator;
     }
 
     public QuizMultiplayerGameState CreateInitialState(Guid gameId, ImmutableArray<string> players)
@@ -114,11 +119,55 @@ public class QuizMultiplayerGameLogic : IGameLogic<QuizMultiplayerGameState, Qui
 
         state.CurrentCardIndex++;
 
-        // Reset the new card's creation time so the per-card timer starts fresh
-        if (state.CurrentCardIndex < state.Cards.Count)
+        // Generate next card lazily so each card gets its own CreationTime
+        if (_cardGenerator != null
+            && state.CurrentCardIndex < state.TotalCards
+            && state.CurrentCardIndex >= state.Cards.Count
+            && state.QuizCategoryId != Guid.Empty)
         {
+            GenerateAndAppendSingleCard(state);
+        }
+        else if (state.CurrentCardIndex < state.Cards.Count)
+        {
+            // Backward compatibility for sessions where cards were pre-generated
             state.Cards[state.CurrentCardIndex].CreationTime = DateTime.UtcNow;
         }
+    }
+
+    private void GenerateAndAppendSingleCard(QuizMultiplayerGameState state)
+    {
+        QuizGameState tempState = new QuizGameState
+        {
+            GameId = state.GameId,
+            Players = state.Players,
+            TotalCards = state.TotalCards,
+            CurrentCardIndex = state.CurrentCardIndex - 1,
+            OptionCount = state.OptionCount,
+            GameLevel = state.GameLevel,
+            QuizCategoryId = state.QuizCategoryId,
+            Cards = Enumerable.Range(0, state.Cards.Count)
+                .Select(_ => new QuizGameState.QuizCard())
+                .ToList()
+        };
+
+        _cardGenerator!
+            .GenerateSingleCard(tempState, state.QuizCategoryId, state.OptionCount, state.GameLevel)
+            .GetAwaiter()
+            .GetResult();
+
+        QuizGameState.QuizCard generatedCard = tempState.Cards.Last();
+        state.Cards.Add(new QuizMultiplayerGameState.QuizMultiplayerCard
+        {
+            Id = generatedCard.Id,
+            CardIndex = generatedCard.CardIndex,
+            CorrectOption = generatedCard.CorrectOption,
+            EntityIds = generatedCard.EntityIds,
+            EntityNames = generatedCard.EntityNames,
+            OptionValues = generatedCard.OptionValues,
+            PlayerAnswers = new Dictionary<string, int?>(),
+            CreationTime = generatedCard.CreationTime,
+            TeamVotes = new Dictionary<int, int>()
+        });
     }
 
     public bool CheckFinished(QuizMultiplayerGameState state)

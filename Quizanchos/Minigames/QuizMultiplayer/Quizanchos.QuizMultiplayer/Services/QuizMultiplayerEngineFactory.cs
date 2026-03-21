@@ -69,17 +69,17 @@ public class QuizMultiplayerEngineFactory
 
         // Create the engine
         QuizMultiplayerGameLogic logic = new QuizMultiplayerGameLogic(
-            totalCards, categoryId, gameLevel, secondsPerCard, optionCount, teams);
+            totalCards, categoryId, gameLevel, secondsPerCard, optionCount, teams, _cardGenerator);
 
         GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove> engine =
             new GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove>(logic, gameId, playerIds);
 
         QuizMultiplayerGameState state = engine.State;
 
-        // Generate cards by reusing Quiz's card generator with a temporary QuizGameState
+        // Generate only the first card. Next cards are generated lazily after each round.
         if (categoryId.HasValue && categoryId.Value != Guid.Empty && _cardGenerator != null)
         {
-            _logger.LogInformation("Generating cards via QuizCardGeneratorService");
+            _logger.LogInformation("Generating first card via QuizCardGeneratorService");
             try
             {
                 QuizGameState tempState = new QuizGameState
@@ -92,10 +92,11 @@ public class QuizMultiplayerEngineFactory
                     GameLevel = gameLevel
                 };
 
-                await _cardGenerator.GenerateCardsForGame(tempState, categoryId.Value, totalCards, optionCount, gameLevel);
+                await _cardGenerator.GenerateSingleCard(tempState, categoryId.Value, optionCount, gameLevel);
 
-                // Copy generated cards into multiplayer state
-                foreach (var quizCard in tempState.Cards)
+                // Copy generated first card into multiplayer state
+                var quizCard = tempState.Cards.FirstOrDefault();
+                if (quizCard != null)
                 {
                     state.Cards.Add(new QuizMultiplayerGameState.QuizMultiplayerCard
                     {
@@ -115,7 +116,7 @@ public class QuizMultiplayerEngineFactory
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating cards for QuizMultiplayer game {GameId}", gameId);
+                _logger.LogError(ex, "Error generating first card for QuizMultiplayer game {GameId}", gameId);
             }
         }
         else
@@ -150,7 +151,8 @@ public class QuizMultiplayerEngineFactory
             state.GameLevel,
             state.SecondsPerCard,
             state.OptionCount,
-            state.Teams);
+            state.Teams,
+            _cardGenerator);
 
         GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove> engine =
             new GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove>(logic, state);

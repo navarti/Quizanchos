@@ -23,7 +23,7 @@ public class GameSessionRepository : IGameSessionRepository
 
     public async Task<GameSession?> GetActiveByPlayerIdAsync(string playerId)
     {
-        return await _context.GameSessions
+       return await _context.GameSessions
             .Include(x => x.Players)
             .Include(x => x.Winner)
             .FirstOrDefaultAsync(x => x.IsActive && x.Players.Any(p => p.ApplicationUserId == playerId));
