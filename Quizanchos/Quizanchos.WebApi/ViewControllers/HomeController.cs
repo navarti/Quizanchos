@@ -49,23 +49,7 @@ public class HomeController : Controller
                 activeGameSession = (await _gameService.GetActiveGameByPlayerIdAsync(userId)).Response?.State;
         }
 
-        var minigames = _minigameFrontendRegistry
-            .GetAllDescriptors()
-            .Values
-            .OrderBy(x => x.Order)
-            .Select(x => new MinigameCardViewModel
-            {
-                MinigameTypeId = x.MinigameTypeId,
-                GameKey = x.GameKey,
-                DisplayName = x.DisplayName,
-                Description = x.Description,
-                CardStyle = x.CardStyle,
-                LobbyUrl = x.LobbyUrl,
-                GameUrlTemplate = x.GameUrlTemplate,
-                ActionText = x.ActionText,
-                Order = x.Order
-            })
-            .ToList();
+        var minigames = GetMinigameCards();
 
         string? activeSessionUrl = null;
         if (activeGameSession != null)
@@ -100,23 +84,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Leaderboard()
     {
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
-        var minigames = _minigameFrontendRegistry
-            .GetAllDescriptors()
-            .Values
-            .OrderBy(x => x.Order)
-            .Select(x => new MinigameCardViewModel
-            {
-                MinigameTypeId = x.MinigameTypeId,
-                GameKey = x.GameKey,
-                DisplayName = x.DisplayName,
-                Description = x.Description,
-                CardStyle = x.CardStyle,
-                LobbyUrl = x.LobbyUrl,
-                GameUrlTemplate = x.GameUrlTemplate,
-                ActionText = x.ActionText,
-                Order = x.Order
-            })
-            .ToList();
+        var minigames = GetMinigameCards();
 
         var currentUserName = User.Identity?.Name ?? "Guest";
         var currentUser = users.FirstOrDefault(u => u.UserName == currentUserName);
@@ -163,6 +131,20 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet("/Minigames")]
+    public IActionResult Minigames()
+    {
+        var viewModel = new HomeViewModel
+        {
+            QuizCategories = new List<QuizCategoryDto>(),
+            QuizName = string.Empty,
+            Minigames = GetMinigameCards(),
+            CurrentUserName = User.Identity?.Name ?? "Guest"
+        };
+
+        return View(viewModel);
+    }
+
     
     [HttpGet("/Signup")]
     public IActionResult Signup()
@@ -186,6 +168,27 @@ public class HomeController : Controller
             CurrentUserName = User.Identity?.Name ?? "Guest"
         };
         return View(viewModel);
+    }
+
+    private List<MinigameCardViewModel> GetMinigameCards()
+    {
+        return _minigameFrontendRegistry
+            .GetAllDescriptors()
+            .Values
+            .OrderBy(x => x.Order)
+            .Select(x => new MinigameCardViewModel
+            {
+                MinigameTypeId = x.MinigameTypeId,
+                GameKey = x.GameKey,
+                DisplayName = x.DisplayName,
+                Description = x.Description,
+                CardStyle = x.CardStyle,
+                LobbyUrl = x.LobbyUrl,
+                GameUrlTemplate = x.GameUrlTemplate,
+                ActionText = x.ActionText,
+                Order = x.Order
+            })
+            .ToList();
     }
     
 }

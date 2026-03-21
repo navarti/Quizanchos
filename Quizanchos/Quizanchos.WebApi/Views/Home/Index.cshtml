@@ -15,53 +15,6 @@
     <div class="wave"></div>
 </div>
 <main>
-    <div class="hero-section">
-        <h1>Quizzes</h1>
-        <p class="subtitle">Get your first 100 points on your first quiz!</p>
-
-        <div class="featured-quizzes">
-            @foreach (var category in Model.QuizCategories.Take(2))
-            {
-                <div class="quiz-card">
-                    <div class="quiz-image" style="background-image: url('@category.ImageUrl')">
-                        <div class="quiz-content">
-                            <div class="quiz-header">
-                                <h2>@category.Name Quiz</h2>
-                                <p>Explore the mysteries of ancient civilizations!</p> 
-                            </div>
-                            <div class="quiz-meta">
-                                <span>@category.CreationDate.ToShortDateString()</span>
-                                <span>@category.Name</span>
-                                <span>@category.AuthorName</span>
-                            </div>
-                            <a href="/Minigame/Quiz?categoryId=@category.Id" class="quiz-btn">GO →</a>
-                        </div>
-                    </div>
-                </div>
-            }
-            </div>
-        </div>
-
-        <div class="hero-section" style="margin-top: 40px;">
-            <h1>Minigames</h1>
-            <p class="subtitle">Try other fun games!</p>
-            <div class="featured-quizzes">
-                @foreach (var minigame in Model.Minigames)
-                {
-                    <div class="quiz-card">
-                        <div class="quiz-image" style="@minigame.CardStyle">
-                            <div class="quiz-content">
-                                <div class="quiz-header">
-                                    <h2>@minigame.DisplayName</h2>
-                                    <p>@minigame.Description</p>
-                                </div>
-                                <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
         @if (User.Identity?.IsAuthenticated == true)
         {
         if (Model.ActiveSession != null)
