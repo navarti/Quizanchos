@@ -58,7 +58,7 @@ public class Game2048EngineFactory
 
         Game2048State state = engine.State;
 
-        await _stateService.CreateInitialStateAsync(gameSession, size, state.Board);
+        await _stateService.CreateInitialStateAsync(gameSession, state);
 
         _logger.LogInformation("2048 engine created. Score={Score}, BestTile={BestTile}", state.Score, state.BestTile);
 

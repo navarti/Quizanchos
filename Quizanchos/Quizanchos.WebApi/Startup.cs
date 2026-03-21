@@ -150,6 +150,7 @@ public static class Startup
         AddControllers(builder, minigameDescriptors);
 
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
+        services.AddScoped<IGameSessionStateRepository, GameSessionStateRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
         services.AddScoped<IUserMinigameScoreRepository, UserMinigameScoreRepository>();
         services.AddScoped<UserScoreService>();
