@@ -18,58 +18,6 @@
         submitButton.addEventListener('click', handleSubmit);
     }
     
-    const startQuestButton = document.getElementById("startQuestButton");
-    
-    if (startQuestButton) {
-        startQuestButton.addEventListener("click", async function (event) {
-            event.preventDefault();
-
-            const form = document.getElementById('gameSettingsForm');
-            const categoryId = form.getAttribute('data-category-id');
-
-            if (!categoryId) {
-                alert("Quiz Category ID is missing.");
-                return;
-            }
-
-            const gameLevel = document.getElementById("gameLevel").value;
-            const cardsCount = document.getElementById("cardsCount").value;
-            const secondPerCard = document.getElementById("secondsPerCard").value;
-            const optionCount = document.getElementById("optionCount").value;
-
-            try {
-                // Get current user ID from the body element
-                const userId = document.body.getAttribute('data-user-id');
-                if (!userId) {
-                    alert("User information is missing. Please log in again.");
-                    return;
-                }
-
-                // Create game using the new universal GameController
-                const gameResponse = await quizClient.createQuizGame(
-                    userId,
-                    parseInt(cardsCount, 10),
-                    {
-                        gameLevel: parseInt(gameLevel, 10),
-                        secondsPerCard: parseInt(secondPerCard, 10),
-                        optionCount: parseInt(optionCount, 10),
-                        categoryId: categoryId
-                    }
-                );
-
-                if (gameResponse && gameResponse.gameId) {
-                    // Navigate to the quiz game page
-                    const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.quizGameUrlTemplate;
-                    window.location.href = gameUrlTemplate.replace('{gameId}', gameResponse.gameId);
-                } else {
-                    alert("Unexpected response format. Please try again.");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert(error.message || "An error occurred. Please try again later.");
-            }
-        });
-    }
 });
 
 async function handleSubmit(event) {

@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!gameId || !userId) {
         console.error('[QUIZ-GAME] Missing game or user information');
         alert('Missing game or user information');
-        window.location.href = window.minigameConfig?.lobbyUrl ?? window.quizLobbyUrl;
+        window.location.href = window.minigameConfig.lobbyUrl;
         return;
     }
 
@@ -365,7 +365,7 @@ function showFinalStats(score, total) {
     modal.style.display = 'flex';
     
     document.getElementById('goToResults').addEventListener('click', () => {
-        window.location.href = window.minigameConfig?.lobbyUrl ?? window.quizLobbyUrl;
+        window.location.href = window.minigameConfig.lobbyUrl;
     });
 }
 
@@ -376,7 +376,7 @@ function showError(message) {
     modal.style.display = 'flex';
     
     document.getElementById('returnToMenu').addEventListener('click', () => {
-        window.location.href = window.minigameConfig?.lobbyUrl ?? window.quizLobbyUrl;
+        window.location.href = window.minigameConfig.lobbyUrl;
     });
 }
 

@@ -97,11 +97,11 @@ function showEndOfTimeModal(currentCardIndex, totalCards) {
 
         const categoryId = quizContainer.getAttribute('data-category-id');
         if (!categoryId) {
-            console.error('Category ID is missing or invalid');
+            redirectwithPreloader('/Minigame/Quiz');
             return;
         }
 
-        redirectwithPreloader(`/Quiz/Setup/${categoryId}`);
+        redirectwithPreloader(`/Minigame/Quiz?categoryId=${encodeURIComponent(categoryId)}`);
     });
 
     document.getElementById('returnToMenu').addEventListener('click', () => {
