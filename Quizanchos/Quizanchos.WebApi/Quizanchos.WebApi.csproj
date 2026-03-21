@@ -34,6 +34,32 @@
     <ProjectReference Include="..\Minigames\Quiz\Quizanchos.Quiz.DbUpdater\Quizanchos.Quiz.DbUpdater.csproj" />
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\Quizanchos.Core\Quizanchos.Core.csproj" />
+    <ProjectReference Include="..\Quizanchos.Domain\Quizanchos.Domain.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <MinigamePluginProject Include="..\Quizanchos.Game2048\Quizanchos.Game2048.csproj" />
+    <MinigamePluginProject Include="..\Minigames\QuizMultiplayer\Quizanchos.QuizMultiplayer\Quizanchos.QuizMultiplayer.csproj" />
+  </ItemGroup>
+
+  <Target Name="BuildAndCopyMinigamePlugins" AfterTargets="Build">
+    <MSBuild Projects="@(MinigamePluginProject)" Targets="Build" Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)" />
+
+    <ItemGroup>
+      <_MinigamePluginDll Include="@(MinigamePluginProject->'%(RootDir)%(Directory)bin\$(Configuration)\$(TargetFramework)\%(Filename).dll')" Condition="Exists('%(Identity)')" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_MinigamePluginDll)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="PublishMinigamePlugins" AfterTargets="ComputeFilesToPublish">
+    <ItemGroup>
+      <_MinigamePluginDllForPublish Include="@(MinigamePluginProject->'%(RootDir)%(Directory)bin\$(Configuration)\$(TargetFramework)\%(Filename).dll')" Condition="Exists('%(Identity)')" />
+      <ResolvedFileToPublish Include="@(_MinigamePluginDllForPublish)">
+        <RelativePath>%(Filename)%(Extension)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
 
 </Project>

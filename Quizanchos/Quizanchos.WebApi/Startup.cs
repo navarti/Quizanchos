@@ -18,6 +18,7 @@ using Quizanchos.WebApi.Services.Rooms;
 using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
 using Quizanchos.WebApi.Hubs;
+using System.Runtime.Loader;
 using System.Reflection;
 
 namespace Quizanchos.WebApi;
@@ -226,6 +227,33 @@ public static class Startup
             catch
             {
                 // Ignore optional/unloadable assemblies
+            }
+        }
+
+        var baseDirectory = AppContext.BaseDirectory;
+        if (Directory.Exists(baseDirectory))
+        {
+            foreach (var dllPath in Directory.EnumerateFiles(baseDirectory, "Quizanchos.*.dll", SearchOption.TopDirectoryOnly))
+            {
+                try
+                {
+                    var assemblyName = AssemblyName.GetAssemblyName(dllPath);
+                    var loaded = AppDomain.CurrentDomain
+                        .GetAssemblies()
+                        .FirstOrDefault(a => string.Equals(a.GetName().Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase));
+
+                    var assembly = loaded ?? AssemblyLoadContext.Default.LoadFromAssemblyPath(dllPath);
+                    var key = assembly.FullName ?? assembly.GetName().Name ?? string.Empty;
+
+                    if (!loadedAssemblies.ContainsKey(key))
+                    {
+                        loadedAssemblies[key] = assembly;
+                    }
+                }
+                catch
+                {
+                    // Ignore optional/unloadable assemblies
+                }
             }
         }
 
