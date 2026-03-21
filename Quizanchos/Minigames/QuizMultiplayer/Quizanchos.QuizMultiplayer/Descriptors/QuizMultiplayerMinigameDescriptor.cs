@@ -16,7 +16,8 @@ namespace Quizanchos.QuizMultiplayer.Descriptors;
 /// </summary>
 public class QuizMultiplayerMinigameDescriptor : IMinigameDescriptor
 {
-    public string GameKey => nameof(MinigameType.QuizMultiplayer);
+    public int MinigameTypeId => 3;
+    public string GameKey => "QuizMultiplayer";
     public string DisplayName => "Quiz Multiplayer";
 
     public void RegisterServices(IServiceCollection services)

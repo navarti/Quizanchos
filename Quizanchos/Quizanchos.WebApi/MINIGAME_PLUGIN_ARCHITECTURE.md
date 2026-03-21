@@ -2,7 +2,7 @@
 
 ## Overview
 
-The platform now uses a **plugin-based architecture** for minigame integration. This allows adding new minigames **without modifying WebApi code** and without changing the `MinigameType` enum.
+The platform now uses a **plugin-based architecture** for minigame integration. This allows adding new minigames **without modifying WebApi startup registration** and without changing any shared enum.
 
 ## Architecture Components
 
@@ -51,7 +51,8 @@ Each minigame project now has a `Descriptors` folder with a descriptor class:
 ```csharp
 public class QuizMinigameDescriptor : IMinigameDescriptor
 {
-    public string GameKey => nameof(MinigameType.Quiz);  // "Quiz"
+    public int MinigameTypeId => 1;
+    public string GameKey => "Quiz";
     public string DisplayName => "Quiz";
     
     // Calls Quiz extension methods to register services
@@ -78,27 +79,20 @@ Similar descriptors exist for:
 
 1. **Initialization** (in `Startup.cs`):
    ```csharp
-   // Create registry
-   services.AddSingleton<IMinigameRegistry, MinigameRegistry>();
-   var registry = new MinigameRegistry();
-   
-   // Register each minigame
-   var quizDescriptor = new QuizMinigameDescriptor();
-   quizDescriptor.RegisterServices(services);  // Register Quiz services
-   registry.Register(quizDescriptor);           // Add to registry
-   
-   // Same for Game2048 and QuizMultiplayer
-   
-   // Make registry available to DI
-   services.AddSingleton(registry);
+   var pluginAssemblies = LoadPluginAssemblies();
+   var registry = BuildMinigameRegistry(services, pluginAssemblies);
+   services.AddSingleton<IMinigameRegistry>(registry);
+
+   var frontendRegistry = BuildFrontendRegistry(pluginAssemblies);
+   services.AddSingleton<IMinigameFrontendRegistry>(frontendRegistry);
    ```
 
 2. **Factory Usage** (in `GameLogicFactory`):
    ```csharp
    public async Task<IGameEngine> CreateGameEngine(
-       MinigameType type, Guid gameId, ...)
+       int type, Guid gameId, ...)
    {
-       var descriptor = _registry.GetDescriptor(type.ToString());
+       var descriptor = _registry.GetDescriptor(type);
        if (descriptor == null)
            throw new ArgumentException($"Unknown minigame type: {type}");
        
@@ -115,9 +109,9 @@ GameController.CreateGame
     ↓
 GameService.CreateGameAsync
     ↓
-GameLogicFactory.CreateGameEngine(MinigameType.Quiz)
+GameLogicFactory.CreateGameEngine(1)
     ↓
-IMinigameRegistry.GetDescriptor("Quiz")
+IMinigameRegistry.GetDescriptor(1)
     ↓
 QuizMinigameDescriptor.CreateGameEngineAsync
     ↓
@@ -145,6 +139,7 @@ namespace Quizanchos.YourGame.Descriptors;
 
 public class YourGameMinigameDescriptor : IMinigameDescriptor
 {
+    public int MinigameTypeId => 4;
     public string GameKey => "YourGame";
     public string DisplayName => "Your Game Name";
 
@@ -231,43 +226,29 @@ public static class YourGameServiceExtensions
 }
 ```
 
-### Step 4: Register in Startup
-File: `Quizanchos.WebApi/Startup.cs`
+### Step 4: Assign a Numeric Type ID in Descriptor
 
 ```csharp
-// Create and populate the registry with minigame descriptors
-var registry = new MinigameRegistry();
-
-// Register Quiz minigame
-var quizDescriptor = new QuizMinigameDescriptor();
-quizDescriptor.RegisterServices(services);
-registry.Register(quizDescriptor);
-
-// ... existing minigames ...
-
-// REGISTER YOUR NEW MINIGAME
-var yourGameDescriptor = new YourGameMinigameDescriptor();
-yourGameDescriptor.RegisterServices(services);
-registry.Register(yourGameDescriptor);
-
-// Replace the singleton registry instance with the populated one
-services.AddSingleton(registry);
-```
-
-### Step 5: Add Minigame Type to Enum
-File: `Quizanchos.Common/Enums/MinigameType.cs`
-
-```csharp
-public enum MinigameType
+public class YourGameMinigameDescriptor : IMinigameDescriptor
 {
-    Quiz = 1,
-    Game2048 = 2,
-    QuizMultiplayer = 3,
-    YourGame = 4  // ADD HERE
+    public int MinigameTypeId => 4;
+    public string GameKey => "YourGame";
+    // ...
 }
 ```
 
-**Important:** The enum value name must match your `GameKey` exactly (case-sensitive).
+### Step 5: Add frontend descriptor with the same `MinigameTypeId`
+
+```csharp
+public class YourGameFrontendDescriptor : IMinigameFrontendDescriptor
+{
+    public int MinigameTypeId => 4;
+    public string GameKey => "YourGame";
+    // ...
+}
+```
+
+**Important:** `MinigameTypeId` must be unique and match between backend and frontend descriptors.
 
 ### That's It! ✅
 
@@ -283,16 +264,16 @@ No other WebApi code needs modification. Your minigame is now fully integrated a
 | **Type-Safe** | Strong typing maintained through generics |
 | **Testable** | Mock descriptors easily for unit tests |
 | **SOLID Compliant** | Follows Open/Closed Principle |
-| **Backward Compatible** | Works with existing code |
+| **Decoupled from shared enums** | New games do not require editing common enum definitions |
 
 ## Key Design Decisions
 
-### Why `GameKey` Must Match Enum Name?
-The `GameKey` property is used to match descriptors to `MinigameType` enum values via string comparison. This ensures consistency and prevents registration errors.
+### Why `MinigameTypeId` and `GameKey`?
+`MinigameTypeId` is the runtime/persistence identity used by APIs and registries. `GameKey` is a stable human-readable key for UI/routing metadata.
 
 ```csharp
 // In GameLogicFactory
-var descriptor = _registry.GetDescriptor(minigameType.ToString());
+var descriptor = _registry.GetDescriptor(minigameTypeId);
 ```
 
 ### Why Services Are Registered in Descriptors?
@@ -310,16 +291,16 @@ Different minigames have different state and move types (`QuizGameState`/`QuizMo
 ## Troubleshooting
 
 ### Issue: "Unknown minigame type" error at runtime
-**Cause:** Descriptor was not registered or `GameKey` doesn't match enum name
+**Cause:** Descriptor was not discovered/registered or `MinigameTypeId` is wrong
 **Solution:** 
-- Verify descriptor is instantiated in `Startup.cs`
-- Ensure `GameKey` property returns exact match of `MinigameType` enum value name
-- Check that `registry.Register(descriptor)` was called
+- Verify descriptor class is public and has a parameterless constructor
+- Ensure `MinigameTypeId` is unique and greater than zero
+- Ensure your minigame project is referenced by WebApi wildcard project references and built
 
 ### Issue: Services not being injected into game engine factory
 **Cause:** `RegisterServices` wasn't called on descriptor
 **Solution:**
-- Verify descriptor's `RegisterServices` method is called in `Startup.cs`
+- Verify descriptor is discovered during startup
 - Ensure the method calls the appropriate extension methods (e.g., `AddYourGameRepositories()`)
 
 ### Issue: Game creation fails with serialization errors

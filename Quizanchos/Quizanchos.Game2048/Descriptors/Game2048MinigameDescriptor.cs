@@ -14,7 +14,8 @@ namespace Quizanchos.Game2048.Descriptors;
 /// </summary>
 public class Game2048MinigameDescriptor : IMinigameDescriptor
 {
-    public string GameKey => nameof(MinigameType.Game2048);
+    public int MinigameTypeId => 2;
+    public string GameKey => "Game2048";
     public string DisplayName => "2048";
 
     public void RegisterServices(IServiceCollection services)

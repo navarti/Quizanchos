@@ -1,6 +1,6 @@
 // Quiz Multiplayer Lobby
 document.addEventListener('DOMContentLoaded', async () => {
-    const MINIGAME_TYPE = 3; // MinigameType.QuizMultiplayer
+    const MINIGAME_TYPE = window.quizMultiplayerMinigameTypeId;
     const API = '/api/GameRoom';
     let currentRoomId = null;
 

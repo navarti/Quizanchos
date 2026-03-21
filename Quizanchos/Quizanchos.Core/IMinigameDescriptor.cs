@@ -10,8 +10,12 @@ namespace Quizanchos.Core;
 public interface IMinigameDescriptor
 {
     /// <summary>
+    /// Numeric minigame identifier used by API contracts and persistence.
+    /// </summary>
+    int MinigameTypeId { get; }
+
+    /// <summary>
     /// Unique identifier for the minigame (e.g., "Quiz", "Game2048", "QuizMultiplayer").
-    /// This should match the MinigameType enum value name.
     /// </summary>
     string GameKey { get; }
 

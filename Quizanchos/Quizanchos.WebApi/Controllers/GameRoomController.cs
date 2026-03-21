@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Quizanchos.Common.Enums;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Models.Rooms;
 using Quizanchos.WebApi.Services.Rooms;
@@ -43,7 +42,7 @@ public class GameRoomController : ControllerBase
     /// </summary>
     [HttpGet]
     [Authorize(AppRole.User)]
-    public IActionResult GetAvailableRooms([FromQuery] MinigameType? minigameType)
+    public IActionResult GetAvailableRooms([FromQuery] int? minigameType)
     {
         var rooms = _roomService.GetAvailableRooms(minigameType);
         return Ok(rooms);

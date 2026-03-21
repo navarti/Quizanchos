@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
@@ -10,6 +9,7 @@ namespace Quizanchos.Game2048.Services;
 
 public class Game2048EngineFactory
 {
+    private const int Game2048MinigameTypeId = 2;
     private readonly ILogger<Game2048EngineFactory> _logger;
     private readonly Game2048StateService _stateService;
     private readonly IGameSessionRepository _gameSessionRepository;
@@ -34,7 +34,7 @@ public class Game2048EngineFactory
         GameSession gameSession = new GameSession
         {
             Id = gameId,
-            MinigameType = MinigameType.Game2048,
+            MinigameType = Game2048MinigameTypeId,
             IsActive = true,
             IsFinished = false,
             CreatedAt = DateTime.UtcNow

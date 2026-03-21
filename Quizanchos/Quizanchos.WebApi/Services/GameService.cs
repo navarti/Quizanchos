@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
@@ -71,7 +70,7 @@ public class GameService
     }
 
     public async Task<CreateGameResponse> CreateMultiPlayerGameAsync(
-        MinigameType minigameType,
+        int minigameType,
         IReadOnlyList<string> playerIds,
         Dictionary<string, object>? parameters,
         IReadOnlyList<TeamInfo> teams)
@@ -194,7 +193,7 @@ public class GameService
         });
     }
 
-    public async Task<GameStateResult> GetGameStateAsync(Guid gameId, MinigameType minigameType)
+    public async Task<GameStateResult> GetGameStateAsync(Guid gameId, int minigameType)
     {
         _logger.LogInformation("Getting game state: GameId={GameId}, Type={Type}", gameId, minigameType);
 
@@ -267,7 +266,7 @@ public class GameService
         });
     }
 
-    public async Task<GameStateResult> FinishGameAsync(Guid gameId, MinigameType minigameType)
+    public async Task<GameStateResult> FinishGameAsync(Guid gameId, int minigameType)
     {
         IGameEngine? engine = await _gameLogicFactory.LoadGameEngine(minigameType, gameId);
         if (engine == null)
@@ -278,7 +277,7 @@ public class GameService
         return await FinishGameSessionAsync(engine, minigameType);
     }
 
-    private async Task<GameStateResult?> CheckFinish(IGameEngine engine, MinigameType minigameType)
+    private async Task<GameStateResult?> CheckFinish(IGameEngine engine, int minigameType)
     {
         if (engine.NeedToFinish())
         {
@@ -288,7 +287,7 @@ public class GameService
         return null;
     }
 
-    private async Task<GameStateResult> FinishGameSessionAsync(IGameEngine engine, MinigameType minigameType)
+    private async Task<GameStateResult> FinishGameSessionAsync(IGameEngine engine, int minigameType)
     {
         GameSession? gameSession = await _gameSessionRepository.GetByIdAsync(engine.GameId);
         if (gameSession != null)

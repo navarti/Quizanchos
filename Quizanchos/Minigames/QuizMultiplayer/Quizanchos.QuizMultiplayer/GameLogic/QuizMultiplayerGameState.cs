@@ -5,7 +5,7 @@ namespace Quizanchos.QuizMultiplayer.GameLogic;
 
 public class QuizMultiplayerGameState : IGameState
 {
-    public MinigameType MinigameType => MinigameType.QuizMultiplayer;
+    public int MinigameType => 3;
 
     public Guid GameId { get; set; }
     public IReadOnlyList<string> Players { get; set; } = Array.Empty<string>();

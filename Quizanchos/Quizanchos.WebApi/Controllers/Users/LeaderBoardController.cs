@@ -17,30 +17,14 @@ public class LeaderBoardController : Controller
     [HttpGet]
     public async Task<IActionResult> GetLeaderBoardAsync(int take, int skip, int? minigameType)
     {
-        Quizanchos.Common.Enums.MinigameType? type = null;
-        if (minigameType.HasValue)
-        {
-            type = System.Enum.IsDefined(typeof(Quizanchos.Common.Enums.MinigameType), minigameType.Value)
-                ? (Quizanchos.Common.Enums.MinigameType?)minigameType.Value
-                : null;
-        }
-
-        List<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip, type);
+        List<ApplicationUserInLeaderBoardDto> result = await _leaderBoardService.GetLeaderBoardAsync(take, skip, minigameType);
         return Ok(result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetUserPositionAsync(int? minigameType)
     {
-        Quizanchos.Common.Enums.MinigameType? type = null;
-        if (minigameType.HasValue)
-        {
-            type = System.Enum.IsDefined(typeof(Quizanchos.Common.Enums.MinigameType), minigameType.Value)
-                ? (Quizanchos.Common.Enums.MinigameType?)minigameType.Value
-                : null;
-        }
-
-        ApplicationUserInLeaderBoardDto result = await _leaderBoardService.GetUserPositionAsync(User, type);
+        ApplicationUserInLeaderBoardDto result = await _leaderBoardService.GetUserPositionAsync(User, minigameType);
         return Ok(result);
     }
 

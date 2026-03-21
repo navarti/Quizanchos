@@ -55,6 +55,7 @@ public class HomeController : Controller
             .OrderBy(x => x.Order)
             .Select(x => new MinigameCardViewModel
             {
+                MinigameTypeId = x.MinigameTypeId,
                 GameKey = x.GameKey,
                 DisplayName = x.DisplayName,
                 Description = x.Description,
@@ -68,7 +69,7 @@ public class HomeController : Controller
         string? activeSessionUrl = null;
         if (activeGameSession != null)
         {
-            var descriptor = _minigameFrontendRegistry.GetDescriptor(activeGameSession.MinigameType.ToString());
+            var descriptor = _minigameFrontendRegistry.GetDescriptor(activeGameSession.MinigameType);
             if (descriptor != null)
             {
                 activeSessionUrl = descriptor.GameUrlTemplate.Replace("{gameId}", activeGameSession.GameId.ToString());
@@ -98,6 +99,23 @@ public class HomeController : Controller
     public async Task<IActionResult> Leaderboard()
     {
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
+        var minigames = _minigameFrontendRegistry
+            .GetAllDescriptors()
+            .Values
+            .OrderBy(x => x.Order)
+            .Select(x => new MinigameCardViewModel
+            {
+                MinigameTypeId = x.MinigameTypeId,
+                GameKey = x.GameKey,
+                DisplayName = x.DisplayName,
+                Description = x.Description,
+                CardStyle = x.CardStyle,
+                LobbyUrl = x.LobbyUrl,
+                ActionText = x.ActionText,
+                Order = x.Order
+            })
+            .ToList();
+
         var currentUserName = User.Identity?.Name ?? "Guest";
         var currentUser = users.FirstOrDefault(u => u.UserName == currentUserName);
         int itemsPerPage = 10;
@@ -119,6 +137,7 @@ public class HomeController : Controller
         {
             QuizCategories = new List<QuizCategoryDto>(),
             QuizName = string.Empty,
+            Minigames = minigames,
             Users = users.ToList(),
             CurrentUserName = currentUserName,
             TotalPages = totalPages,

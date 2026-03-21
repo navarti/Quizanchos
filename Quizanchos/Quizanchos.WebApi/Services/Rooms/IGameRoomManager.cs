@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.WebApi.Models.Rooms;
 
 namespace Quizanchos.WebApi.Services.Rooms;
@@ -11,7 +10,7 @@ public interface IGameRoomManager
 {
     GameRoom CreateRoom(
         Guid roomId,
-        MinigameType minigameType,
+        int minigameType,
         string hostPlayerId,
         int maxPlayers,
         List<GameRoomTeam> teams,
@@ -21,7 +20,7 @@ public interface IGameRoomManager
 
     bool RemoveRoom(Guid roomId);
 
-    IReadOnlyList<GameRoom> GetAvailableRooms(MinigameType? minigameType = null);
+    IReadOnlyList<GameRoom> GetAvailableRooms(int? minigameType = null);
 
     GameRoom? GetRoomByPlayerId(string playerId);
 }

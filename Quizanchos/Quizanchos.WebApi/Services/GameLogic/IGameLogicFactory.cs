@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using System.Collections.Immutable;
 
@@ -6,7 +5,7 @@ namespace Quizanchos.WebApi.Services.GameLogic;
 
 public interface IGameLogicFactory
 {
-    Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters);
-    Task<IGameEngine?> LoadGameEngine(MinigameType type, Guid gameId);
-    Task SaveGameState(MinigameType type, Guid gameId, IGameState state);
+    Task<IGameEngine> CreateGameEngine(int type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters);
+    Task<IGameEngine?> LoadGameEngine(int type, Guid gameId);
+    Task SaveGameState(int type, Guid gameId, IGameState state);
 }

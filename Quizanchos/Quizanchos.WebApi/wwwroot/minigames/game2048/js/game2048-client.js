@@ -3,7 +3,7 @@
 
 class Game2048Client extends GameClient {
     constructor() {
-        super(2); // MinigameType.Game2048 = 2
+        super(window.game2048MinigameTypeId);
     }
 
     /**

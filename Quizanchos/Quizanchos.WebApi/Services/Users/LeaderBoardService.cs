@@ -4,7 +4,6 @@ using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.Quiz.Util;
 using System.Security.Claims;
-using Quizanchos.Common.Enums;
 using System.Linq;
 using Quizanchos.Domain;
 
@@ -30,7 +29,7 @@ public class LeaderBoardService
         return await GetLeaderBoardAsync(take, skip, null).ConfigureAwait(false);
     }
 
-    public async Task<List<ApplicationUserInLeaderBoardDto>> GetLeaderBoardAsync(int take, int skip, MinigameType? minigameType)
+    public async Task<List<ApplicationUserInLeaderBoardDto>> GetLeaderBoardAsync(int take, int skip, int? minigameType)
     {
         var users = await GetAppUsesLeaderBoardAsync(take, skip, minigameType).ConfigureAwait(false);
 
@@ -60,7 +59,7 @@ public class LeaderBoardService
         return await GetAppUsesLeaderBoardAsync(take, skip, null).ConfigureAwait(false);
     }
 
-    public async Task<List<ApplicationUser>> GetAppUsesLeaderBoardAsync(int take, int skip, MinigameType? minigameType)
+    public async Task<List<ApplicationUser>> GetAppUsesLeaderBoardAsync(int take, int skip, int? minigameType)
     {
         SkipTakeValidator.Validate(skip, take);
 
@@ -83,7 +82,7 @@ public class LeaderBoardService
         return await GetUserPositionAsync(claimsPrincipal, null).ConfigureAwait(false);
     }
 
-    public async Task<ApplicationUserInLeaderBoardDto> GetUserPositionAsync(ClaimsPrincipal claimsPrincipal, MinigameType? minigameType)
+    public async Task<ApplicationUserInLeaderBoardDto> GetUserPositionAsync(ClaimsPrincipal claimsPrincipal, int? minigameType)
     {
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
         // Use DB scores to order

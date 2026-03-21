@@ -21,6 +21,11 @@ public interface IMinigameRegistry
     IMinigameDescriptor? GetDescriptor(string gameKey);
 
     /// <summary>
+    /// Get a descriptor by numeric minigame type id.
+    /// </summary>
+    IMinigameDescriptor? GetDescriptor(int minigameTypeId);
+
+    /// <summary>
     /// Get all registered descriptors.
     /// </summary>
     /// <returns>Read-only dictionary of all registered descriptors keyed by GameKey</returns>
@@ -30,4 +35,9 @@ public interface IMinigameRegistry
     /// Check if a descriptor is registered for the given key.
     /// </summary>
     bool IsRegistered(string gameKey);
+
+    /// <summary>
+    /// Check if a descriptor is registered for the given numeric type id.
+    /// </summary>
+    bool IsRegistered(int minigameTypeId);
 }

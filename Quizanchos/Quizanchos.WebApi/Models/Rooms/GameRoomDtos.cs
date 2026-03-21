@@ -1,10 +1,8 @@
-using Quizanchos.Common.Enums;
-
 namespace Quizanchos.WebApi.Models.Rooms;
 
 public record CreateRoomRequest
 {
-    public MinigameType MinigameType { get; init; }
+    public int MinigameType { get; init; }
     public int MaxPlayers { get; init; }
     public int TeamCount { get; init; } = 1;
     public Dictionary<string, object>? GameParameters { get; init; }
@@ -32,7 +30,7 @@ public record GameRoomTeamDto
 public record GameRoomDto
 {
     public Guid RoomId { get; init; }
-    public MinigameType MinigameType { get; init; }
+    public int MinigameType { get; init; }
     public string HostPlayerId { get; init; } = string.Empty;
     public int MaxPlayers { get; init; }
     public int CurrentPlayerCount { get; init; }

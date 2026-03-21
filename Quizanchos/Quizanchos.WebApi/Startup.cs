@@ -7,9 +7,6 @@ using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Implementations;
 using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.Quiz.Extensions;
-using Quizanchos.Game2048.Extensions;
-using Quizanchos.QuizMultiplayer.Extensions;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Controllers.Auth;
@@ -21,6 +18,7 @@ using Quizanchos.WebApi.Services.Rooms;
 using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
 using Quizanchos.WebApi.Hubs;
+using System.Reflection;
 
 namespace Quizanchos.WebApi;
 
@@ -119,34 +117,13 @@ public static class Startup
         }, ServiceLifetime.Scoped);
 
         // ========== MINIGAME REGISTRATION SYSTEM ==========
-        // Create and populate the registry with minigame descriptors
-        var registry = new MinigameRegistry();
+        var pluginAssemblies = LoadPluginAssemblies();
 
-        // Register Quiz minigame
-        var quizDescriptor = new Quizanchos.Quiz.Descriptors.QuizMinigameDescriptor();
-        quizDescriptor.RegisterServices(services);
-        registry.Register(quizDescriptor);
-
-        // Register Game2048 minigame
-        var game2048Descriptor = new Quizanchos.Game2048.Descriptors.Game2048MinigameDescriptor();
-        game2048Descriptor.RegisterServices(services);
-        registry.Register(game2048Descriptor);
-
-        // Register QuizMultiplayer minigame
-        var quizMultiplayerDescriptor = new Quizanchos.QuizMultiplayer.Descriptors.QuizMultiplayerMinigameDescriptor();
-        quizMultiplayerDescriptor.RegisterServices(services);
-        registry.Register(quizMultiplayerDescriptor);
-
-        // Register the populated minigame registry
+        var registry = BuildMinigameRegistry(services, pluginAssemblies);
         services.AddSingleton<IMinigameRegistry>(registry);
 
         // ========== FRONTEND MINIGAME REGISTRATION SYSTEM ==========
-        var frontendRegistry = new MinigameFrontendRegistry();
-
-        frontendRegistry.Register(new Quizanchos.Quiz.Descriptors.QuizFrontendDescriptor());
-        frontendRegistry.Register(new Quizanchos.Game2048.Descriptors.Game2048FrontendDescriptor());
-        frontendRegistry.Register(new Quizanchos.QuizMultiplayer.Descriptors.QuizMultiplayerFrontendDescriptor());
-
+        var frontendRegistry = BuildFrontendRegistry(pluginAssemblies);
         services.AddSingleton<IMinigameFrontendRegistry>(frontendRegistry);
         // ===================================================
 
@@ -210,6 +187,101 @@ public static class Startup
         {
             IServiceProvider services = scope.ServiceProvider;
             await DataSeeder.SeedDatabase(services, configuration);
+        }
+    }
+
+    private static IReadOnlyList<Assembly> LoadPluginAssemblies()
+    {
+        var loadedAssemblies = new Dictionary<string, Assembly>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            if (assembly.IsDynamic)
+                continue;
+
+            if (!loadedAssemblies.ContainsKey(assembly.FullName ?? assembly.GetName().Name ?? string.Empty))
+            {
+                loadedAssemblies[assembly.FullName ?? assembly.GetName().Name ?? string.Empty] = assembly;
+            }
+        }
+
+        var rootAssembly = Assembly.GetExecutingAssembly();
+        var dependencyNames = rootAssembly
+            .GetReferencedAssemblies()
+            .Where(x => x.Name?.StartsWith("Quizanchos.", StringComparison.OrdinalIgnoreCase) == true)
+            .ToList();
+
+        foreach (var dependencyName in dependencyNames)
+        {
+            try
+            {
+                var assembly = Assembly.Load(dependencyName);
+                var key = assembly.FullName ?? assembly.GetName().Name ?? string.Empty;
+                if (!loadedAssemblies.ContainsKey(key))
+                {
+                    loadedAssemblies[key] = assembly;
+                }
+            }
+            catch
+            {
+                // Ignore optional/unloadable assemblies
+            }
+        }
+
+        return loadedAssemblies.Values.ToList();
+    }
+
+    private static IMinigameRegistry BuildMinigameRegistry(IServiceCollection services, IReadOnlyList<Assembly> pluginAssemblies)
+    {
+        var registry = new MinigameRegistry();
+
+        foreach (var descriptor in CreateDescriptors<IMinigameDescriptor>(pluginAssemblies))
+        {
+            descriptor.RegisterServices(services);
+            registry.Register(descriptor);
+        }
+
+        return registry;
+    }
+
+    private static IMinigameFrontendRegistry BuildFrontendRegistry(IReadOnlyList<Assembly> pluginAssemblies)
+    {
+        var registry = new MinigameFrontendRegistry();
+
+        foreach (var descriptor in CreateDescriptors<IMinigameFrontendDescriptor>(pluginAssemblies))
+        {
+            registry.Register(descriptor);
+        }
+
+        return registry;
+    }
+
+    private static IEnumerable<TDescriptor> CreateDescriptors<TDescriptor>(IReadOnlyList<Assembly> assemblies)
+        where TDescriptor : class
+    {
+        var descriptorTypes = assemblies
+            .Where(a => a.GetName().Name?.StartsWith("Quizanchos.", StringComparison.OrdinalIgnoreCase) == true)
+            .SelectMany(a =>
+            {
+                try
+                {
+                    return a.GetTypes();
+                }
+                catch
+                {
+                    return Array.Empty<Type>();
+                }
+            })
+            .Where(t => typeof(TDescriptor).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false })
+            .OrderBy(t => t.FullName)
+            .ToList();
+
+        foreach (var descriptorType in descriptorTypes)
+        {
+            if (Activator.CreateInstance(descriptorType) is TDescriptor descriptor)
+            {
+                yield return descriptor;
+            }
         }
     }
 

@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Quizanchos.Common.Enums;
 using Quizanchos.WebApi.Models.Rooms;
 
 namespace Quizanchos.WebApi.Services.Rooms;
@@ -15,7 +14,7 @@ public class InMemoryGameRoomManager : IGameRoomManager
 
     public GameRoom CreateRoom(
         Guid roomId,
-        MinigameType minigameType,
+        int minigameType,
         string hostPlayerId,
         int maxPlayers,
         List<GameRoomTeam> teams,
@@ -32,7 +31,7 @@ public class InMemoryGameRoomManager : IGameRoomManager
 
     public bool RemoveRoom(Guid roomId) => _rooms.TryRemove(roomId, out _);
 
-    public IReadOnlyList<GameRoom> GetAvailableRooms(MinigameType? minigameType = null)
+    public IReadOnlyList<GameRoom> GetAvailableRooms(int? minigameType = null)
     {
         var query = _rooms.Values.Where(r => r.Status == GameRoomStatus.WaitingForPlayers);
 

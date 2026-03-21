@@ -1,11 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Quizanchos.Core;
 
 namespace Quizanchos.WebApi.Controllers.Quiz;
 
 [Route("Quiz")]
 public class QuizViewController : Controller
 {
+    private readonly IMinigameFrontendRegistry _minigameFrontendRegistry;
+
+    public QuizViewController(IMinigameFrontendRegistry minigameFrontendRegistry)
+    {
+        _minigameFrontendRegistry = minigameFrontendRegistry;
+    }
+
     [HttpGet("Setup/{categoryId:guid}")]
     [Authorize(Roles = "User")]
     public IActionResult Setup(Guid categoryId)
@@ -13,6 +21,7 @@ public class QuizViewController : Controller
         // Pass only the category ID to the view
         // The view will load all data via API
         ViewBag.CategoryId = categoryId;
+        ViewBag.MinigameTypeId = _minigameFrontendRegistry.GetDescriptor("Quiz")?.MinigameTypeId ?? 1;
         return View("~/Views/Quiz/SessionSetup.cshtml");
     }
 
@@ -22,6 +31,7 @@ public class QuizViewController : Controller
         // Pass only the game ID to the view
         // The view will load all data via API
         ViewBag.GameId = gameId;
+        ViewBag.MinigameTypeId = _minigameFrontendRegistry.GetDescriptor("Quiz")?.MinigameTypeId ?? 1;
         return View("~/Views/Quiz/Game.cshtml");
     }
 }

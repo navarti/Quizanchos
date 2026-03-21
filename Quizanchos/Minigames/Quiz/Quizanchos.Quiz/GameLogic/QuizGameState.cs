@@ -5,7 +5,7 @@ namespace Quizanchos.Quiz.GameLogic;
 
 public class QuizGameState : IGameState
 {
-    public MinigameType MinigameType => MinigameType.Quiz;
+    public int MinigameType => 1;
 
     public Guid GameId { get; set; }
     public IReadOnlyList<string> Players { get; set; } = Array.Empty<string>();

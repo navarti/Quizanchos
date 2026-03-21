@@ -20,9 +20,10 @@
     <div class="leaderboard-container">
         <div class="filters">
             <button class="filter-btn active" data-minigame="">All</button>
-            <button class="filter-btn" data-minigame="1">Quiz</button>
-            <button class="filter-btn" data-minigame="2">2048</button>
-            <button class="filter-btn" data-minigame="3">Quiz Multiplayer</button>
+            @foreach (var minigame in Model.Minigames.OrderBy(x => x.Order))
+            {
+                <button class="filter-btn" data-minigame="@minigame.MinigameTypeId">@minigame.DisplayName</button>
+            }
         </div>
 
         <div class="leaderboard" data-current-user="@Model.CurrentUserName">

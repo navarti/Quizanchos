@@ -1,11 +1,9 @@
-﻿using Quizanchos.Common.Enums;
-
-namespace Quizanchos.Core;
+﻿namespace Quizanchos.Core;
 
 public interface IGameState
 {
     Guid GameId { get; }
-    MinigameType MinigameType { get; }
+    int MinigameType { get; }
     IReadOnlyList<string> Players { get; }
 
     bool IsFinished { get; set; }

@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using System.Collections.Immutable;
 
@@ -25,12 +24,12 @@ public class GameLogicFactory : IGameLogicFactory
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<IGameEngine> CreateGameEngine(MinigameType type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
+    public async Task<IGameEngine> CreateGameEngine(int type, Guid gameId, ImmutableArray<string> playerIds, Dictionary<string, object> parameters)
     {
         _logger.LogInformation("Creating game engine for type: {Type}, GameId: {GameId}, Players: {PlayerCount}",
             type, gameId, playerIds.Length);
 
-        var descriptor = _registry.GetDescriptor(type.ToString());
+        var descriptor = _registry.GetDescriptor(type);
         if (descriptor == null)
         {
             throw new ArgumentException($"Unknown minigame type: {type}. No descriptor registered.");
@@ -39,11 +38,11 @@ public class GameLogicFactory : IGameLogicFactory
         return await descriptor.CreateGameEngineAsync(gameId, playerIds, parameters, _serviceProvider);
     }
 
-    public async Task<IGameEngine?> LoadGameEngine(MinigameType type, Guid gameId)
+    public async Task<IGameEngine?> LoadGameEngine(int type, Guid gameId)
     {
         _logger.LogInformation("Loading game engine for type: {Type}, GameId: {GameId}", type, gameId);
 
-        var descriptor = _registry.GetDescriptor(type.ToString());
+        var descriptor = _registry.GetDescriptor(type);
         if (descriptor == null)
         {
             throw new ArgumentException($"Unknown minigame type: {type}. No descriptor registered.");
@@ -52,11 +51,11 @@ public class GameLogicFactory : IGameLogicFactory
         return await descriptor.LoadGameEngineAsync(gameId, _serviceProvider);
     }
 
-    public async Task SaveGameState(MinigameType type, Guid gameId, IGameState state)
+    public async Task SaveGameState(int type, Guid gameId, IGameState state)
     {
         _logger.LogInformation("Saving game state for type: {Type}, GameId: {GameId}", type, gameId);
 
-        var descriptor = _registry.GetDescriptor(type.ToString());
+        var descriptor = _registry.GetDescriptor(type);
         if (descriptor == null)
         {
             throw new ArgumentException($"Unknown minigame type: {type}. No descriptor registered.");

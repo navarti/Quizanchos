@@ -4,5 +4,5 @@ namespace Quizanchos.Domain.Repositories.Interfaces;
 
 public interface IUserMinigameScoreRepository : IEntityRepository<Guid, UserMinigameScore>
 {
-    Task<UserMinigameScore?> FindByUserAndTypeAsync(string userId, Quizanchos.Common.Enums.MinigameType type);
+    Task<UserMinigameScore?> FindByUserAndTypeAsync(string userId, int type);
 }

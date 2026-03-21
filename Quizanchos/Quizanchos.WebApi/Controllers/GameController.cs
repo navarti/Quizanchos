@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Services;
@@ -49,7 +48,7 @@ public class GameController : ControllerBase
 
     [HttpGet("{gameId}/state")]
     [Authorize(AppRole.User)]
-    public async Task<IActionResult> GetGameState(Guid gameId, [FromQuery] MinigameType minigameType)
+    public async Task<IActionResult> GetGameState(Guid gameId, [FromQuery] int minigameType)
     {
         GameStateResult result = await _gameService.GetGameStateAsync(gameId, minigameType);
         
@@ -83,7 +82,7 @@ public class GameController : ControllerBase
 
     [HttpPost("{gameId}/finish")]
     [Authorize(AppRole.User)]
-    public async Task<IActionResult> FinishGame(Guid gameId, [FromQuery] MinigameType minigameType)
+    public async Task<IActionResult> FinishGame(Guid gameId, [FromQuery] int minigameType)
     {
         GameStateResult result = await _gameService.FinishGameAsync(gameId, minigameType);
         

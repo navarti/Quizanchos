@@ -10,6 +10,7 @@ namespace Quizanchos.Quiz.Services;
 
 public class QuizEngineFactory
 {
+    private const int QuizMinigameTypeId = 1;
     private readonly ILogger<QuizEngineFactory> _logger;
     private readonly QuizCardGeneratorService? _cardGenerator;
     private readonly QuizGameStateService _stateService;
@@ -43,7 +44,7 @@ public class QuizEngineFactory
         GameSession gameSession = new GameSession
         {
             Id = gameId,
-            MinigameType = MinigameType.Quiz,
+            MinigameType = QuizMinigameTypeId,
             IsActive = true,
             IsFinished = false,
             CreatedAt = DateTime.UtcNow
