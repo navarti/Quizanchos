@@ -2,6 +2,7 @@ using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using Quizanchos.Core;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Implementations;
@@ -117,14 +118,31 @@ public static class Startup
             options.UseSqlServer(connectionString);
         }, ServiceLifetime.Scoped);
 
-        services.AddQuizRepositories();
-        services.AddQuizServices();
+        // ========== MINIGAME REGISTRATION SYSTEM ==========
+        // Register the minigame registry as a singleton
+        services.AddSingleton<IMinigameRegistry, MinigameRegistry>();
 
-        services.AddGame2048Repositories();
-        services.AddGame2048Services();
+        // Create and populate the registry with minigame descriptors
+        var registry = new MinigameRegistry();
 
-        services.AddQuizMultiplayerRepositories();
-        services.AddQuizMultiplayerServices();
+        // Register Quiz minigame
+        var quizDescriptor = new Quizanchos.Quiz.Descriptors.QuizMinigameDescriptor();
+        quizDescriptor.RegisterServices(services);
+        registry.Register(quizDescriptor);
+
+        // Register Game2048 minigame
+        var game2048Descriptor = new Quizanchos.Game2048.Descriptors.Game2048MinigameDescriptor();
+        game2048Descriptor.RegisterServices(services);
+        registry.Register(game2048Descriptor);
+
+        // Register QuizMultiplayer minigame
+        var quizMultiplayerDescriptor = new Quizanchos.QuizMultiplayer.Descriptors.QuizMultiplayerMinigameDescriptor();
+        quizMultiplayerDescriptor.RegisterServices(services);
+        registry.Register(quizMultiplayerDescriptor);
+
+        // Replace the singleton registry instance with the populated one
+        services.AddSingleton(registry);
+        // ===================================================
 
         services.AddAutoMapper(cfg => 
         { 
