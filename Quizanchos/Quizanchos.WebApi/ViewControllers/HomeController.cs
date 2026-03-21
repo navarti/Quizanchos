@@ -145,7 +145,6 @@ public class HomeController : Controller
         return View(viewModel);
     }
 
-    
     [HttpGet("/Signup")]
     public IActionResult Signup()
     {
@@ -155,19 +154,6 @@ public class HomeController : Controller
     public IActionResult Signin()
     {
         return View();
-    }
-    
-    [HttpGet("/QuizCategories")]
-    public async Task<IActionResult> QuizCategories()
-    {
-        List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
-        var viewModel = new HomeViewModel
-        {
-            QuizCategories = quizCategories,
-            QuizName = string.Empty,
-            CurrentUserName = User.Identity?.Name ?? "Guest"
-        };
-        return View(viewModel);
     }
 
     private List<MinigameCardViewModel> GetMinigameCards()

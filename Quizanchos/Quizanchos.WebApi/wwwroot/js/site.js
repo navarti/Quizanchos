@@ -129,7 +129,7 @@ async function handleSubmit(event) {
     }
 }
 function redirectToCategory(category) {
-    window.location.href = `/QuizCategories?filter=${category}`;
+    window.location.href = `/Minigame/Quiz?filter=${category}`;
 }
 
 const verifyModal = document.getElementById('verifyModal');

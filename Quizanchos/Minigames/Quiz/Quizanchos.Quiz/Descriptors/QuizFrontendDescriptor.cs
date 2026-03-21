@@ -11,13 +11,14 @@ public class QuizFrontendDescriptor : IMinigameFrontendDescriptor
     public string DisplayName => "Quiz";
     public string Description => "Challenge yourself with category-based quizzes.";
     public string CardStyle => "background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);";
-    public string LobbyUrl => "/QuizCategories";
+    public string LobbyUrl => MinigameRoute;
     public string GameUrlTemplate => $"{MinigameRoute}/{{gameId}}";
     public string LobbyViewType => "module";
     public string GameViewType => "module";
     public IReadOnlyList<string> LobbyStyles =>
     [
         "/minigames/quiz/css/quiz.css",
+        "/minigames/quiz/css/quizcategories.css",
         "/css/bootstrap.min.css"
     ];
     public IReadOnlyList<string> LobbyScripts =>
