@@ -76,10 +76,11 @@ function showModal(headerText = 'Notification', bodyText, isSuccess = false,butt
 
 function hideModal() {
     const modal = document.getElementById('errorModal');
+    if (!modal) return;
     modal.style.display = 'none';
 }
 
-document.getElementById('closeModal').addEventListener('click', hideModal);
+document.getElementById('closeModal')?.addEventListener('click', hideModal);
 
 window.addEventListener('click', function (event) {
     const modal = document.getElementById('errorModal');

@@ -3,7 +3,7 @@
 
 class QuizMultiplayerClient extends GameClient {
     constructor() {
-        super(window.minigameConfig?.minigameTypeId ?? window.quizMultiplayerMinigameTypeId);
+        super(window.minigameConfig.minigameTypeId);
     }
 
     /**

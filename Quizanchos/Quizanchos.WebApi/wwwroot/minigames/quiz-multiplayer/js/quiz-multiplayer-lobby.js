@@ -2,8 +2,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
     ensureQuizMultiplayerLobbyLayout();
 
-    const MINIGAME_TYPE = window.minigameConfig?.minigameTypeId ?? window.quizMultiplayerMinigameTypeId;
-    const GAME_URL_TEMPLATE = window.minigameConfig?.gameUrlTemplate ?? window.quizMultiplayerGameUrlTemplate;
+    const MINIGAME_TYPE = window.minigameConfig.minigameTypeId;
+    const GAME_URL_TEMPLATE = window.minigameConfig.gameUrlTemplate;
     const API = '/api/GameRoom';
     let currentRoomId = null;
 

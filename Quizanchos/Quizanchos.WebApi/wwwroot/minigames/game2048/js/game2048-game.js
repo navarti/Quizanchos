@@ -1,7 +1,7 @@
 // 2048 Game Page - API-driven
 document.addEventListener('DOMContentLoaded', async () => {
-    const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.game2048GameUrlTemplate;
-    const lobbyUrl = window.minigameConfig?.lobbyUrl ?? window.game2048LobbyUrl;
+    const gameUrlTemplate = window.minigameConfig.gameUrlTemplate;
+    const lobbyUrl = window.minigameConfig.lobbyUrl;
     ensureGame2048Layout();
 
     const wrapper = document.getElementById('game2048-wrapper');
@@ -53,7 +53,7 @@ function ensureGame2048Layout() {
     <div class="game2048-actions">
         <button id="finishGameBtn" class="btn-finish-game">Finish Game</button>
         <button id="newGameBtn" class="btn-new-game">New Game</button>
-        <a href="${window.minigameConfig?.lobbyUrl ?? '/'}" class="btn-back">Back</a>
+        <a href="${window.minigameConfig.lobbyUrl}" class="btn-back">Back</a>
     </div>
 </div>
 <div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 60vh;"><p>Loading game...</p></div>
@@ -201,8 +201,7 @@ function setupButtons(gameId, userId) {
         try {
             const result = await game2048Client.createGame([userId], { size: boardSize });
             if (result && result.gameId) {
-                const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.game2048GameUrlTemplate;
-                window.location.href = gameUrlTemplate.replace('{gameId}', result.gameId);
+                window.location.href = window.minigameConfig.gameUrlTemplate.replace('{gameId}', result.gameId);
             }
         } catch (error) {
             alert('Failed to create new game: ' + error.message);
@@ -228,7 +227,6 @@ function setupButtons(gameId, userId) {
     if (newGameBtn) newGameBtn.addEventListener('click', finishAndStartNew);
     if (playAgainBtn) playAgainBtn.addEventListener('click', finishAndStartNew);
     if (returnHomeBtn) returnHomeBtn.addEventListener('click', () => {
-        const lobbyUrl = window.minigameConfig?.lobbyUrl ?? window.game2048LobbyUrl;
-        window.location.href = lobbyUrl;
+        window.location.href = window.minigameConfig.lobbyUrl;
     });
 }
