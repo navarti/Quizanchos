@@ -8,6 +8,7 @@ namespace Quizanchos.WebApi.Controllers.QuizMultiplayer;
 public class QuizMultiplayerViewController : Controller
 {
     private readonly IMinigameFrontendRegistry _minigameFrontendRegistry;
+    private const string GameKey = "QuizMultiplayer";
 
     public QuizMultiplayerViewController(IMinigameFrontendRegistry minigameFrontendRegistry)
     {
@@ -18,7 +19,10 @@ public class QuizMultiplayerViewController : Controller
     [Authorize(Roles = "User")]
     public IActionResult Lobby()
     {
-        ViewBag.MinigameTypeId = _minigameFrontendRegistry.GetDescriptor("QuizMultiplayer")?.MinigameTypeId ?? 3;
+        var descriptor = GetRequiredDescriptor();
+        ViewBag.MinigameTypeId = descriptor.MinigameTypeId;
+        ViewBag.GameUrlTemplate = descriptor.GameUrlTemplate;
+        ViewBag.LobbyUrl = descriptor.LobbyUrl;
         return View("~/Views/QuizMultiplayer/Lobby.cshtml");
     }
 
@@ -26,8 +30,17 @@ public class QuizMultiplayerViewController : Controller
     [Authorize(Roles = "User")]
     public IActionResult Game(Guid gameId)
     {
+        var descriptor = GetRequiredDescriptor();
         ViewBag.GameId = gameId;
-        ViewBag.MinigameTypeId = _minigameFrontendRegistry.GetDescriptor("QuizMultiplayer")?.MinigameTypeId ?? 3;
+        ViewBag.MinigameTypeId = descriptor.MinigameTypeId;
+        ViewBag.GameUrlTemplate = descriptor.GameUrlTemplate;
+        ViewBag.LobbyUrl = descriptor.LobbyUrl;
         return View("~/Views/QuizMultiplayer/Game.cshtml");
+    }
+
+    private IMinigameFrontendDescriptor GetRequiredDescriptor()
+    {
+        return _minigameFrontendRegistry.GetDescriptor(GameKey)
+            ?? throw new InvalidOperationException($"Frontend descriptor '{GameKey}' is not registered.");
     }
 }

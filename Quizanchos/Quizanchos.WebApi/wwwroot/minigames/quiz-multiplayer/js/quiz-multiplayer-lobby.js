@@ -1,8 +1,13 @@
 // Quiz Multiplayer Lobby
 document.addEventListener('DOMContentLoaded', async () => {
-    const MINIGAME_TYPE = window.quizMultiplayerMinigameTypeId;
+    const MINIGAME_TYPE = window.minigameConfig?.minigameTypeId ?? window.quizMultiplayerMinigameTypeId;
+    const GAME_URL_TEMPLATE = window.minigameConfig?.gameUrlTemplate ?? window.quizMultiplayerGameUrlTemplate;
     const API = '/api/GameRoom';
     let currentRoomId = null;
+
+    function navigateToGame(gameId) {
+        window.location.href = GAME_URL_TEMPLATE.replace('{gameId}', gameId);
+    }
 
     // ?? SignalR ??????????????????????????????????????????????????????
     const roomHub = new signalR.HubConnectionBuilder()
@@ -27,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     roomHub.on('GameStarting', (payload) => {
         const gameId = payload.gameId || payload.GameId;
         if (gameId) {
-            window.location.href = `/QuizMultiplayer/${gameId}`;
+            navigateToGame(gameId);
         }
     });
 
@@ -211,7 +216,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // If game already launched, navigate
             const gameId = room.launchedGameId || room.LaunchedGameId;
             if (gameId) {
-                window.location.href = `/QuizMultiplayer/${gameId}`;
+                navigateToGame(gameId);
             }
         } catch (_) { /* ignore */ }
     }

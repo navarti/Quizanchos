@@ -1,5 +1,7 @@
 // 2048 Game Page - API-driven
 document.addEventListener('DOMContentLoaded', async () => {
+    const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.game2048GameUrlTemplate;
+    const lobbyUrl = window.minigameConfig?.lobbyUrl ?? window.game2048LobbyUrl;
     const wrapper = document.getElementById('game2048-wrapper');
     const gameId = wrapper.getAttribute('data-game-id');
     const userId = document.body.getAttribute('data-user-id');
@@ -7,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!gameId || !userId) {
         alert('Missing game or user information');
-        window.location.href = '/';
+        window.location.href = lobbyUrl;
         return;
     }
 
@@ -24,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         initializeGame(gameState, gameId, userId);
     } catch (error) {
         console.error('[2048] Error loading game:', error);
-        loadingContainer.innerHTML = '<p>Failed to load game. <a href="/Game2048">Try again</a></p>';
+        loadingContainer.innerHTML = `<p>Failed to load game. <a href="${lobbyUrl}">Try again</a></p>`;
     }
 });
 
@@ -158,7 +160,8 @@ function setupButtons(gameId, userId) {
         try {
             const result = await game2048Client.createGame([userId], { size: boardSize });
             if (result && result.gameId) {
-                window.location.href = '/Game2048/' + result.gameId;
+                const gameUrlTemplate = window.minigameConfig?.gameUrlTemplate ?? window.game2048GameUrlTemplate;
+                window.location.href = gameUrlTemplate.replace('{gameId}', result.gameId);
             }
         } catch (error) {
             alert('Failed to create new game: ' + error.message);
@@ -183,5 +186,8 @@ function setupButtons(gameId, userId) {
     if (finishGameBtn) finishGameBtn.addEventListener('click', finishCurrentGame);
     if (newGameBtn) newGameBtn.addEventListener('click', finishAndStartNew);
     if (playAgainBtn) playAgainBtn.addEventListener('click', finishAndStartNew);
-    if (returnHomeBtn) returnHomeBtn.addEventListener('click', () => { window.location.href = '/'; });
+    if (returnHomeBtn) returnHomeBtn.addEventListener('click', () => {
+        const lobbyUrl = window.minigameConfig?.lobbyUrl ?? window.game2048LobbyUrl;
+        window.location.href = lobbyUrl;
+    });
 }

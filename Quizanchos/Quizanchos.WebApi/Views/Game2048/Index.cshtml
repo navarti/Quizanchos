@@ -25,7 +25,11 @@
 </div>
 
 <script>
-    window.game2048MinigameTypeId = @ViewBag.MinigameTypeId;
+    window.minigameConfig = {
+        minigameTypeId: @ViewBag.MinigameTypeId,
+        gameUrlTemplate: '@ViewBag.GameUrlTemplate',
+        lobbyUrl: '@ViewBag.LobbyUrl'
+    };
 </script>
 <script src="/js/game-client.js" asp-append-version="true"></script>
 <script src="/minigames/game2048/js/game2048-client.js" asp-append-version="true"></script>
@@ -41,7 +45,7 @@
         try {
             const result = await game2048Client.createGame([userId], { size: size });
             if (result && result.gameId) {
-                window.location.href = '/Game2048/' + result.gameId;
+                window.location.href = window.minigameConfig.gameUrlTemplate.replace('{gameId}', result.gameId);
             }
         } catch (error) {
             alert('Failed to create game: ' + error.message);

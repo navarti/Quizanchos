@@ -67,7 +67,11 @@
 </div>
 
 <script>
-    window.quizMinigameTypeId = @ViewBag.MinigameTypeId;
+    window.minigameConfig = {
+        minigameTypeId: @ViewBag.MinigameTypeId,
+        gameUrlTemplate: '@ViewBag.GameUrlTemplate',
+        lobbyUrl: '@ViewBag.LobbyUrl'
+    };
 
     // Load category name on page load
     document.addEventListener('DOMContentLoaded', async () => {

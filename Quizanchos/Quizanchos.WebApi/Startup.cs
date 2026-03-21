@@ -118,8 +118,9 @@ public static class Startup
 
         // ========== MINIGAME REGISTRATION SYSTEM ==========
         var pluginAssemblies = LoadPluginAssemblies();
+        var minigameDescriptors = CreateDescriptors<IMinigameDescriptor>(pluginAssemblies).ToList();
 
-        var registry = BuildMinigameRegistry(services, pluginAssemblies);
+        var registry = BuildMinigameRegistry(services, minigameDescriptors);
         services.AddSingleton<IMinigameRegistry>(registry);
 
         // ========== FRONTEND MINIGAME REGISTRATION SYSTEM ==========
@@ -145,7 +146,7 @@ public static class Startup
 
         services.AddSingleton<ContainerService>();
 
-        AddControllers(builder);
+        AddControllers(builder, minigameDescriptors);
 
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
@@ -231,11 +232,13 @@ public static class Startup
         return loadedAssemblies.Values.ToList();
     }
 
-    private static IMinigameRegistry BuildMinigameRegistry(IServiceCollection services, IReadOnlyList<Assembly> pluginAssemblies)
+    private static IMinigameRegistry BuildMinigameRegistry(
+        IServiceCollection services,
+        IReadOnlyCollection<IMinigameDescriptor> minigameDescriptors)
     {
         var registry = new MinigameRegistry();
 
-        foreach (var descriptor in CreateDescriptors<IMinigameDescriptor>(pluginAssemblies))
+        foreach (var descriptor in minigameDescriptors)
         {
             descriptor.RegisterServices(services);
             registry.Register(descriptor);
@@ -285,7 +288,9 @@ public static class Startup
         }
     }
 
-    private static void AddControllers(WebApplicationBuilder builder)
+    private static void AddControllers(
+        WebApplicationBuilder builder,
+        IReadOnlyCollection<IMinigameDescriptor> minigameDescriptors)
     {
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
@@ -298,7 +303,7 @@ public static class Startup
             {
                 options.Conventions.Add(new SkipControllerConvention(typeof(EmailConfirmationController)));
             })
-            .AddJsonOptions(ConfigureJsonOptions);
+            .AddJsonOptions(options => ConfigureJsonOptions(options, minigameDescriptors));
             return;
         }
 
@@ -313,10 +318,12 @@ public static class Startup
         services.AddTransient<IUserRegistrationService, EmailConfirmationUserRegistrationService>();
 
         services.AddControllersWithViews()
-            .AddJsonOptions(ConfigureJsonOptions);
+            .AddJsonOptions(options => ConfigureJsonOptions(options, minigameDescriptors));
     }
 
-    private static void ConfigureJsonOptions(Microsoft.AspNetCore.Mvc.JsonOptions options)
+    private static void ConfigureJsonOptions(
+        Microsoft.AspNetCore.Mvc.JsonOptions options,
+        IReadOnlyCollection<IMinigameDescriptor> minigameDescriptors)
     {
         options.JsonSerializerOptions.TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver
         {
@@ -327,17 +334,41 @@ public static class Startup
                     // Configure polymorphic serialization for GameMove
                     if (typeInfo.Type == typeof(Quizanchos.Core.GameMove))
                     {
+                        var usedDiscriminators = new HashSet<string>(StringComparer.Ordinal);
                         typeInfo.PolymorphismOptions = new System.Text.Json.Serialization.Metadata.JsonPolymorphismOptions
                         {
                             TypeDiscriminatorPropertyName = "gameType",
-                            UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor,
-                            DerivedTypes =
-                            {
-                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Quiz.GameLogic.QuizMove), "quiz"),
-                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.Game2048.GameLogic.Game2048Move), "game2048"),
-                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(typeof(Quizanchos.QuizMultiplayer.GameLogic.QuizMultiplayerMove), "quizMultiplayer")
-                            }
+                            UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor
                         };
+
+                        foreach (var descriptor in minigameDescriptors)
+                        {
+                            if (descriptor.MoveType == null)
+                            {
+                                throw new InvalidOperationException($"Minigame descriptor '{descriptor.GetType().FullName}' has null MoveType.");
+                            }
+
+                            if (!typeof(Quizanchos.Core.GameMove).IsAssignableFrom(descriptor.MoveType))
+                            {
+                                throw new InvalidOperationException(
+                                    $"Minigame descriptor '{descriptor.GetType().FullName}' declares move type '{descriptor.MoveType.FullName}' that does not derive from {nameof(Quizanchos.Core.GameMove)}.");
+                            }
+
+                            if (string.IsNullOrWhiteSpace(descriptor.MoveDiscriminator))
+                            {
+                                throw new InvalidOperationException($"Minigame descriptor '{descriptor.GetType().FullName}' has empty MoveDiscriminator.");
+                            }
+
+                            if (!usedDiscriminators.Add(descriptor.MoveDiscriminator))
+                            {
+                                throw new InvalidOperationException($"Duplicate move discriminator '{descriptor.MoveDiscriminator}' detected during startup.");
+                            }
+
+                            typeInfo.PolymorphismOptions.DerivedTypes.Add(
+                                new System.Text.Json.Serialization.Metadata.JsonDerivedType(
+                                    descriptor.MoveType,
+                                    descriptor.MoveDiscriminator));
+                        }
                     }
                 }
             }

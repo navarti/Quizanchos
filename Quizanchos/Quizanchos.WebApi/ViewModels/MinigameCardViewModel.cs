@@ -8,6 +8,7 @@ public class MinigameCardViewModel
     public required string Description { get; set; }
     public required string CardStyle { get; set; }
     public required string LobbyUrl { get; set; }
+    public string? GameUrlTemplate { get; set; }
     public required string ActionText { get; set; }
     public int Order { get; set; }
 }

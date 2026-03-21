@@ -61,6 +61,7 @@ public class HomeController : Controller
                 Description = x.Description,
                 CardStyle = x.CardStyle,
                 LobbyUrl = x.LobbyUrl,
+                GameUrlTemplate = x.GameUrlTemplate,
                 ActionText = x.ActionText,
                 Order = x.Order
             })
@@ -111,6 +112,7 @@ public class HomeController : Controller
                 Description = x.Description,
                 CardStyle = x.CardStyle,
                 LobbyUrl = x.LobbyUrl,
+                GameUrlTemplate = x.GameUrlTemplate,
                 ActionText = x.ActionText,
                 Order = x.Order
             })

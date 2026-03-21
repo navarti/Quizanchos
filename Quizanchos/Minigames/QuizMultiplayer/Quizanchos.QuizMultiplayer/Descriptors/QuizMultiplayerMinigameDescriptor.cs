@@ -7,6 +7,7 @@ using Quizanchos.QuizMultiplayer.Extensions;
 using Quizanchos.QuizMultiplayer.GameLogic;
 using Quizanchos.QuizMultiplayer.Services;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.QuizMultiplayer.Descriptors;
 
@@ -19,6 +20,8 @@ public class QuizMultiplayerMinigameDescriptor : IMinigameDescriptor
     public int MinigameTypeId => 3;
     public string GameKey => "QuizMultiplayer";
     public string DisplayName => "Quiz Multiplayer";
+    public Type MoveType => typeof(QuizMultiplayerMove);
+    public string MoveDiscriminator => "quizMultiplayer";
 
     public void RegisterServices(IServiceCollection services)
     {
@@ -37,32 +40,14 @@ public class QuizMultiplayerMinigameDescriptor : IMinigameDescriptor
         var factory = serviceProvider.GetRequiredService<QuizMultiplayerEngineFactory>();
 
         // Extract game parameters with defaults
-        int totalCards = parameters.ContainsKey("totalCards")
-            ? (int)parameters["totalCards"]
-            : 5;
-
-        Guid? categoryId = parameters.ContainsKey("categoryId")
-            ? (Guid)parameters["categoryId"]
-            : null;
-
-        GameLevel gameLevel = parameters.ContainsKey("gameLevel")
-            ? (GameLevel)parameters["gameLevel"]
-            : GameLevel.Easy;
-
-        int secondsPerCard = parameters.ContainsKey("secondsPerCard")
-            ? (int)parameters["secondsPerCard"]
-            : 10;
-
-        int optionCount = parameters.ContainsKey("optionCount")
-            ? (int)parameters["optionCount"]
-            : 4;
+        int totalCards = GetInt(parameters, "totalCards", 5);
+        Guid? categoryId = GetNullableGuid(parameters, "categoryId");
+        GameLevel gameLevel = GetEnum(parameters, "gameLevel", GameLevel.Easy);
+        int secondsPerCard = GetInt(parameters, "secondsPerCard", 10);
+        int optionCount = GetInt(parameters, "optionCount", 4);
 
         // Extract teams if provided, otherwise create empty list
-        List<QuizMultiplayerGameState.TeamData> teams = new();
-        if (parameters.ContainsKey("teams") && parameters["teams"] is List<QuizMultiplayerGameState.TeamData> teamsList)
-        {
-            teams = teamsList;
-        }
+        var teams = GetTeams(parameters, "teams");
 
         // Create the game engine
         var engine = await factory.CreateEngineAsync(
@@ -98,5 +83,95 @@ public class QuizMultiplayerMinigameDescriptor : IMinigameDescriptor
         {
             await factory.SaveStateAsync(gameId, quizMultiplayerState);
         }
+    }
+
+    private static int GetInt(Dictionary<string, object> parameters, string key, int fallback)
+    {
+        if (!parameters.TryGetValue(key, out var value) || value == null)
+            return fallback;
+
+        return value switch
+        {
+            int intValue => intValue,
+            long longValue => (int)longValue,
+            string stringValue when int.TryParse(stringValue, out var parsed) => parsed,
+            JsonElement { ValueKind: JsonValueKind.Number } element when element.TryGetInt32(out var parsed) => parsed,
+            JsonElement { ValueKind: JsonValueKind.String } element when int.TryParse(element.GetString(), out var parsed) => parsed,
+            _ => fallback
+        };
+    }
+
+    private static Guid? GetNullableGuid(Dictionary<string, object> parameters, string key)
+    {
+        if (!parameters.TryGetValue(key, out var value) || value == null)
+            return null;
+
+        return value switch
+        {
+            Guid guid => guid,
+            string stringValue when Guid.TryParse(stringValue, out var parsed) => parsed,
+            JsonElement { ValueKind: JsonValueKind.String } element when Guid.TryParse(element.GetString(), out var parsed) => parsed,
+            _ => null
+        };
+    }
+
+    private static TEnum GetEnum<TEnum>(Dictionary<string, object> parameters, string key, TEnum fallback)
+        where TEnum : struct, Enum
+    {
+        if (!parameters.TryGetValue(key, out var value) || value == null)
+            return fallback;
+
+        return value switch
+        {
+            TEnum enumValue => enumValue,
+            int intValue when Enum.IsDefined(typeof(TEnum), intValue) => (TEnum)Enum.ToObject(typeof(TEnum), intValue),
+            long longValue when Enum.IsDefined(typeof(TEnum), (int)longValue) => (TEnum)Enum.ToObject(typeof(TEnum), (int)longValue),
+            string stringValue when Enum.TryParse<TEnum>(stringValue, true, out var parsed) => parsed,
+            JsonElement { ValueKind: JsonValueKind.Number } element when element.TryGetInt32(out var parsedInt) && Enum.IsDefined(typeof(TEnum), parsedInt)
+                => (TEnum)Enum.ToObject(typeof(TEnum), parsedInt),
+            JsonElement { ValueKind: JsonValueKind.String } element when Enum.TryParse<TEnum>(element.GetString(), true, out var parsed)
+                => parsed,
+            _ => fallback
+        };
+    }
+
+    private static List<QuizMultiplayerGameState.TeamData> GetTeams(Dictionary<string, object> parameters, string key)
+    {
+        if (!parameters.TryGetValue(key, out var value) || value == null)
+            return new List<QuizMultiplayerGameState.TeamData>();
+
+        if (value is List<QuizMultiplayerGameState.TeamData> directTeams)
+            return directTeams;
+
+        if (value is JsonElement { ValueKind: JsonValueKind.Array } element)
+        {
+            var payload = element.Deserialize<List<TeamPayload>>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+            return payload.Select(ToTeamData).ToList();
+        }
+
+        if (value is string json && !string.IsNullOrWhiteSpace(json))
+        {
+            var payload = JsonSerializer.Deserialize<List<TeamPayload>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new();
+            return payload.Select(ToTeamData).ToList();
+        }
+
+        return new List<QuizMultiplayerGameState.TeamData>();
+    }
+
+    private static QuizMultiplayerGameState.TeamData ToTeamData(TeamPayload payload)
+    {
+        return new QuizMultiplayerGameState.TeamData
+        {
+            TeamIndex = payload.TeamIndex,
+            Name = payload.Name ?? $"Team {payload.TeamIndex + 1}",
+            PlayerIds = payload.PlayerIds ?? new List<string>()
+        };
+    }
+
+    private sealed class TeamPayload
+    {
+        public int TeamIndex { get; set; }
+        public string? Name { get; set; }
+        public List<string>? PlayerIds { get; set; }
     }
 }
