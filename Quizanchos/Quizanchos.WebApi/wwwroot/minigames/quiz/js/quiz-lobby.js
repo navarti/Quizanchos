@@ -1,7 +1,149 @@
+const QUIZ_LOBBY_ROUTE = '/Minigame/Quiz';
+const CATEGORY_ITEMS_PER_PAGE = 2;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const root = document.getElementById('minigame-root');
     if (!root) return;
 
+    const query = new URLSearchParams(window.location.search);
+    const presetCategoryId = query.get('categoryId');
+    const initialFilter = (query.get('filter') || 'all').toLowerCase();
+
+    if (!presetCategoryId) {
+        await renderCategorySelection(root, initialFilter);
+        return;
+    }
+
+    renderGameSettings(root);
+    await initializeSettingsForm(presetCategoryId);
+});
+
+async function loadCategories() {
+    const response = await fetch('/QuizCategory/GetAll');
+    if (!response.ok) {
+        throw new Error('Failed to load quiz categories.');
+    }
+
+    return await response.json();
+}
+
+function normalizeCategory(category) {
+    return {
+        id: category.id || category.Id,
+        name: category.name || category.Name,
+        imageUrl: category.imageUrl || category.ImageUrl,
+        authorName: category.authorName || category.AuthorName,
+        creationDate: category.creationDate || category.CreationDate,
+        questionToDisplay: category.questionToDisplay || category.QuestionToDisplay
+    };
+}
+
+function slugify(value) {
+    return (value || '').toLowerCase().replace(/\s+/g, '-');
+}
+
+function formatDate(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return '';
+    }
+
+    return date.toLocaleDateString();
+}
+
+async function renderCategorySelection(root, initialFilter) {
+    let categories;
+    try {
+        categories = (await loadCategories()).map(normalizeCategory);
+    } catch (error) {
+        console.error('Error loading categories:', error);
+        root.innerHTML = '<p>Failed to load categories. Please try again later.</p>';
+        return;
+    }
+
+    let currentFilter = initialFilter === 'all' ? 'all' : slugify(initialFilter);
+    let currentPage = 1;
+    const filters = ['all', ...new Set(categories.map(c => slugify(c.name)))];
+
+    const render = () => {
+        const filtered = categories.filter(c => currentFilter === 'all' || slugify(c.name) === currentFilter);
+        const totalPages = Math.max(1, Math.ceil(filtered.length / CATEGORY_ITEMS_PER_PAGE));
+        currentPage = Math.min(currentPage, totalPages);
+
+        const start = (currentPage - 1) * CATEGORY_ITEMS_PER_PAGE;
+        const pageItems = filtered.slice(start, start + CATEGORY_ITEMS_PER_PAGE);
+
+        root.innerHTML = `
+<div class="container quiz-categories-page">
+    <div class="filters">
+        ${filters.map(filter => `
+            <button class="filter-btn ${filter === currentFilter ? 'active' : ''}" data-filter="${filter}">
+                ${filter === 'all' ? 'All' : categories.find(c => slugify(c.name) === filter)?.name || filter}
+            </button>
+        `).join('')}
+    </div>
+    <div id="categories">
+        ${pageItems.map(category => `
+            <div class="category" data-category="${slugify(category.name)}" style="background-image: url('${category.imageUrl}');">
+                <div class="category-content">
+                    <div class="category-header">
+                        <h2 class="category-title">${category.name} Quiz</h2>
+                    </div>
+                    <div class="meta">
+                        <span>${formatDate(category.creationDate)}</span>
+                        <span>${category.name}</span>
+                        <span>${category.authorName || ''}</span>
+                    </div>
+                    <p class="description">${category.questionToDisplay || 'Challenge yourself with category-based questions.'}</p>
+                    <div class="actions">
+                        <a href="${QUIZ_LOBBY_ROUTE}?categoryId=${category.id}" class="quiz-categories-btn quiz-categories-btn-primary">
+                            GO
+                            <span>→</span>
+                        </a>
+                        <a href="/Leaderboard" class="quiz-categories-btn quiz-categories-btn-secondary">
+                            Leaderboard
+                            <span>📊</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        `).join('')}
+    </div>
+    <div class="pagination">
+        <button class="page-btn" id="prevPage" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
+        <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+        <button class="page-btn" id="nextPage" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+    </div>
+</div>`;
+    };
+
+    render();
+
+    root.addEventListener('click', event => {
+        const filterButton = event.target.closest('.filter-btn');
+        if (filterButton) {
+            currentFilter = filterButton.dataset.filter;
+            currentPage = 1;
+            render();
+            return;
+        }
+
+        if (event.target.closest('#prevPage')) {
+            currentPage = Math.max(1, currentPage - 1);
+            render();
+            return;
+        }
+
+        if (event.target.closest('#nextPage')) {
+            const filteredCount = categories.filter(c => currentFilter === 'all' || slugify(c.name) === currentFilter).length;
+            const totalPages = Math.max(1, Math.ceil(filteredCount / CATEGORY_ITEMS_PER_PAGE));
+            currentPage = Math.min(totalPages, currentPage + 1);
+            render();
+        }
+    });
+}
+
+function renderGameSettings(root) {
     root.innerHTML = `
 <div class="container game-session-container">
     <div class="header">
@@ -55,43 +197,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         <div class="action-buttons">
             <button type="button" id="startQuestButton" class="btn-start-quiz">Start Quest</button>
-            <a href="/" class="btn-back-to-quizzes">Back to Quizzes</a>
+            <a href="${QUIZ_LOBBY_ROUTE}" class="btn-back-to-quizzes">Back to Categories</a>
         </div>
     </form>
 </div>`;
+}
 
-    const query = new URLSearchParams(window.location.search);
-    const presetCategoryId = query.get('categoryId');
-
+async function initializeSettingsForm(presetCategoryId) {
     try {
-        const response = await fetch('/QuizCategory/GetAll');
-        if (response.ok) {
-            const categories = await response.json();
-            const categorySelect = document.getElementById('categoryId');
-            categorySelect.innerHTML = '';
+        const categories = (await loadCategories()).map(normalizeCategory);
+        const categorySelect = document.getElementById('categoryId');
+        categorySelect.innerHTML = '';
 
-            categories.forEach(c => {
-                const option = document.createElement('option');
-                option.value = c.id || c.Id;
-                option.textContent = c.name || c.Name;
-                if (presetCategoryId && option.value.toLowerCase() === presetCategoryId.toLowerCase()) {
-                    option.selected = true;
-                }
-                categorySelect.appendChild(option);
-            });
-
-            const selected = categorySelect.options[categorySelect.selectedIndex];
-            if (selected) {
-                document.getElementById('categoryName').textContent = selected.textContent + ' Quiz';
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            if (presetCategoryId && option.value.toLowerCase() === presetCategoryId.toLowerCase()) {
+                option.selected = true;
             }
+            categorySelect.appendChild(option);
+        });
 
-            categorySelect.addEventListener('change', () => {
-                const next = categorySelect.options[categorySelect.selectedIndex];
-                if (next) {
-                    document.getElementById('categoryName').textContent = next.textContent + ' Quiz';
-                }
-            });
-        }
+        updateCategoryTitle(categorySelect);
+
+        categorySelect.addEventListener('change', () => {
+            updateCategoryTitle(categorySelect);
+        });
     } catch (error) {
         console.error('Error loading categories:', error);
     }
@@ -136,4 +268,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert(error.message || 'An error occurred. Please try again later.');
         }
     });
-});
+}
+
+function updateCategoryTitle(categorySelect) {
+    const selected = categorySelect.options[categorySelect.selectedIndex];
+    if (!selected) {
+        return;
+    }
+
+    const title = document.getElementById('categoryName');
+    if (title) {
+        title.textContent = `${selected.textContent} Quiz`;
+    }
+}
