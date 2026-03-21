@@ -27,6 +27,13 @@ The platform now uses a **plugin-based architecture** for minigame integration. 
   - `GetAllDescriptors()` - Get all registered minigames
   - `IsRegistered()` - Check if a minigame is registered
 
+#### `IMinigameFrontendDescriptor`
+- Descriptor for frontend rendering metadata.
+- Provides card metadata (`DisplayName`, `Description`, `LobbyUrl`, `GameUrlTemplate`) and host-migration metadata:
+  - `LobbyViewType`, `GameViewType`
+  - `LobbyStyles`, `LobbyScripts`
+  - `GameStyles`, `GameScripts`
+
 #### `IGameEngine`
 - (Moved from WebApi to Core)
 - Generic interface that all game engines implement
@@ -71,6 +78,31 @@ public class QuizMinigameDescriptor : IMinigameDescriptor
     public async Task SaveGameStateAsync(...)
 }
 ```
+
+### Frontend Host Flow (parallel path)
+
+`MinigameViewController` provides generic routes:
+
+- `GET /Minigame/{gameKey}`
+- `GET /Minigame/{gameKey}/{gameId}`
+
+Behavior:
+
+- If descriptor view type is `legacy`, request is redirected to existing per-minigame route.
+- Otherwise the generic host view is rendered using descriptor metadata:
+  - `LobbyStyles` / `LobbyScripts`
+  - `GameStyles` / `GameScripts`
+
+PR-6 note:
+
+- Frontend descriptor `LobbyUrl` / `GameUrlTemplate` now point to `/Minigame/{gameKey}` routes.
+- Legacy minigame controllers (`Quiz`, `Game2048`, `QuizMultiplayer`) redirect to `MinigameViewController` routes.
+
+PR-7 note:
+
+- Legacy minigame-specific Razor views were removed.
+- Minigame JS modules now render their required DOM under `#minigame-root` in generic host views.
+- Frontend descriptors use `module` view types and provide host-loaded assets.
 
 Similar descriptors exist for:
 - `Quizanchos.Game2048/Descriptors/Game2048MinigameDescriptor.cs`

@@ -1,0 +1,32 @@
+@model MinigameHostViewModel
+@{
+    ViewData["Title"] = $"{Model.DisplayName} Lobby";
+}
+
+@foreach (var style in Model.Styles)
+{
+    <link rel="stylesheet" href="@style" asp-append-version="@(!style.StartsWith("http", StringComparison.OrdinalIgnoreCase))" />
+}
+
+<div id="minigame-root"
+     data-game-key="@Model.GameKey"
+     data-view-mode="@Model.ViewMode"
+     data-game-id=""
+     data-minigame-type-id="@Model.MinigameTypeId"></div>
+
+<script>
+    window.minigameConfig = {
+        gameKey: '@Model.GameKey',
+        displayName: '@Model.DisplayName',
+        description: '@Model.Description',
+        minigameTypeId: @Model.MinigameTypeId,
+        gameUrlTemplate: '@Model.GameUrlTemplate',
+        lobbyUrl: '@Model.LobbyUrl',
+        viewMode: '@Model.ViewMode'
+    };
+</script>
+
+@foreach (var script in Model.Scripts)
+{
+    <script src="@script" asp-append-version="@(!script.StartsWith("http", StringComparison.OrdinalIgnoreCase))"></script>
+}

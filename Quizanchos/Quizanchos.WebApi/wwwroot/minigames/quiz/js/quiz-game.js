@@ -1,6 +1,8 @@
 // Quiz Game Page - API-driven
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('[QUIZ-GAME] Page loaded, initializing...');
+
+    ensureQuizGameLayout();
     
     const container = document.getElementById('quiz-container');
     const gameId = container.getAttribute('data-game-id');
@@ -39,6 +41,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         showError('Failed to load quiz game. Please try again.');
     }
 });
+
+function ensureQuizGameLayout() {
+    if (document.getElementById('quiz-container')) return;
+
+    const root = document.getElementById('minigame-root');
+    if (!root) return;
+
+    root.innerHTML = `
+<div class="quiz-container" data-game-id="${window.minigameConfig?.gameId ?? ''}" id="quiz-container" style="display:none;">
+<div class="quiz-header" id="quiz-header">
+    <h1 id="quiz-question">Loading...</h1>
+    <div class="question-info">
+        <span id="question-number">Question <span data-current>1</span> of <span data-total>10</span></span>
+        <span id="score-display">Score: <span data-score>0</span></span>
+    </div>
+    <button id="finishQuizBtn" class="btn-finish-quiz">Finish Game</button>
+</div>
+    <div class="timeline-container" id="timeline-container"><div class="timeline" id="timeline"></div></div>
+    <div class="quiz-options" id="quiz-options"></div>
+</div>
+<div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 100vh;"><div id="loader"></div></div>
+<div id="errorModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <h2 id="modalHeader">Error</h2>
+        <p id="modalErrorText"></p>
+        <div id="modalButtons" class="modal-buttons">
+            <button id="restartQuiz">Restart Quiz</button>
+            <button id="returnToMenu">Return to Menu</button>
+        </div>
+    </div>
+</div>
+<div id="finalStatsModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h2>Quiz Complete!</h2>
+        <p>Your Score: <strong id="scoreDisplay"></strong> / <span id="totalCardsDisplay"></span></p>
+        <p>Thank you for participating!</p>
+        <button id="goToResults">Return to Main Menu</button>
+    </div>
+</div>
+<div id="preloader"><div id="loader"></div></div>`;
+}
 
 async function initializeQuizGame(gameState, gameId, userId) {
     console.log('[QUIZ-GAME] initializeQuizGame called');

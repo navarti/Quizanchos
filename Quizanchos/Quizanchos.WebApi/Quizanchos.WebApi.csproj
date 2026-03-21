@@ -31,8 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Minigames\**\*.csproj" />
-    <ProjectReference Include="..\Quizanchos.Game*\*.csproj" />
+    <ProjectReference Include="..\Minigames\Quiz\Quizanchos.Quiz.DbUpdater\Quizanchos.Quiz.DbUpdater.csproj" />
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\Quizanchos.Core\Quizanchos.Core.csproj" />
   </ItemGroup>

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Quizanchos.Core;
 
 /// <summary>
@@ -13,6 +15,12 @@ public interface IMinigameFrontendDescriptor
     string CardStyle { get; }
     string LobbyUrl { get; }
     string GameUrlTemplate { get; }
+    string LobbyViewType { get; }
+    string GameViewType { get; }
+    IReadOnlyList<string> LobbyStyles { get; }
+    IReadOnlyList<string> LobbyScripts { get; }
+    IReadOnlyList<string> GameStyles { get; }
+    IReadOnlyList<string> GameScripts { get; }
     string ActionText { get; }
     int Order { get; }
 }
