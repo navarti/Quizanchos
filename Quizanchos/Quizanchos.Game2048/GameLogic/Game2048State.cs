@@ -1,11 +1,10 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 
 namespace Quizanchos.Game2048.GameLogic;
 
 public class Game2048State : IGameState
 {
-    public MinigameType MinigameType => MinigameType.Game2048;
+    public int MinigameType => 2;
 
     public Guid GameId { get; set; }
     public IReadOnlyList<string> Players { get; set; } = Array.Empty<string>();

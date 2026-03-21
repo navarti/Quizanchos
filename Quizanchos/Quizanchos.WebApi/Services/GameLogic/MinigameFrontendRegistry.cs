@@ -8,6 +8,7 @@ namespace Quizanchos.WebApi.Services.GameLogic;
 public class MinigameFrontendRegistry : IMinigameFrontendRegistry
 {
     private readonly Dictionary<string, IMinigameFrontendDescriptor> _descriptors = new();
+    private readonly Dictionary<int, IMinigameFrontendDescriptor> _descriptorsByTypeId = new();
     private readonly object _lockObject = new object();
 
     public void Register(IMinigameFrontendDescriptor descriptor)
@@ -18,9 +19,13 @@ public class MinigameFrontendRegistry : IMinigameFrontendRegistry
         if (string.IsNullOrWhiteSpace(descriptor.GameKey))
             throw new ArgumentException("GameKey cannot be empty or whitespace", nameof(descriptor));
 
+        if (descriptor.MinigameTypeId <= 0)
+            throw new ArgumentException("MinigameTypeId must be greater than zero", nameof(descriptor));
+
         lock (_lockObject)
         {
             _descriptors[descriptor.GameKey] = descriptor;
+            _descriptorsByTypeId[descriptor.MinigameTypeId] = descriptor;
         }
     }
 
@@ -36,11 +41,34 @@ public class MinigameFrontendRegistry : IMinigameFrontendRegistry
         }
     }
 
+    public IMinigameFrontendDescriptor? GetDescriptor(int minigameTypeId)
+    {
+        if (minigameTypeId <= 0)
+            return null;
+
+        lock (_lockObject)
+        {
+            _descriptorsByTypeId.TryGetValue(minigameTypeId, out var descriptor);
+            return descriptor;
+        }
+    }
+
     public IReadOnlyDictionary<string, IMinigameFrontendDescriptor> GetAllDescriptors()
     {
         lock (_lockObject)
         {
             return _descriptors.AsReadOnly();
+        }
+    }
+
+    public bool IsRegistered(int minigameTypeId)
+    {
+        if (minigameTypeId <= 0)
+            return false;
+
+        lock (_lockObject)
+        {
+            return _descriptorsByTypeId.ContainsKey(minigameTypeId);
         }
     }
 

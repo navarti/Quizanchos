@@ -5,7 +5,8 @@ namespace Quizanchos.Quiz.Descriptors;
 
 public class QuizFrontendDescriptor : IMinigameFrontendDescriptor
 {
-    public string GameKey => nameof(MinigameType.Quiz);
+    public int MinigameTypeId => 1;
+    public string GameKey => "Quiz";
     public string DisplayName => "Quiz";
     public string Description => "Challenge yourself with category-based quizzes.";
     public string CardStyle => "background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);";

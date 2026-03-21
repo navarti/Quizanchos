@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Domain.Entities.Interfaces;
 
 namespace Quizanchos.Domain.Entities;
@@ -6,7 +5,7 @@ namespace Quizanchos.Domain.Entities;
 public class GameSession : IKeyedEntity<Guid>
 {
     public Guid Id { get; set; }
-    public MinigameType MinigameType { get; set; }
+    public int MinigameType { get; set; }
     public bool IsActive { get; set; }
     public bool IsFinished { get; set; }
     public string? WinnerId { get; set; }

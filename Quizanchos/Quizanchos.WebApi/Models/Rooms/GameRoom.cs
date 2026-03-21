@@ -1,5 +1,3 @@
-using Quizanchos.Common.Enums;
-
 namespace Quizanchos.WebApi.Models.Rooms;
 
 public enum GameRoomStatus
@@ -46,7 +44,7 @@ public class GameRoom
     private readonly object _syncRoot = new();
 
     public Guid RoomId { get; }
-    public MinigameType MinigameType { get; }
+    public int MinigameType { get; }
     public string HostPlayerId { get; }
     public int MaxPlayers { get; }
     public Dictionary<string, object>? GameParameters { get; }
@@ -61,7 +59,7 @@ public class GameRoom
 
     public GameRoom(
         Guid roomId,
-        MinigameType minigameType,
+        int minigameType,
         string hostPlayerId,
         int maxPlayers,
         List<GameRoomTeam> teams,

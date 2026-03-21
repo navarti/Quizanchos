@@ -12,6 +12,7 @@ namespace Quizanchos.QuizMultiplayer.Services;
 
 public class QuizMultiplayerEngineFactory
 {
+    private const int QuizMultiplayerMinigameTypeId = 3;
     private readonly ILogger<QuizMultiplayerEngineFactory> _logger;
     private readonly QuizMultiplayerStateService _stateService;
     private readonly IGameSessionRepository _gameSessionRepository;
@@ -47,7 +48,7 @@ public class QuizMultiplayerEngineFactory
         GameSession gameSession = new GameSession
         {
             Id = gameId,
-            MinigameType = MinigameType.QuizMultiplayer,
+            MinigameType = QuizMultiplayerMinigameTypeId,
             IsActive = true,
             IsFinished = false,
             CreatedAt = DateTime.UtcNow

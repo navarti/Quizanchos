@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Interfaces;
 
@@ -20,7 +19,7 @@ public class UserScoreService
     /// <summary>
     /// Increment or set user's score for a specific minigame type.
     /// </summary>
-    public async Task IncrementScoreAsync(string userId, MinigameType minigameType, int points)
+    public async Task IncrementScoreAsync(string userId, int minigameType, int points)
     {
         if (points <= 0)
             return;
@@ -59,7 +58,7 @@ public class UserScoreService
     /// <summary>
     /// Get score for a specific minigame.
     /// </summary>
-    public async Task<int> GetScoreAsync(string userId, MinigameType minigameType)
+    public async Task<int> GetScoreAsync(string userId, int minigameType)
     {
         var score = await _scoreRepository.FindByUserAndTypeAsync(userId, minigameType).ConfigureAwait(false);
         return score?.Score ?? 0;

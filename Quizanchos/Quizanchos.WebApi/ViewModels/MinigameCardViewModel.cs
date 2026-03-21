@@ -2,6 +2,7 @@ namespace Quizanchos.ViewModels;
 
 public class MinigameCardViewModel
 {
+    public int MinigameTypeId { get; set; }
     public required string GameKey { get; set; }
     public required string DisplayName { get; set; }
     public required string Description { get; set; }

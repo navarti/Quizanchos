@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.WebApi.Models.Rooms;
 
@@ -192,7 +191,7 @@ public class GameRoomService
         return RoomActionResult.Success(MapToDto(room));
     }
 
-    public IReadOnlyList<GameRoomDto> GetAvailableRooms(MinigameType? minigameType = null)
+    public IReadOnlyList<GameRoomDto> GetAvailableRooms(int? minigameType = null)
     {
         return _roomManager.GetAvailableRooms(minigameType)
             .Select(MapToDto)

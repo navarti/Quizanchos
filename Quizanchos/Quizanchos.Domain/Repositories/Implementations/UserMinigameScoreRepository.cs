@@ -10,7 +10,7 @@ public class UserMinigameScoreRepository : EntityRepositoryBase<Guid, UserMiniga
     {
     }
 
-    public async Task<UserMinigameScore?> FindByUserAndTypeAsync(string userId, Quizanchos.Common.Enums.MinigameType type)
+    public async Task<UserMinigameScore?> FindByUserAndTypeAsync(string userId, int type)
     {
         return await _dbSet.FirstOrDefaultAsync(s => s.ApplicationUserId == userId && s.MinigameType == type).ConfigureAwait(false);
     }

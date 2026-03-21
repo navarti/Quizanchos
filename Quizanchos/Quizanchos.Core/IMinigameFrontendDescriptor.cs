@@ -6,6 +6,7 @@ namespace Quizanchos.Core;
 /// </summary>
 public interface IMinigameFrontendDescriptor
 {
+    int MinigameTypeId { get; }
     string GameKey { get; }
     string DisplayName { get; }
     string Description { get; }

@@ -1,11 +1,9 @@
-using Quizanchos.Common.Enums;
-
 namespace Quizanchos.WebApi.Controllers;
 
 public record GameStateResponse
 {
     public Guid GameId { get; init; }
-    public MinigameType MinigameType { get; init; }
+    public int MinigameType { get; init; }
     public IReadOnlyList<string> Players { get; init; } = Array.Empty<string>();
     public bool IsFinished { get; init; }
     public string? Winner { get; init; }
