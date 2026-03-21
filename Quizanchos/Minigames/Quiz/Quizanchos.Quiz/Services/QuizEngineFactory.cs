@@ -63,15 +63,6 @@ public class QuizEngineFactory
 
         await _gameSessionRepository.CreateAsync(gameSession);
 
-        // Create quiz-specific state
-        await _stateService.CreateInitialStateAsync(
-            gameSession,
-            categoryId ?? Guid.Empty,
-            totalCards,
-            (int)gameLevel,
-            secondsPerCard,
-            optionCount);
-
         // Create the engine
         QuizGameLogic logic = new QuizGameLogic(
             totalCards,
@@ -85,6 +76,9 @@ public class QuizEngineFactory
         GameEngine<QuizGameState, QuizMove> engine = new GameEngine<QuizGameState, QuizMove>(logic, gameId, playerIds);
         
         QuizGameState state = engine.State;
+
+        await _stateService.CreateInitialStateAsync(gameSession, state);
+
         _logger.LogInformation("Quiz engine created. Initial state: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
             state.CurrentCardIndex, state.TotalCards, state.Cards.Count);
 

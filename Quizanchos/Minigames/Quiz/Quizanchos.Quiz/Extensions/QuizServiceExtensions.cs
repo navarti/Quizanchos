@@ -16,7 +16,6 @@ public static class QuizServiceExtensions
         services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();
         services.AddTransient<IFeatureFloatRepository, FeatureFloatRepository>();
         services.AddTransient<IFeatureIntRepository, FeatureIntRepository>();
-        services.AddScoped<IQuizGameSessionRepository, QuizGameSessionRepository>();
 
         return services;
     }

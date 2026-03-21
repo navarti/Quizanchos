@@ -1,41 +1,47 @@
 using System.Text.Json;
 using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Entities.Game2048;
-using Quizanchos.Domain.Repositories.Game2048.Interfaces;
+using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Game2048.GameLogic;
 
 namespace Quizanchos.Game2048.Services;
 
 public class Game2048StateService
 {
-    private readonly IGame2048SessionRepository _repository;
+    private readonly IGameSessionStateRepository _repository;
 
-    public Game2048StateService(IGame2048SessionRepository repository)
+    public Game2048StateService(IGameSessionStateRepository repository)
     {
         _repository = repository;
     }
 
     public async Task<Game2048State?> LoadStateAsync(Guid gameSessionId)
     {
-        Game2048SessionState? sessionState = await _repository.GetByGameSessionIdAsync(gameSessionId);
+        GameSessionState? sessionState = await _repository.GetByGameSessionIdAsync(gameSessionId);
         if (sessionState == null)
             return null;
 
-        return ConvertToGameState(sessionState);
+        Game2048State? state = JsonSerializer.Deserialize<Game2048State>(sessionState.StateJson);
+        if (state == null)
+            return null;
+
+        state.GameId = sessionState.GameSessionId;
+        state.Players = sessionState.GameSession.Players.Select(p => p.ApplicationUserId).ToList();
+        state.IsFinished = sessionState.GameSession.IsFinished;
+        state.Winner = sessionState.GameSession.WinnerId;
+
+        return state;
     }
 
     public async Task SaveStateAsync(Guid gameSessionId, Game2048State state)
     {
-        Game2048SessionState? existingState = await _repository.GetByGameSessionIdAsync(gameSessionId);
+        GameSessionState? existingState = await _repository.GetByGameSessionIdAsync(gameSessionId);
         if (existingState == null)
         {
-            throw new InvalidOperationException($"Game2048SessionState not found for GameSessionId: {gameSessionId}");
+            throw new InvalidOperationException($"GameSessionState not found for GameSessionId: {gameSessionId}");
         }
 
-        existingState.BoardJson = JsonSerializer.Serialize(state.Board);
-        existingState.Score = state.Score;
-        existingState.BestTile = state.BestTile;
-        existingState.MoveCount = state.MoveCount;
+        existingState.StateJson = JsonSerializer.Serialize(state);
+        existingState.UpdatedAt = DateTime.UtcNow;
 
         existingState.GameSession.IsFinished = state.IsFinished;
         if (!string.IsNullOrEmpty(state.Winner))
@@ -51,56 +57,21 @@ public class Game2048StateService
         await _repository.UpdateAsync(existingState);
     }
 
-    public async Task<Game2048SessionState> CreateInitialStateAsync(
+    public async Task<GameSessionState> CreateInitialStateAsync(
         GameSession gameSession,
-        int size,
-        int[][] initialBoard)
+        Game2048State state)
     {
-        var sessionState = new Game2048SessionState
+        var sessionState = new GameSessionState
         {
             Id = Guid.NewGuid(),
             GameSessionId = gameSession.Id,
-            Size = size,
-            BoardJson = JsonSerializer.Serialize(initialBoard),
-            Score = 0,
-            BestTile = GetBestTile(initialBoard),
-            MoveCount = 0,
-            CreationTime = DateTime.UtcNow
+            MinigameType = gameSession.MinigameType,
+            StateJson = JsonSerializer.Serialize(state),
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         await _repository.CreateAsync(sessionState);
         return sessionState;
-    }
-
-    private static Game2048State ConvertToGameState(Game2048SessionState sessionState)
-    {
-        int[][] board = JsonSerializer.Deserialize<int[][]>(sessionState.BoardJson) ?? Array.Empty<int[]>();
-
-        return new Game2048State
-        {
-            GameId = sessionState.GameSessionId,
-            Players = sessionState.GameSession.Players.Select(p => p.ApplicationUserId).ToList(),
-            IsFinished = sessionState.GameSession.IsFinished,
-            Winner = sessionState.GameSession.WinnerId,
-            Size = sessionState.Size,
-            Board = board,
-            Score = sessionState.Score,
-            BestTile = sessionState.BestTile,
-            MoveCount = sessionState.MoveCount,
-            CreationTime = sessionState.CreationTime
-        };
-    }
-
-    private static int GetBestTile(int[][] board)
-    {
-        int best = 0;
-        foreach (var row in board)
-        {
-            foreach (var cell in row)
-            {
-                if (cell > best) best = cell;
-            }
-        }
-        return best;
     }
 }

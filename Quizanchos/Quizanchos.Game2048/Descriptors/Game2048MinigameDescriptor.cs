@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Quizanchos.Common.Enums;
 using Quizanchos.Core;
 using Quizanchos.Game2048.Extensions;
 using Quizanchos.Game2048.GameLogic;
@@ -24,7 +23,6 @@ public class Game2048MinigameDescriptor : IMinigameDescriptor
     public void RegisterServices(IServiceCollection services)
     {
         // Register all 2048-specific repositories and services
-        services.AddGame2048Repositories();
         services.AddGame2048Services();
     }
 

@@ -14,5 +14,6 @@ public class GameSession : IKeyedEntity<Guid>
 
     // Navigation properties
     public ApplicationUser? Winner { get; set; }
+    public GameSessionState? State { get; set; }
     public ICollection<GameSessionPlayer> Players { get; set; } = new List<GameSessionPlayer>();
 }

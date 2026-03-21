@@ -26,7 +26,6 @@ public class QuizMultiplayerMinigameDescriptor : IMinigameDescriptor
     public void RegisterServices(IServiceCollection services)
     {
         // Register all QuizMultiplayer-specific repositories and services
-        services.AddQuizMultiplayerRepositories();
         services.AddQuizMultiplayerServices();
 
         // Also register Quiz services for card generation
