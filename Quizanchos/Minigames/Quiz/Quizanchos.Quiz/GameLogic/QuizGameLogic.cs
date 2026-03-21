@@ -91,6 +91,18 @@ public class QuizGameLogic : IGameLogic<QuizGameState, QuizMove>
 
         // After answering, move to the next card
         state.CurrentCardIndex++;
+
+        // Generate the next card lazily so each card gets its own CreationTime
+        if (_cardGenerator != null
+            && state.CurrentCardIndex < state.TotalCards
+            && state.CurrentCardIndex >= state.Cards.Count
+            && state.QuizCategoryId != Guid.Empty)
+        {
+            _cardGenerator
+                .GenerateSingleCard(state, state.QuizCategoryId, state.OptionCount, state.GameLevel)
+                .GetAwaiter()
+                .GetResult();
+        }
     }
 
     public bool CheckFinished(QuizGameState state)

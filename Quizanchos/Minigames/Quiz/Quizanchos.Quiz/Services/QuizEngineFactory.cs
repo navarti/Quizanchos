@@ -82,20 +82,23 @@ public class QuizEngineFactory
         _logger.LogInformation("Quiz engine created. Initial state: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
             state.CurrentCardIndex, state.TotalCards, state.Cards.Count);
 
-        // Generate cards if categoryId is provided
+        // Generate only the first card if categoryId is provided.
+        // Next cards will be generated lazily after each move.
         if (categoryId.HasValue && categoryId.Value != Guid.Empty && _cardGenerator != null)
         {
-            _logger.LogInformation("Delegating card generation to QuizCardGeneratorService");
+            _logger.LogInformation("Delegating first-card generation to QuizCardGeneratorService");
             
             try
             {
-                await _cardGenerator.GenerateCardsForGame(state, categoryId.Value, totalCards, optionCount, gameLevel);
-                // Save generated cards to DB
+                await _cardGenerator.GenerateSingleCard(state, categoryId.Value, optionCount, gameLevel);
+                state.CurrentCardIndex = 0;
+
+                // Save generated card to DB
                 await _stateService.SaveStateAsync(gameId, state);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error generating cards for game {GameId}", gameId);
+                _logger.LogError(ex, "Error generating first card for game {GameId}", gameId);
             }
         }
         else
