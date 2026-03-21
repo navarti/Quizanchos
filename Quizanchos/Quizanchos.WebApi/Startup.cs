@@ -119,9 +119,6 @@ public static class Startup
         }, ServiceLifetime.Scoped);
 
         // ========== MINIGAME REGISTRATION SYSTEM ==========
-        // Register the minigame registry as a singleton
-        services.AddSingleton<IMinigameRegistry, MinigameRegistry>();
-
         // Create and populate the registry with minigame descriptors
         var registry = new MinigameRegistry();
 
@@ -140,8 +137,17 @@ public static class Startup
         quizMultiplayerDescriptor.RegisterServices(services);
         registry.Register(quizMultiplayerDescriptor);
 
-        // Replace the singleton registry instance with the populated one
-        services.AddSingleton(registry);
+        // Register the populated minigame registry
+        services.AddSingleton<IMinigameRegistry>(registry);
+
+        // ========== FRONTEND MINIGAME REGISTRATION SYSTEM ==========
+        var frontendRegistry = new MinigameFrontendRegistry();
+
+        frontendRegistry.Register(new Quizanchos.Quiz.Descriptors.QuizFrontendDescriptor());
+        frontendRegistry.Register(new Quizanchos.Game2048.Descriptors.Game2048FrontendDescriptor());
+        frontendRegistry.Register(new Quizanchos.QuizMultiplayer.Descriptors.QuizMultiplayerFrontendDescriptor());
+
+        services.AddSingleton<IMinigameFrontendRegistry>(frontendRegistry);
         // ===================================================
 
         services.AddAutoMapper(cfg => 

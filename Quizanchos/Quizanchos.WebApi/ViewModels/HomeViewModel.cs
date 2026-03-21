@@ -8,8 +8,10 @@ public class HomeViewModel
 {
     public required List<QuizCategoryDto> QuizCategories { get; set; }
     public IGameState? ActiveSession { get; set; } 
+    public string? ActiveSessionUrl { get; set; }
 
     public required string QuizName { get; set; }
+    public List<MinigameCardViewModel> Minigames { get; set; } = new List<MinigameCardViewModel>();
 
     public List<ApplicationUserInLeaderBoardDto> Users { get; set; } = new List<ApplicationUserInLeaderBoardDto>();
 
