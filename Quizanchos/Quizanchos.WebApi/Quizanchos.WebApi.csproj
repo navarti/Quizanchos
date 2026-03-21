@@ -40,6 +40,7 @@
   <ItemGroup>
     <MinigamePluginProject Include="..\Quizanchos.Game2048\Quizanchos.Game2048.csproj" />
     <MinigamePluginProject Include="..\Minigames\QuizMultiplayer\Quizanchos.QuizMultiplayer\Quizanchos.QuizMultiplayer.csproj" />
+    <MinigamePluginProject Include="..\Minigames\TicketToRideEurope\Quizanchos.TicketToRideEurope\Quizanchos.TicketToRideEurope.csproj" />
   </ItemGroup>
 
   <Target Name="BuildAndCopyMinigamePlugins" AfterTargets="Build">

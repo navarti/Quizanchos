@@ -23,6 +23,7 @@ public class QuizMultiplayerFrontendDescriptor : IMinigameFrontendDescriptor
     public IReadOnlyList<string> LobbyScripts =>
     [
         "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js",
+        "/js/room-lobby-base.js",
         "/minigames/quiz-multiplayer/js/quiz-multiplayer-lobby.js"
     ];
     public IReadOnlyList<string> GameStyles =>

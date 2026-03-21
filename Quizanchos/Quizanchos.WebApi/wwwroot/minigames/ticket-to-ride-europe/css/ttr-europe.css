@@ -1,0 +1,53 @@
+.ttr-lobby,
+.ttr-game {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 16px;
+    color: #f8f9fa;
+}
+
+.ttr-game section {
+    border: 1px solid #3f4a56;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #1d2733;
+}
+
+.ttr-status {
+    margin-bottom: 12px;
+    padding: 10px;
+    background: #102a43;
+    border-radius: 6px;
+}
+
+#faceUpCards {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+#faceUpCards button,
+.ttr-game button,
+.btn-start-game,
+.btn-back {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #5b7085;
+    background: #244b6d;
+    color: #fff;
+    cursor: pointer;
+}
+
+.ttr-game table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ttr-game th,
+.ttr-game td {
+    border: 1px solid #3f4a56;
+    padding: 6px;
+    text-align: left;
+    font-size: 13px;
+}
