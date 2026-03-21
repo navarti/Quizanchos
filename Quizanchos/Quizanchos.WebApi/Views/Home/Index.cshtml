@@ -1,5 +1,4 @@
 ﻿@model HomeViewModel
-@using Quizanchos.Common.Enums
 @{
     ViewData["Title"] = "Home";
 }
@@ -47,48 +46,36 @@
             <h1>Minigames</h1>
             <p class="subtitle">Try other fun games!</p>
             <div class="featured-quizzes">
-                <div class="quiz-card">
-                    <div class="quiz-image" style="background: linear-gradient(135deg, #edc22e 0%, #f2b179 100%);">
-                        <div class="quiz-content">
-                            <div class="quiz-header">
-                                <h2>2048</h2>
-                                <p>Join the tiles, get to 2048!</p>
+                @foreach (var minigame in Model.Minigames)
+                {
+                    <div class="quiz-card">
+                        <div class="quiz-image" style="@minigame.CardStyle">
+                            <div class="quiz-content">
+                                <div class="quiz-header">
+                                    <h2>@minigame.DisplayName</h2>
+                                    <p>@minigame.Description</p>
+                                </div>
+                                <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
                             </div>
-                            <a href="/Game2048" class="quiz-btn">PLAY →</a>
                         </div>
                     </div>
-                </div>
-                <div class="quiz-card">
-                    <div class="quiz-image" style="background: linear-gradient(135deg, #7b61ff 0%, #4fc3f7 100%);">
-                        <div class="quiz-content">
-                            <div class="quiz-header">
-                                <h2>Quiz Multiplayer</h2>
-                                <p>Team up and compete in real-time quizzes!</p>
-                            </div>
-                            <a href="/QuizMultiplayer" class="quiz-btn">FIND ROOM →</a>
-                        </div>
-                    </div>
-                </div>
+                }
             </div>
         </div>
         @if (User.Identity?.IsAuthenticated == true)
         {
         if (Model.ActiveSession != null)
         {
-            var sessionUrl = Model.ActiveSession.MinigameType switch
-            {
-                MinigameType.Quiz => $"/Quiz/{Model.ActiveSession.GameId}",
-                MinigameType.Game2048 => $"/Game2048/{Model.ActiveSession.GameId}",
-                MinigameType.QuizMultiplayer => $"/QuizMultiplayer/{Model.ActiveSession.GameId}",
-                _ => $"/Quiz/{Model.ActiveSession.GameId}"
-            };
             <div class="sessions-card">
                 <h2>Your Active Session</h2>
                 <div class="session-item">
                     <div class="session-info">
                         <p><strong>Minigame:</strong> @Model.ActiveSession.MinigameType</p>
                     </div>
-                    <a href="@sessionUrl" class="join-btn">Continue →</a>
+                    @if (!string.IsNullOrWhiteSpace(Model.ActiveSessionUrl))
+                    {
+                        <a href="@Model.ActiveSessionUrl" class="join-btn">Continue →</a>
+                    }
                 </div>
             </div>
         }

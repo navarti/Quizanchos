@@ -18,13 +18,20 @@ public class HomeController : Controller
     private readonly QuizCategoryService _quizCategoryService;
     private readonly LeaderBoardService _leaderBoardService;
     private readonly GameService _gameService;
+    private readonly IMinigameFrontendRegistry _minigameFrontendRegistry;
     
-    public HomeController(LeaderBoardService leaderBoardService, ILogger<HomeController> logger, QuizCategoryService quizCategoryService, GameService gameService)
+    public HomeController(
+        LeaderBoardService leaderBoardService,
+        ILogger<HomeController> logger,
+        QuizCategoryService quizCategoryService,
+        GameService gameService,
+        IMinigameFrontendRegistry minigameFrontendRegistry)
     {
         _leaderBoardService = leaderBoardService;
         _logger = logger;
         _quizCategoryService = quizCategoryService;
         _gameService = gameService;
+        _minigameFrontendRegistry = minigameFrontendRegistry;
     }
 
     [HttpGet("/")]
@@ -42,11 +49,39 @@ public class HomeController : Controller
                 activeGameSession = (await _gameService.GetActiveGameByPlayerIdAsync(userId)).Response?.State;
         }
 
+        var minigames = _minigameFrontendRegistry
+            .GetAllDescriptors()
+            .Values
+            .OrderBy(x => x.Order)
+            .Select(x => new MinigameCardViewModel
+            {
+                GameKey = x.GameKey,
+                DisplayName = x.DisplayName,
+                Description = x.Description,
+                CardStyle = x.CardStyle,
+                LobbyUrl = x.LobbyUrl,
+                ActionText = x.ActionText,
+                Order = x.Order
+            })
+            .ToList();
+
+        string? activeSessionUrl = null;
+        if (activeGameSession != null)
+        {
+            var descriptor = _minigameFrontendRegistry.GetDescriptor(activeGameSession.MinigameType.ToString());
+            if (descriptor != null)
+            {
+                activeSessionUrl = descriptor.GameUrlTemplate.Replace("{gameId}", activeGameSession.GameId.ToString());
+            }
+        }
+
         var viewModel = new HomeViewModel
         {
             QuizCategories = quizCategories,
             ActiveSession = activeGameSession,
+            ActiveSessionUrl = activeSessionUrl,
             QuizName = quizName,
+            Minigames = minigames,
             Users = users.ToList(),
             CurrentUserName = User.Identity?.Name ?? "Guest"
         };
