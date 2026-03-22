@@ -30,6 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('placeStationBtn')?.addEventListener('click', () => {
         const stationCity = document.getElementById('stationCity').value.trim();
         const color = document.getElementById('stationColor').value;
+        if (!stationCity) {
+            alert('Select a city on the map first.');
+            return;
+        }
         makeMove(gameId, userId, 4, { stationCity, color });
     });
     document.getElementById('keepTicketsBtn')?.addEventListener('click', () => {
@@ -37,6 +41,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         makeMove(gameId, userId, 3, { keepTicketIndexes: selected });
     });
 });
+
+const CITY_POSITIONS = {
+    London: { x: 10, y: 24 },
+    Brussels: { x: 20, y: 30 },
+    Paris: { x: 18, y: 39 },
+    Amsterdam: { x: 23, y: 26 },
+    Essen: { x: 30, y: 24 },
+    Frankfurt: { x: 30, y: 33 },
+    Berlin: { x: 42, y: 28 },
+    Warsaw: { x: 56, y: 30 },
+    Zurich: { x: 31, y: 44 },
+    Marseille: { x: 23, y: 55 },
+    Barcelona: { x: 14, y: 62 },
+    Madrid: { x: 8, y: 68 },
+    Vienna: { x: 45, y: 43 },
+    Venice: { x: 39, y: 51 },
+    Budapest: { x: 53, y: 46 },
+    Rome: { x: 36, y: 67 },
+    Sofia: { x: 60, y: 58 },
+    Athens: { x: 68, y: 74 }
+};
 
 function ensureLayout(root) {
     root.innerHTML = `
@@ -49,6 +74,16 @@ function ensureLayout(root) {
   </div>
 
   <div id="ttrStatus" class="ttr-status"></div>
+
+  <section>
+    <h2>Europe map</h2>
+    <p class="map-help">Click a route to preselect it. Click a city to prefill station placement.</p>
+    <div class="map-meta">
+        <span id="selectedRouteHint">Selected route: none</span>
+        <span id="selectedCityHint">Selected city: none</span>
+    </div>
+    <div id="europeMap" class="europe-map"></div>
+  </section>
 
   <section>
     <h2>Your hand</h2>
@@ -80,7 +115,7 @@ function ensureLayout(root) {
 
   <section>
     <h2>Stations</h2>
-    <input id="stationCity" placeholder="City name" />
+    <input id="stationCity" placeholder="Select city on map" readonly />
     <select id="stationColor"></select>
     <button id="placeStationBtn">Place station</button>
   </section>
@@ -140,6 +175,7 @@ async function refreshState(gameId, userId) {
 
     renderHand(me);
     renderFaceUp(faceUp, gameId, userId);
+    renderEuropeMap(routes);
     renderRoutes(routes);
     renderRouteSelect(routes);
     renderTickets(me, pendingChoices);
@@ -156,6 +192,91 @@ async function refreshState(gameId, userId) {
     if (finishSessionBtn) {
         finishSessionBtn.disabled = !!data.isFinished;
     }
+}
+
+function renderEuropeMap(routes) {
+    const container = document.getElementById('europeMap');
+    if (!container) return;
+
+    const routeLines = routes.map(route => {
+        const id = route.id ?? route.Id;
+        const cityA = route.cityA ?? route.CityA;
+        const cityB = route.cityB ?? route.CityB;
+        const a = CITY_POSITIONS[cityA] || { x: 50, y: 50 };
+        const b = CITY_POSITIONS[cityB] || { x: 50, y: 50 };
+        const claimedBy = route.claimedBy ?? route.ClaimedBy;
+        const isFree = !claimedBy;
+        const x1 = a.x * 10;
+        const y1 = a.y * 10;
+        const x2 = b.x * 10;
+        const y2 = b.y * 10;
+
+        return `<line class="map-route ${isFree ? 'free' : 'claimed'}" data-route-id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" />`;
+    }).join('');
+
+    const cityNodes = Object.entries(CITY_POSITIONS).map(([city, pos]) => {
+        const x = pos.x * 10;
+        const y = pos.y * 10;
+        return `<g class="map-city" data-city="${city}">
+                    <circle cx="${x}" cy="${y}" r="12"></circle>
+                    <text x="${x + 14}" y="${y + 4}">${city}</text>
+                </g>`;
+    }).join('');
+
+    container.innerHTML = `
+<div class="europe-map-canvas">
+  <svg viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" class="europe-map-svg">
+      ${routeLines}
+      ${cityNodes}
+  </svg>
+</div>`;
+
+    container.querySelectorAll('.map-route.free').forEach(line => {
+        line.addEventListener('click', () => {
+            const routeId = line.getAttribute('data-route-id');
+            const routeSelect = document.getElementById('routeSelect');
+            if (routeSelect && routeId) {
+                routeSelect.value = routeId;
+                updateSelectedRouteHint(routes, routeId);
+            }
+
+            container.querySelectorAll('.map-route.selected').forEach(x => x.classList.remove('selected'));
+            line.classList.add('selected');
+        });
+    });
+
+    container.querySelectorAll('.map-city').forEach(group => {
+        group.addEventListener('click', () => {
+            const city = group.getAttribute('data-city') || '';
+            const stationCity = document.getElementById('stationCity');
+            if (stationCity) {
+                stationCity.value = city;
+            }
+
+            const selectedCityHint = document.getElementById('selectedCityHint');
+            if (selectedCityHint) {
+                selectedCityHint.textContent = `Selected city: ${city}`;
+            }
+
+            container.querySelectorAll('.map-city.selected').forEach(x => x.classList.remove('selected'));
+            group.classList.add('selected');
+        });
+    });
+}
+
+function updateSelectedRouteHint(routes, routeId) {
+    const selectedRouteHint = document.getElementById('selectedRouteHint');
+    if (!selectedRouteHint) return;
+
+    const route = routes.find(r => (r.id ?? r.Id) === routeId);
+    if (!route) {
+        selectedRouteHint.textContent = 'Selected route: none';
+        return;
+    }
+
+    const cityA = route.cityA ?? route.CityA;
+    const cityB = route.cityB ?? route.CityB;
+    selectedRouteHint.textContent = `Selected route: ${cityA} - ${cityB}`;
 }
 
 function setControlsState(disabled) {
