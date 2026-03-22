@@ -27,7 +27,7 @@ public class UserProfileService
     {
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
         int totalScore = await _userScoreService.GetTotalScoreAsync(user.Id).ConfigureAwait(false);
-        return new FullApplicationUserDto(user.Email!, user.UserName!, user.AvatarUrl, totalScore, user.Status);
+        return new FullApplicationUserDto(user.Email!, user.UserName!, user.AvatarUrl, totalScore, user.Coins, user.Status);
     }
 
     public async Task UpdateNickname(ClaimsPrincipal claimsPrincipal, string nickNameToUpdate)
@@ -74,6 +74,18 @@ public class UserProfileService
             throw HandledExceptionFactory.Create("Error uploading image.");
 
         user.AvatarUrl = uploadResult.SecureUrl.AbsoluteUri;
+        await _userManager.UpdateAsync(user).ConfigureAwait(false);
+    }
+
+    public async Task AddCoins(ClaimsPrincipal claimsPrincipal, int coinsToAdd)
+    {
+        if (coinsToAdd <= 0)
+        {
+            throw HandledExceptionFactory.Create("Coins to add must be greater than zero");
+        }
+
+        ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
+        user.Coins += coinsToAdd;
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
     }
 }

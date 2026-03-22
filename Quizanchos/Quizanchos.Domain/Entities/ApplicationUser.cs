@@ -7,6 +7,8 @@ public class ApplicationUser : IdentityUser
 {
     public string AvatarUrl { get; set; } = "";
 
+    public int Coins { get; set; } = 0;
+
     public UserStatusEnum Status { get; set; }
 
     // Per-minigame scores are stored as separate entity "UserMinigameScore"

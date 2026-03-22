@@ -27,6 +27,14 @@ public class ProfileController : Controller
         return View(userDto); 
     }
 
+    [HttpGet("Balance")]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> Balance()
+    {
+        FullApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
+        return View(userDto);
+    }
+
     [HttpPost("Logout")]
     [Authorize]
     [ValidateAntiForgeryToken]

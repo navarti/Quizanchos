@@ -50,7 +50,7 @@ public class LeaderBoardService
                 score = scores.Where(s => s.ApplicationUserId == user.Id).Sum(s => s.Score);
             }
 
-            return new ApplicationUserInLeaderBoardDto(user.UserName!, user.AvatarUrl, score, position + 1, user.Status);
+            return new ApplicationUserInLeaderBoardDto(user.UserName!, user.AvatarUrl, score, user.Coins, position + 1, user.Status);
         }).ToList();
     }
 
@@ -108,7 +108,7 @@ public class LeaderBoardService
 
         var score = minigameType.HasValue ? userScores.FirstOrDefault()?.Score ?? 0 : userScores.Sum(s => s.Score);
 
-        return new ApplicationUserInLeaderBoardDto(user.UserName!, user.AvatarUrl, score, position + 1, user.Status);
+        return new ApplicationUserInLeaderBoardDto(user.UserName!, user.AvatarUrl, score, user.Coins, position + 1, user.Status);
     }
 
 }

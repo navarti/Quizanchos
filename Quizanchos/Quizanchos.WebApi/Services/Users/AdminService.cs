@@ -41,6 +41,7 @@ public class AdminService
             u.UserName!,
             u.AvatarUrl,
             scores.Where(s => s.ApplicationUserId == u.Id).Sum(s => s.Score),
+            u.Coins,
             u.Status));
     }
 
