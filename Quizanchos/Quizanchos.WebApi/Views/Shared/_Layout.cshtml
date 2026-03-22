@@ -29,6 +29,11 @@
             <div class="auth-buttons">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
+                    <a href="/Account/Balance" class="user-balance" id="user-balance">
+                        <span class="balance-label">Balance:</span>
+                        <span class="balance-value" id="user-balance-value">0</span>
+                        <span class="balance-currency">coins</span>
+                    </a>
                     <a href="/Account/Profile" class="btn-profile">
                         <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">
                         <span>Profile</span>

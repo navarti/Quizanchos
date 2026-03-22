@@ -1,0 +1,33 @@
+@model Quizanchos.WebApi.Dto.FullApplicationUserDto
+
+@{
+    ViewData["Title"] = "Balance";
+}
+
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/profile.css">
+<link rel="stylesheet" href="/css/balance.css">
+
+<div class="profile-container">
+    <h1 class="profile-header">Balance</h1>
+
+    <div class="profile-card balance-card">
+        <div class="balance-main-info">
+            <p class="balance-username">@Model.UserName</p>
+            <p class="balance-caption">Current balance</p>
+            <p class="balance-amount" id="balance-amount">@Model.Coins coins</p>
+        </div>
+
+        <div class="profile-info">
+            <div class="info-group">
+                <label class="info-label" for="coins-to-add">Add coins</label>
+                <input type="number" id="coins-to-add" class="info-value" min="1" value="100" step="1">
+            </div>
+            <button type="button" class="save-button" id="add-coins-button">Add coins</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/balance.js" asp-append-version="true"></script>
+}

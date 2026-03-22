@@ -17,8 +17,28 @@
         submitButton.removeEventListener('click', handleSubmit); 
         submitButton.addEventListener('click', handleSubmit);
     }
+
+    loadUserBalance();
     
 });
+
+async function loadUserBalance() {
+    const balanceElement = document.getElementById('user-balance-value');
+    if (!balanceElement) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/UserProfile/GetUserInfo');
+        if (!response.ok) {
+            return;
+        }
+
+        const userInfo = await response.json();
+        balanceElement.textContent = `${userInfo.coins ?? 0}`;
+    } catch {
+    }
+}
 
 async function handleSubmit(event) {
     event.preventDefault();

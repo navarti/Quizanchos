@@ -8,5 +8,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
+        builder.Property(user => user.Coins)
+            .HasDefaultValue(0);
     }
 }

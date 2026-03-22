@@ -47,4 +47,12 @@ public class UserProfileController : Controller
         await _userProfileService.UpdateNickname(User, nickname);
         return Ok();
     }
+
+    [HttpPost]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> AddCoins(int coinsToAdd)
+    {
+        await _userProfileService.AddCoins(User, coinsToAdd);
+        return Ok();
+    }
 }
