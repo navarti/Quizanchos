@@ -22,7 +22,6 @@ public class QuizMultiplayerFrontendDescriptor : IMinigameFrontendDescriptor
     ];
     public IReadOnlyList<string> LobbyScripts =>
     [
-        "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js",
         "/js/room-lobby-base.js",
         "/minigames/quiz-multiplayer/js/quiz-multiplayer-lobby.js"
     ];
@@ -32,7 +31,6 @@ public class QuizMultiplayerFrontendDescriptor : IMinigameFrontendDescriptor
     ];
     public IReadOnlyList<string> GameScripts =>
     [
-        "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js",
         "/js/game-client.js",
         "/minigames/quiz-multiplayer/js/quiz-multiplayer-client.js",
         "/minigames/quiz-multiplayer/js/quiz-multiplayer-game.js"
