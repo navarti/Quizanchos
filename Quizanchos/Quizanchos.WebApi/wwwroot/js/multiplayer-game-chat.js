@@ -19,13 +19,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const messageInput = document.getElementById('multiplayer-chat-input');
     const sendButton = document.getElementById('multiplayer-chat-send');
     const emojiWheel = document.getElementById('multiplayer-emoji-wheel');
-    const emojiShop = document.getElementById('multiplayer-emoji-shop');
     const emojiToggle = document.getElementById('multiplayer-emoji-toggle');
-    const shopToggle = document.getElementById('multiplayer-shop-toggle');
+
+    if (emojiToggle) {
+        emojiToggle.style.cssText = 'appearance:none;-webkit-appearance:none;border:none;border-radius:50%;width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;color:#fff;background:linear-gradient(145deg,#6a1b9a,#8e24aa);box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer;';
+    }
+
+    setEmojiWheelOpen(emojiWheel, false);
 
     const emojiState = {
         catalog: [],
-        ownedIds: new Set(),
         lastSentAt: 0,
         sendCooldownMs: 1000
     };
@@ -55,21 +58,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     sendButton?.addEventListener('click', sendMessage);
 
     emojiToggle?.addEventListener('click', () => {
-        if (!emojiWheel || !emojiShop) {
+        if (!emojiWheel) {
             return;
         }
 
-        emojiWheel.classList.toggle('open');
-        emojiShop.classList.remove('open');
-    });
-
-    shopToggle?.addEventListener('click', () => {
-        if (!emojiWheel || !emojiShop) {
-            return;
-        }
-
-        emojiShop.classList.toggle('open');
-        emojiWheel.classList.remove('open');
+        const isOpen = emojiWheel.classList.contains('open');
+        setEmojiWheelOpen(emojiWheel, !isOpen);
     });
 
     messageInput?.addEventListener('keydown', event => {
@@ -96,17 +90,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function loadEmojiUi() {
         try {
-            const [catalogRaw, ownershipRaw] = await Promise.all([
-                fetchJson('/api/market/catalog?type=emoji'),
-                fetchJson('/api/market/ownership?type=emoji')
-            ]);
-
-            const ownershipIds = new Set((ownershipRaw || []).map(x => getValue(x, 'itemId', 'ItemId')));
+            const catalogRaw = await fetchJson('/api/market/catalog?type=emoji');
             const catalog = (catalogRaw || []).map(item => {
                 const id = getValue(item, 'id', 'Id');
                 const isFree = !!getValue(item, 'isFree', 'IsFree');
                 const isOwnedFlag = !!getValue(item, 'isOwned', 'IsOwned');
-                const isOwned = isFree || isOwnedFlag || ownershipIds.has(id);
+                const isOwned = isFree || isOwnedFlag;
                 return {
                     id,
                     type: getValue(item, 'type', 'Type'),
@@ -120,29 +109,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             emojiState.catalog = catalog;
-            emojiState.ownedIds = new Set(catalog.filter(x => !x.isLocked).map(x => x.id));
 
             renderEmojiWheel(emojiWheel, emojiState.catalog, sendEmoji);
-            renderEmojiShop(emojiShop, emojiState.catalog, purchaseEmoji);
         } catch (error) {
             appendSystemMessage(messagesContainer, error?.message || 'Failed to load emoji catalog');
-        }
-    }
-
-    async function purchaseEmoji(itemId) {
-        try {
-            const payload = await fetchJson('/api/market/purchase', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ marketItemId: itemId })
-            });
-
-            const remainingCoins = getValue(payload, 'remainingCoins', 'RemainingCoins');
-            updateUserCoins(remainingCoins);
-            await loadEmojiUi();
-            appendSystemMessage(messagesContainer, 'Emoji purchased');
-        } catch (error) {
-            appendSystemMessage(messagesContainer, error?.message || 'Purchase failed');
         }
     }
 
@@ -203,8 +173,8 @@ function renderEmojiWheel(container, catalog, onSend) {
     }
 
     container.innerHTML = usable.map(item => `
-<button class="emoji-wheel-item" type="button" data-item-id="${item.id}" title="${escapeHtml(item.name)}">
-    <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" />
+<button class="emoji-wheel-item" type="button" data-item-id="${item.id}" title="${escapeHtml(item.name)}" style="appearance:none;-webkit-appearance:none;border:none;border-radius:10px;width:56px;height:56px;padding:0;margin:0 auto;background:rgba(255,255,255,0.18);cursor:pointer;display:flex;justify-content:center;align-items:center;">
+    <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" style="width:42px;height:42px;display:block;object-fit:contain;flex-shrink:0;" />
 </button>`).join('');
 
     container.querySelectorAll('.emoji-wheel-item').forEach(button => {
@@ -215,41 +185,13 @@ function renderEmojiWheel(container, catalog, onSend) {
     });
 }
 
-function renderEmojiShop(container, catalog, onPurchase) {
-    if (!container) {
+function setEmojiWheelOpen(emojiWheel, isOpen) {
+    if (!emojiWheel) {
         return;
     }
 
-    if (!catalog || !catalog.length) {
-        container.innerHTML = '<div class="emoji-empty-state">Catalog is empty</div>';
-        return;
-    }
-
-    container.innerHTML = catalog.map(item => {
-        const stateText = item.isLocked ? 'Locked' : 'Unlocked';
-        const isPurchasable = item.isLocked && !item.isFree;
-        const priceText = item.isFree ? 'Free' : `${item.priceCoins} coins`;
-
-        return `
-<div class="emoji-shop-item ${item.isLocked ? 'locked' : 'unlocked'}">
-    <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" class="emoji-shop-image" />
-    <div class="emoji-shop-meta">
-        <div class="emoji-shop-name">${escapeHtml(item.name)}</div>
-        <div class="emoji-shop-price">${priceText}</div>
-        <div class="emoji-shop-state">${stateText}</div>
-    </div>
-    ${isPurchasable
-            ? `<button class="emoji-buy-button" type="button" data-item-id="${item.id}">Buy</button>`
-            : '<button class="emoji-buy-button" type="button" disabled>Owned</button>'}
-</div>`;
-    }).join('');
-
-    container.querySelectorAll('.emoji-buy-button[data-item-id]').forEach(button => {
-        button.addEventListener('click', () => {
-            const itemId = button.getAttribute('data-item-id');
-            onPurchase(itemId);
-        });
-    });
+    emojiWheel.classList.toggle('open', isOpen);
+    emojiWheel.style.display = isOpen ? 'grid' : 'none';
 }
 
 function showEmojiOverlay(payload, currentUserId) {
@@ -293,6 +235,8 @@ function renderEmojiOverlay(payload, currentUserId) {
 
     const node = document.createElement('div');
     node.className = `emoji-overlay-item ${senderId === currentUserId ? 'mine' : 'from-other'}`;
+    node.style.position = 'fixed';
+    node.style.left = '50%';
     node.style.setProperty('--emoji-shift', `${shift}px`);
     node.innerHTML = `
 <div class="emoji-overlay-burst"></div>
@@ -334,21 +278,17 @@ function getOrCreateEmojiOverlayLayer() {
         layer = document.createElement('div');
         layer.id = 'emoji-overlay-layer';
         layer.className = 'emoji-overlay-layer';
-        document.body.appendChild(layer);
+
+        const host = document.getElementById('minigame-root') || document.body;
+        host.prepend(layer);
     }
+
+    layer.style.position = 'fixed';
+    layer.style.inset = '0';
+    layer.style.pointerEvents = 'none';
+    layer.style.zIndex = '5000';
 
     return layer;
-}
-
-function updateUserCoins(coins) {
-    if (coins === null || coins === undefined) {
-        return;
-    }
-
-    const balanceValue = document.getElementById('user-balance-value');
-    if (balanceValue) {
-        balanceValue.textContent = String(coins);
-    }
 }
 
 async function fetchJson(url, options) {
@@ -416,13 +356,11 @@ function renderChatLayout() {
 <div class="multiplayer-chat-header">
     <span>Game chat</span>
     <div class="multiplayer-chat-header-actions">
-        <button id="multiplayer-emoji-toggle" type="button" class="multiplayer-header-button" title="Open emoji wheel">😊</button>
-        <button id="multiplayer-shop-toggle" type="button" class="multiplayer-header-button" title="Open emoji shop">Shop</button>
+        <button id="multiplayer-emoji-toggle" type="button" class="multiplayer-header-button" title="Open emoji wheel" style="appearance:none;-webkit-appearance:none;border:none;border-radius:50%;width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;color:#fff;background:linear-gradient(145deg,#6a1b9a,#8e24aa);box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer;">😊</button>
     </div>
 </div>
 <div id="multiplayer-chat-messages" class="multiplayer-chat-messages"></div>
 <div id="multiplayer-emoji-wheel" class="multiplayer-emoji-wheel"></div>
-<div id="multiplayer-emoji-shop" class="multiplayer-emoji-shop"></div>
 <div class="multiplayer-chat-controls">
     <input id="multiplayer-chat-input" maxlength="300" type="text" placeholder="Type a message..." />
     <button id="multiplayer-chat-send" type="button">Send</button>

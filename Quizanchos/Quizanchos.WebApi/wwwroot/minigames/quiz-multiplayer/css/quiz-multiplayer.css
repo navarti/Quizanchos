@@ -415,6 +415,29 @@ body::after {
     background: rgba(255, 255, 255, 0.25);
 }
 
+#multiplayer-emoji-toggle {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1rem;
+    line-height: 1;
+    background: linear-gradient(145deg, #6a1b9a, #8e24aa);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#multiplayer-emoji-toggle:hover {
+    background: linear-gradient(145deg, #8e24aa, #6a1b9a);
+    transform: translateY(-1px);
+}
+
+#multiplayer-emoji-toggle:active {
+    transform: translateY(0);
+}
+
 .multiplayer-chat-messages {
     padding: 10px;
     overflow: auto;
@@ -476,22 +499,16 @@ body::after {
     cursor: pointer;
 }
 
-.multiplayer-emoji-wheel,
-.multiplayer-emoji-shop {
+.multiplayer-emoji-wheel {
     display: none;
     background: rgba(255, 255, 255, 0.06);
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.multiplayer-emoji-wheel.open,
-.multiplayer-emoji-shop.open {
-    display: block;
-}
-
 .multiplayer-emoji-wheel {
     padding: 10px;
     display: none;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 8px;
 }
 
@@ -500,9 +517,14 @@ body::after {
 }
 
 .emoji-wheel-item {
+    appearance: none;
+    -webkit-appearance: none;
     border: none;
     border-radius: 10px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    margin: 0 auto;
     background: rgba(255, 255, 255, 0.18);
     cursor: pointer;
     display: flex;
@@ -510,74 +532,32 @@ body::after {
     align-items: center;
 }
 
+#multiplayer-emoji-wheel .emoji-wheel-item {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: flex !important;
+    width: 56px !important;
+    min-width: 56px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+}
+
 .emoji-wheel-item:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
 .emoji-wheel-item img {
-    width: 26px;
-    height: 26px;
+    width: 42px;
+    height: 42px;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
 }
 
-.multiplayer-emoji-shop {
-    max-height: 200px;
-    overflow: auto;
-    padding: 8px;
-}
-
-.emoji-shop-item {
-    display: grid;
-    grid-template-columns: 36px 1fr auto;
-    align-items: center;
-    gap: 8px;
-    border-radius: 10px;
-    padding: 8px;
-    margin-bottom: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-}
-
-.emoji-shop-item.locked {
-    opacity: 0.85;
-}
-
-.emoji-shop-image {
-    width: 28px;
-    height: 28px;
-}
-
-.emoji-shop-meta {
-    min-width: 0;
-}
-
-.emoji-shop-name {
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.emoji-shop-price,
-.emoji-shop-state {
-    font-size: 0.72rem;
-    opacity: 0.88;
-}
-
-.emoji-buy-button {
-    border: none;
-    border-radius: 8px;
-    padding: 6px 10px;
-    font-size: 0.75rem;
-    color: #fff;
-    background: #7b61ff;
-    cursor: pointer;
-}
-
-.emoji-buy-button:disabled {
-    cursor: default;
-    background: rgba(255, 255, 255, 0.25);
-}
 
 .emoji-empty-state {
     color: #fff;
@@ -591,7 +571,8 @@ body::after {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 1300;
+    z-index: 5000;
+    isolation: isolate;
 }
 
 .emoji-overlay-item {
