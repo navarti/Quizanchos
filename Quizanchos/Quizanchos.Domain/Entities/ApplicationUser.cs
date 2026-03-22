@@ -13,4 +13,6 @@ public class ApplicationUser : IdentityUser
 
     // Per-minigame scores are stored as separate entity "UserMinigameScore"
     public List<UserMinigameScore> MinigameScores { get; set; } = new();
+
+    public List<UserOwnedItem> OwnedItems { get; set; } = new();
 }
