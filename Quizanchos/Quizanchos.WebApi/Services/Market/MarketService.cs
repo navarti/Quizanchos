@@ -101,18 +101,23 @@ public class MarketService
             }
 
             var user = await _dbContext.ApplicationUsers
+                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == userId)
                 .ConfigureAwait(false)
                 ?? throw HandledExceptionFactory.Create("User was not found.");
 
             if (!marketItem.IsFree)
             {
-                if (user.Coins < marketItem.PriceCoins)
+                var updatedRows = await _dbContext.ApplicationUsers
+                    .Where(x => x.Id == userId && x.Coins >= marketItem.PriceCoins)
+                    .ExecuteUpdateAsync(setters =>
+                        setters.SetProperty(x => x.Coins, x => x.Coins - marketItem.PriceCoins))
+                    .ConfigureAwait(false);
+
+                if (updatedRows == 0)
                 {
                     throw HandledExceptionFactory.Create("Not enough coins.");
                 }
-
-                user.Coins -= marketItem.PriceCoins;
             }
 
             var ownership = new UserOwnedItem
@@ -125,9 +130,17 @@ public class MarketService
 
             await _dbContext.UserOwnedItems.AddAsync(ownership).ConfigureAwait(false);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            int remainingCoins = await _dbContext.ApplicationUsers
+                .AsNoTracking()
+                .Where(x => x.Id == userId)
+                .Select(x => x.Coins)
+                .FirstAsync()
+                .ConfigureAwait(false);
+
             await transaction.CommitAsync().ConfigureAwait(false);
 
-            return new MarketPurchaseResultDto(ownership.MarketItemId, ownership.PurchasedAtUtc, user.Coins);
+            return new MarketPurchaseResultDto(ownership.MarketItemId, ownership.PurchasedAtUtc, remainingCoins);
         }
         catch (DbUpdateException)
         {
@@ -139,5 +152,52 @@ public class MarketService
             await transaction.RollbackAsync().ConfigureAwait(false);
             throw;
         }
+    }
+
+    public async Task<MarketCatalogItemDto> GetUsableItemForUser(string userId, Guid marketItemId, MarketItemType expectedType)
+    {
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            throw HandledExceptionFactory.CreateNullException(nameof(userId));
+        }
+
+        if (marketItemId == Guid.Empty)
+        {
+            throw HandledExceptionFactory.Create("Invalid market item id.");
+        }
+
+        var marketItem = await _marketItemRepository.FindById(marketItemId).ConfigureAwait(false)
+            ?? throw HandledExceptionFactory.CreateIdNotFoundException(marketItemId);
+
+        if (!marketItem.IsActive)
+        {
+            throw HandledExceptionFactory.Create("This item is not available.");
+        }
+
+        if (marketItem.Type != expectedType)
+        {
+            throw HandledExceptionFactory.Create("Item type is invalid for this action.");
+        }
+
+        if (!marketItem.IsFree)
+        {
+            var existingOwnership = await _userOwnedItemRepository
+                .FindByUserAndItemAsync(userId, marketItemId)
+                .ConfigureAwait(false);
+
+            if (existingOwnership is null)
+            {
+                throw HandledExceptionFactory.Create("Item is not owned.");
+            }
+        }
+
+        return new MarketCatalogItemDto(
+            marketItem.Id,
+            (int)marketItem.Type,
+            marketItem.Name,
+            marketItem.ImageUrl,
+            marketItem.PriceCoins,
+            marketItem.IsFree,
+            marketItem.IsActive);
     }
 }

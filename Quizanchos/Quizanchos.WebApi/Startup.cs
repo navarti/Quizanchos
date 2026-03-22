@@ -193,6 +193,8 @@ public static class Startup
         using (IServiceScope scope = app.Services.CreateScope())
         {
             IServiceProvider services = scope.ServiceProvider;
+            QuizanchosDbContext dbContext = services.GetRequiredService<QuizanchosDbContext>();
+            await dbContext.Database.MigrateAsync().ConfigureAwait(false);
             await DataSeeder.SeedDatabase(services, configuration);
         }
     }

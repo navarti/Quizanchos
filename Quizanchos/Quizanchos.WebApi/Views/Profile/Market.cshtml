@@ -1,0 +1,31 @@
+@model Quizanchos.WebApi.Dto.FullApplicationUserDto
+
+@{
+    ViewData["Title"] = "Emoji Market";
+}
+
+<link rel="stylesheet" href="/css/site.css">
+<link rel="stylesheet" href="/css/profile.css">
+<link rel="stylesheet" href="/css/market.css">
+
+<div class="profile-container">
+    <h1 class="profile-header">Emoji Market</h1>
+
+    <div class="profile-card market-card">
+        <div class="market-balance-row">
+            <div>
+                <p class="market-balance-caption">Available balance</p>
+                <p class="market-balance-value"><span id="market-balance">@Model.Coins</span> coins</p>
+            </div>
+            <a href="/Account/Balance" class="save-button market-balance-link">Top up</a>
+        </div>
+
+        <div id="market-status" class="market-status" style="display:none;"></div>
+
+        <div id="market-grid" class="market-grid"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/market.js" asp-append-version="true"></script>
+}
