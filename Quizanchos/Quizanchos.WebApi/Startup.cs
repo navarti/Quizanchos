@@ -14,6 +14,7 @@ using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Services.Auth;
 using Quizanchos.WebApi.Services.GameLogic;
+using Quizanchos.WebApi.Services.Market;
 using Quizanchos.WebApi.Services.Rooms;
 using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
@@ -151,9 +152,12 @@ public static class Startup
 
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameSessionStateRepository, GameSessionStateRepository>();
+        services.AddScoped<IMarketItemRepository, MarketItemRepository>();
+        services.AddScoped<IUserOwnedItemRepository, UserOwnedItemRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
         services.AddScoped<IUserMinigameScoreRepository, UserMinigameScoreRepository>();
         services.AddScoped<UserScoreService>();
+        services.AddScoped<MarketService>();
         services.AddScoped<GameService>();
         services.AddSignalR();
         services.AddScoped<Quizanchos.Core.IGameNotifier, SignalRGameNotifier>();

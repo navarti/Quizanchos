@@ -17,6 +17,8 @@ public class QuizanchosDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<GameSessionPlayer> GameSessionPlayers { get; set; }
     public DbSet<GameSessionState> GameSessionStates { get; set; }
     public DbSet<UserMinigameScore> UserMinigameScores { get; set; }
+    public DbSet<MarketItem> MarketItems { get; set; }
+    public DbSet<UserOwnedItem> UserOwnedItems { get; set; }
 
     #region Quiz Domain Entities
     public DbSet<QuizEntity> QuizEntities { get; set; }
