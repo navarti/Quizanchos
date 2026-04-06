@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Quizanchos.Core;
+using Quizanchos.Domain.Entities;
 using Quizanchos.Domain.Repositories.Implementations;
 using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services;
@@ -22,6 +25,7 @@ public class HomeController : Controller
     private readonly GameService _gameService;
     private readonly IMinigameFrontendRegistry _minigameFrontendRegistry;
     private readonly UserProfileService _userProfileService;
+    private readonly UserManager<ApplicationUser> _userManager;
     
     public HomeController(
         LeaderBoardService leaderBoardService,
@@ -29,7 +33,8 @@ public class HomeController : Controller
         QuizCategoryService quizCategoryService,
         GameService gameService,
         IMinigameFrontendRegistry minigameFrontendRegistry,
-        UserProfileService userProfileService)
+        UserProfileService userProfileService,
+        UserManager<ApplicationUser> userManager)
     {
         _leaderBoardService = leaderBoardService;
         _logger = logger;
@@ -37,6 +42,7 @@ public class HomeController : Controller
         _gameService = gameService;
         _minigameFrontendRegistry = minigameFrontendRegistry;
         _userProfileService = userProfileService;
+        _userManager = userManager;
     }
 
     [HttpGet("/")]
@@ -45,8 +51,9 @@ public class HomeController : Controller
         List<QuizCategoryDto> quizCategories = await _quizCategoryService.GetAll();
         IGameState? activeGameSession = null;
         string quizName = "Unknown Category";
+        int activeUsersCount = await _userManager.Users.CountAsync().ConfigureAwait(false);
+        string? activeSessionMinigameName = null;
 
-        var users = await _leaderBoardService.GetLeaderBoardAsync(take: 3, skip: 0); 
         if (User.Identity?.IsAuthenticated == true)
         {
             string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -62,6 +69,7 @@ public class HomeController : Controller
             var descriptor = _minigameFrontendRegistry.GetDescriptor(activeGameSession.MinigameType);
             if (descriptor != null)
             {
+                activeSessionMinigameName = descriptor.DisplayName;
                 activeSessionUrl = descriptor.GameUrlTemplate.Replace("{gameId}", activeGameSession.GameId.ToString());
             }
         }
@@ -70,10 +78,11 @@ public class HomeController : Controller
         {
             QuizCategories = quizCategories,
             ActiveSession = activeGameSession,
+            ActiveSessionMinigameName = activeSessionMinigameName,
             ActiveSessionUrl = activeSessionUrl,
             QuizName = quizName,
             Minigames = minigames,
-            Users = users.ToList(),
+            ActiveUsersCount = activeUsersCount,
             CurrentUserName = User.Identity?.Name ?? "Guest"
         };
         return View(viewModel);
