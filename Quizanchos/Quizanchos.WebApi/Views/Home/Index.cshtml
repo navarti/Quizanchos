@@ -23,7 +23,7 @@
                 <h2>Your Active Session</h2>
                 <div class="session-item">
                     <div class="session-info">
-                        <p><strong>Minigame:</strong> @Model.ActiveSession.MinigameType</p>
+                        <p><strong>Minigame:</strong> @(Model.ActiveSessionMinigameName ?? Model.ActiveSession.MinigameType.ToString())</p>
                     </div>
                     @if (!string.IsNullOrWhiteSpace(Model.ActiveSessionUrl))
                     {
@@ -46,52 +46,12 @@
     }
     <div class="stats-grid">
         <div class="stat-card">
-            <h3>Total Quizzes</h3>
-            <p class="stat-number">42</p>
+            <h3>Total Minigames</h3>
+            <p class="stat-number">@Model.Minigames.Count</p>
         </div>
         <div class="stat-card">
             <h3>Active Users</h3>
-            <p class="stat-number">1,337</p>
-        </div>
-        <div class="stat-card">
-            <h3>Total Points</h3>
-            <p class="stat-number">98,765</p>
-        </div>
-    </div>
-
-    <div class="leaderboards-grid">
-        <div class="leaderboard-card">
-            <h3>Current Leaderboard</h3>
-            <div class="leaderboard-list">
-                @foreach (var user in Model.Users.Take(3).Select((user, index) => new { User = user, Rank = index + 1 }))
-                {
-                    <div class="leaderboard-item">
-                        <span class="rank">@user.Rank</span>
-                        <span class="username">@user.User.UserName</span>
-                        <span class="points">@user.User.Score pts</span>
-                    </div>
-                }
-            </div>
-        </div>
-        <div class="leaderboard-card">
-            <h3>This month prizes</h3>
-            <div class="leaderboard-list">
-                <div class="leaderboard-item">
-                    <span class="rank">1</span>
-                    <span class="username">Amazon Gift Card</span>
-                    <span class="points">$100</span>
-                </div>
-                <div class="leaderboard-item">
-                    <span class="rank">2</span>
-                    <span class="username">Amazon Gift Card</span>
-                    <span class="points">$50</span>
-                </div>
-                <div class="leaderboard-item">
-                    <span class="rank">3</span>
-                    <span class="username">Amazon Gift Card</span>
-                    <span class="points">$25</span>
-                </div>
-            </div>
+            <p class="stat-number">@Model.ActiveUsersCount</p>
         </div>
     </div>
 </main>
