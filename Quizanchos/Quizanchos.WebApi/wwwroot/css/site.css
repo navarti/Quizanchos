@@ -595,6 +595,67 @@ body {
     position: relative; 
 }
 
+.user-status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 12px;
+    border-radius: 20px;
+    background: #e5e7eb;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.user-status-chip.premium {
+    background: linear-gradient(145deg, #facc15, #f59e0b);
+    color: #1f2937;
+}
+
+.premium-status-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.premium-status-card {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.12);
+}
+
+.premium-status-card h1 {
+    margin-bottom: 1rem;
+    color: #6c63ff;
+}
+
+.premium-status-card p {
+    margin-bottom: 0.8rem;
+    color: #1f2937;
+}
+
+.premium-text {
+    color: #b45309;
+}
+
+.premium-status-link {
+    display: inline-block;
+    margin-top: 1rem;
+    text-decoration: none;
+    background: #6c63ff;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 14px;
+}
+
+.premium-status-link:hover {
+    background: #463bff;
+}
+
 .user-balance {
     display: flex;
     align-items: center;

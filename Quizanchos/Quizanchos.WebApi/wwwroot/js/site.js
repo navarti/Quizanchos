@@ -24,7 +24,10 @@
 
 async function loadUserBalance() {
     const balanceElement = document.getElementById('user-balance-value');
-    if (!balanceElement) {
+    const statusElement = document.getElementById('user-status-value');
+    const statusChipElement = document.getElementById('user-status-chip');
+
+    if (!balanceElement && !statusElement) {
         return;
     }
 
@@ -35,9 +38,40 @@ async function loadUserBalance() {
         }
 
         const userInfo = await response.json();
-        balanceElement.textContent = `${userInfo.coins ?? 0}`;
+        if (balanceElement) {
+            balanceElement.textContent = `${userInfo.coins ?? 0}`;
+        }
+
+        if (statusElement) {
+            const isPremiumActive = !!userInfo.premiumUntilUtc && new Date(userInfo.premiumUntilUtc) > new Date();
+            const normalizedStatus = normalizeUserStatus(userInfo.userStatus);
+            const displayStatus = isPremiumActive ? 'Premium' : normalizedStatus;
+
+            statusElement.textContent = displayStatus;
+
+            if (statusChipElement) {
+                statusChipElement.classList.toggle('premium', displayStatus === 'Premium');
+            }
+        }
     } catch {
     }
+}
+
+function normalizeUserStatus(userStatus) {
+    if (typeof userStatus === 'string') {
+        const normalized = userStatus.trim();
+        if (!normalized) {
+            return 'Ordinary';
+        }
+
+        return normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
+    }
+
+    if (typeof userStatus === 'number') {
+        return userStatus === 1 ? 'Premium' : 'Ordinary';
+    }
+
+    return 'Ordinary';
 }
 
 async function handleSubmit(event) {

@@ -26,9 +26,20 @@
                         <div class="quiz-content">
                             <div class="quiz-header">
                                 <h2>@minigame.DisplayName</h2>
+                                @if (minigame.IsPremium)
+                                {
+                                    <span class="premium-badge">Premium</span>
+                                }
                                 <p>@minigame.Description</p>
                             </div>
-                            <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
+                            @if (minigame.CanAccess)
+                            {
+                                <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
+                            }
+                            else
+                            {
+                                <span class="quiz-btn quiz-btn-disabled">Premium required</span>
+                            }
                         </div>
                     </div>
                 </div>

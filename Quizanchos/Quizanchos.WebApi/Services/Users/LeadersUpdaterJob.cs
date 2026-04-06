@@ -25,17 +25,24 @@ public class LeadersUpdaterJob : IJob
     public async Task Execute(IJobExecutionContext context)
     {
         List<ApplicationUser> users = await _userManager.Users.ToListAsync();
-        foreach (ApplicationUser user in users)
-        {
-            user.Status = UserStatusEnum.Ordinary;
-            await _userManager.UpdateAsync(user); 
-        }
+        HashSet<string> leaderboardPremiumUserIds = (await _leaderBoardService
+            .GetAppUsesLeaderBoardAsync(take: PremiumUsersCount, skip: 0)
+            .ConfigureAwait(false))
+            .Select(x => x.Id)
+            .ToHashSet(StringComparer.Ordinal);
 
-        users = await _leaderBoardService.GetAppUsesLeaderBoardAsync(take: PremiumUsersCount, skip: 0);
+        DateTime nowUtc = DateTime.UtcNow;
+
         foreach (ApplicationUser user in users)
         {
-            user.Status = UserStatusEnum.Premium;
-            await _userManager.UpdateAsync(user);
+            bool hasPaidPremium = user.PremiumUntilUtc.HasValue && user.PremiumUntilUtc.Value > nowUtc;
+            bool hasLeaderboardPremium = leaderboardPremiumUserIds.Contains(user.Id);
+
+            user.Status = hasPaidPremium || hasLeaderboardPremium
+                ? UserStatusEnum.Premium
+                : UserStatusEnum.Ordinary;
+
+            await _userManager.UpdateAsync(user).ConfigureAwait(false);
         }
     }
 }

@@ -25,6 +25,11 @@ public interface IMinigameDescriptor
     string DisplayName { get; }
 
     /// <summary>
+    /// Indicates whether this minigame requires premium access.
+    /// </summary>
+    bool IsPremium { get; }
+
+    /// <summary>
     /// Concrete move type for this minigame used for polymorphic serialization.
     /// Must derive from <see cref="GameMove"/>.
     /// </summary>

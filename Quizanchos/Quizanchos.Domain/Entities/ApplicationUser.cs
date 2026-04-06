@@ -9,6 +9,8 @@ public class ApplicationUser : IdentityUser
 
     public int Coins { get; set; } = 0;
 
+    public DateTime? PremiumUntilUtc { get; set; }
+
     public UserStatusEnum Status { get; set; }
 
     // Per-minigame scores are stored as separate entity "UserMinigameScore"

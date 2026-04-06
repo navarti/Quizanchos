@@ -51,6 +51,12 @@
     color: #991b1b;
 }
 
+.market-section-title {
+    margin: 1rem 0 0.7rem;
+    font-size: 1.05rem;
+    color: #374151;
+}
+
 .market-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));

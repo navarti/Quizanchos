@@ -7,5 +7,6 @@ public record MarketCatalogItemStateDto(
     string ImageUrl,
     int PriceCoins,
     bool IsFree,
+    int? DurationMonths,
     bool IsOwned,
     bool IsLocked);

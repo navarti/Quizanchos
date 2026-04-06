@@ -12,6 +12,7 @@ public class TicketToRideEuropeMinigameDescriptor : IMinigameDescriptor
     public int MinigameTypeId => 4;
     public string GameKey => "TicketToRideEurope";
     public string DisplayName => "Ticket to Ride: Europe";
+    public bool IsPremium => true;
     public Type MoveType => typeof(TicketToRideEuropeMove);
     public string MoveDiscriminator => "ticketToRideEurope";
 

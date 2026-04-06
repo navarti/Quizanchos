@@ -61,7 +61,8 @@ public class HomeController : Controller
                 activeGameSession = (await _gameService.GetActiveGameByPlayerIdAsync(userId)).Response?.State;
         }
 
-        var minigames = GetMinigameCards();
+        bool hasPremiumAccess = await HasCurrentUserPremiumAccessAsync().ConfigureAwait(false);
+        var minigames = GetMinigameCards(hasPremiumAccess);
 
         string? activeSessionUrl = null;
         if (activeGameSession != null)
@@ -98,7 +99,8 @@ public class HomeController : Controller
     public async Task<IActionResult> Leaderboard()
     {
         var users = await _leaderBoardService.GetLeaderBoardAsync(take: 10, skip: 0); 
-        var minigames = GetMinigameCards();
+        bool hasPremiumAccess = await HasCurrentUserPremiumAccessAsync().ConfigureAwait(false);
+        var minigames = GetMinigameCards(hasPremiumAccess);
 
         var currentUserName = User.Identity?.Name ?? "Guest";
         var currentUser = users.FirstOrDefault(u => u.UserName == currentUserName);
@@ -146,13 +148,15 @@ public class HomeController : Controller
     }
 
     [HttpGet("/Minigames")]
-    public IActionResult Minigames()
+    public async Task<IActionResult> Minigames()
     {
+        bool hasPremiumAccess = await HasCurrentUserPremiumAccessAsync().ConfigureAwait(false);
+
         var viewModel = new HomeViewModel
         {
             QuizCategories = new List<QuizCategoryDto>(),
             QuizName = string.Empty,
-            Minigames = GetMinigameCards(),
+            Minigames = GetMinigameCards(hasPremiumAccess),
             CurrentUserName = User.Identity?.Name ?? "Guest"
         };
 
@@ -167,6 +171,14 @@ public class HomeController : Controller
         return View(userDto);
     }
 
+    [HttpGet("/PremiumStatus")]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> PremiumStatus()
+    {
+        var userDto = await _userProfileService.GetUserInfo(User).ConfigureAwait(false);
+        return View(userDto);
+    }
+
     [HttpGet("/Signup")]
     public IActionResult Signup()
     {
@@ -178,7 +190,7 @@ public class HomeController : Controller
         return View();
     }
 
-    private List<MinigameCardViewModel> GetMinigameCards()
+    private List<MinigameCardViewModel> GetMinigameCards(bool hasPremiumAccess)
     {
         return _minigameFrontendRegistry
             .GetAllDescriptors()
@@ -189,6 +201,8 @@ public class HomeController : Controller
                 MinigameTypeId = x.MinigameTypeId,
                 GameKey = x.GameKey,
                 DisplayName = x.DisplayName,
+                IsPremium = x.IsPremium,
+                CanAccess = !x.IsPremium || hasPremiumAccess,
                 Description = x.Description,
                 CardStyle = x.CardStyle,
                 LobbyUrl = x.LobbyUrl,
@@ -197,6 +211,23 @@ public class HomeController : Controller
                 Order = x.Order
             })
             .ToList();
+    }
+
+    private async Task<bool> HasCurrentUserPremiumAccessAsync()
+    {
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            return false;
+        }
+
+        string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(userId))
+        {
+            return false;
+        }
+
+        var user = await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
+        return user?.PremiumUntilUtc.HasValue == true && user.PremiumUntilUtc.Value > DateTime.UtcNow;
     }
     
 }

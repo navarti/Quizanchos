@@ -18,6 +18,7 @@ public class QuizMinigameDescriptor : IMinigameDescriptor
     public int MinigameTypeId => 1;
     public string GameKey => "Quiz";
     public string DisplayName => "Quiz";
+    public bool IsPremium => false;
     public Type MoveType => typeof(QuizMove);
     public string MoveDiscriminator => "quiz";
 
