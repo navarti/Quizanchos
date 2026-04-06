@@ -17,25 +17,33 @@ document.addEventListener('DOMContentLoaded', () => {
             (async () => {
                 const take = 100; // adjust as needed
                 const skip = 0;
-                const url = `/LeaderBoard/GetLeaderBoardAsync?take=${take}&skip=${skip}${minigame ? `&minigameType=${minigame}` : ''}`;
+                const url = `/LeaderBoard/GetLeaderBoard?take=${take}&skip=${skip}${minigame ? `&minigameType=${minigame}` : ''}`;
                 const resp = await fetch(url);
+                if (!resp.ok) {
+                    return;
+                }
                 const users = await resp.json();
 
                 // Update leaderboard DOM
                 const leaderboard = leaderboardContainer;
                 leaderboard.innerHTML = '';
                 users.forEach(u => {
+                    const position = u.position ?? u.Position;
+                    const numericPosition = Number(position);
+                    const userName = u.userName ?? u.UserName;
+                    const avatarUrl = u.avatarUrl ?? u.AvatarUrl ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+                    const score = u.score ?? u.Score;
                     const div = document.createElement('div');
-                    div.className = 'leaderboard-item' + (u.UserName === leaderboard.getAttribute('data-current-user') ? ' current-user' : '');
+                    div.className = 'leaderboard-item' + (userName === leaderboard.getAttribute('data-current-user') ? ' current-user' : '');
                     div.innerHTML = `
-                        <div class="rank">${u.Position}</div>
+                        <div class="rank">${position}</div>
                         <div class="player-info">
-                            <img src="${u.AvatarUrl}" alt="${u.UserName}" class="player-avatar">
-                            <span class="player-name">${u.UserName}</span>
+                            <img src="${avatarUrl}" alt="${userName}" class="player-avatar">
+                            <span class="player-name">${userName}</span>
                         </div>
                         <div class="score">
-                            <span class="trophy">${u.Position === 1 ? '??' : ''}</span>
-                            ${u.Score}
+                            ${numericPosition === 1 ? '<span class="trophy">&#x1F3C6;</span>' : ''}
+                            ${score}
                         </div>`;
                     leaderboard.appendChild(div);
                 });
@@ -79,15 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const leaderboard = document.querySelector('.leaderboard');
             leaderboard.innerHTML = ''; // Clear current leaderboard
             data.Users.forEach(user => {
+                const position = user.position ?? user.Position;
+                const userName = user.userName ?? user.UserName;
+                const avatarUrl = user.avatarUrl ?? user.AvatarUrl ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+                const score = user.score ?? user.Score;
                 const userItem = document.createElement('div');
                 userItem.className = 'leaderboard-item';
                 userItem.innerHTML = `
-                <div class="rank">${user.Position}</div>
+                <div class="rank">${position}</div>
                 <div class="player-info">
-                    <img src="${user.AvatarUrl}" alt="${user.UserName}" class="player-avatar">
-                    <span class="player-name">${user.UserName}</span>
+                    <img src="${avatarUrl}" alt="${userName}" class="player-avatar">
+                    <span class="player-name">${userName}</span>
                 </div>
-                <div class="score">${user.Score}</div>`;
+                <div class="score">${score}</div>`;
                 leaderboard.appendChild(userItem);
             });
         });
