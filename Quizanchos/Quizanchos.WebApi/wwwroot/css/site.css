@@ -954,6 +954,40 @@ body {
         text-decoration: underline;
     }
 
+.quiz-footer {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(6px);
+    border-top: 1px solid rgba(108, 99, 255, 0.25) !important;
+    box-shadow: 0 -4px 18px rgba(49, 27, 146, 0.15);
+}
+
+.quiz-footer .container {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #4f46e5;
+    font-weight: 500;
+    flex-wrap: wrap;
+}
+
+.quiz-footer .footer-separator {
+    opacity: 0.65;
+}
+
+.quiz-footer .footer-link {
+    color: #6c63ff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.quiz-footer .footer-link:hover {
+    color: #463bff;
+    text-decoration: underline;
+}
+
 .signin-form .btn-primary {
     width: 100%;
     padding: 15px;
