@@ -5,9 +5,11 @@ using Quizanchos.Quiz.Dto;
 using Quizanchos.Quiz.Services;
 using Quizanchos.ViewModels;
 using Quizanchos.WebApi.Services;
+using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Services.Users;
 using System.Diagnostics;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Quizanchos.WebApi.ViewControllers;
 
@@ -19,19 +21,22 @@ public class HomeController : Controller
     private readonly LeaderBoardService _leaderBoardService;
     private readonly GameService _gameService;
     private readonly IMinigameFrontendRegistry _minigameFrontendRegistry;
+    private readonly UserProfileService _userProfileService;
     
     public HomeController(
         LeaderBoardService leaderBoardService,
         ILogger<HomeController> logger,
         QuizCategoryService quizCategoryService,
         GameService gameService,
-        IMinigameFrontendRegistry minigameFrontendRegistry)
+        IMinigameFrontendRegistry minigameFrontendRegistry,
+        UserProfileService userProfileService)
     {
         _leaderBoardService = leaderBoardService;
         _logger = logger;
         _quizCategoryService = quizCategoryService;
         _gameService = gameService;
         _minigameFrontendRegistry = minigameFrontendRegistry;
+        _userProfileService = userProfileService;
     }
 
     [HttpGet("/")]
@@ -143,6 +148,14 @@ public class HomeController : Controller
         };
 
         return View(viewModel);
+    }
+
+    [HttpGet("/Market")]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> Market()
+    {
+        var userDto = await _userProfileService.GetUserInfo(User);
+        return View(userDto);
     }
 
     [HttpGet("/Signup")]
