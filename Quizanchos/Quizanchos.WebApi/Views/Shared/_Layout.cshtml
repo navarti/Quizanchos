@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - Quizzes</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/multiplayer-game-chat.css" asp-append-version="true">
 </head>
 <body data-user-id="@(User.Identity?.IsAuthenticated == true ? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) : "")">
 
