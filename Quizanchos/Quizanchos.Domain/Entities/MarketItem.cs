@@ -10,6 +10,7 @@ public class MarketItem : IKeyedEntity<Guid>
     public string ImageUrl { get; set; } = string.Empty;
     public int PriceCoins { get; set; }
     public bool IsFree { get; set; }
+    public int? DurationMonths { get; set; }
     public bool IsActive { get; set; } = true;
 
     public ICollection<UserOwnedItem> OwnedByUsers { get; set; } = new List<UserOwnedItem>();

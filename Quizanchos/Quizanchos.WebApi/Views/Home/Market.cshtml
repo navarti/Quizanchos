@@ -1,7 +1,7 @@
 @model Quizanchos.WebApi.Dto.FullApplicationUserDto
 
 @{
-    ViewData["Title"] = "Emoji Market";
+    ViewData["Title"] = "Market";
 }
 
 <link rel="stylesheet" href="/css/site.css">
@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="/css/market.css">
 
 <div class="profile-container">
-    <h1 class="profile-header">Emoji Market</h1>
+    <h1 class="profile-header">Market</h1>
 
     <div class="profile-card market-card">
         <div class="market-balance-row">
@@ -22,7 +22,11 @@
 
         <div id="market-status" class="market-status" style="display:none;"></div>
 
-        <div id="market-grid" class="market-grid"></div>
+        <h2 class="market-section-title">Premium Subscriptions</h2>
+        <div id="market-grid-premium" class="market-grid"></div>
+
+        <h2 class="market-section-title">Emoji Catalog</h2>
+        <div id="market-grid-emoji" class="market-grid"></div>
     </div>
 </div>
 

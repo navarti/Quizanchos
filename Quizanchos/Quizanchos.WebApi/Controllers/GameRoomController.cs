@@ -23,13 +23,13 @@ public class GameRoomController : ControllerBase
     /// </summary>
     [HttpPost]
     [Authorize(AppRole.User)]
-    public IActionResult CreateRoom([FromBody] CreateRoomRequest request)
+    public async Task<IActionResult> CreateRoom([FromBody] CreateRoomRequest request)
     {
         string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userId))
             return Unauthorized();
 
-        RoomActionResult result = _roomService.CreateRoom(request, userId);
+        RoomActionResult result = await _roomService.CreateRoomAsync(request, userId);
 
         if (!result.IsSuccess)
             return BadRequest(new { Message = result.ErrorMessage });

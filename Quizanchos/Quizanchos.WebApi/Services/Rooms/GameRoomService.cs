@@ -1,5 +1,6 @@
 using Quizanchos.Core;
 using Quizanchos.WebApi.Models.Rooms;
+using Quizanchos.WebApi.Services.Users;
 
 namespace Quizanchos.WebApi.Services.Rooms;
 
@@ -13,21 +14,28 @@ public class GameRoomService
     private readonly IRoomNotifier _roomNotifier;
     private readonly GameService _gameService;
     private readonly ILogger<GameRoomService> _logger;
+    private readonly PremiumAccessService _premiumAccessService;
 
     public GameRoomService(
         IGameRoomManager roomManager,
         IRoomNotifier roomNotifier,
         GameService gameService,
-        ILogger<GameRoomService> logger)
+        ILogger<GameRoomService> logger,
+        PremiumAccessService premiumAccessService)
     {
         _roomManager = roomManager;
         _roomNotifier = roomNotifier;
         _gameService = gameService;
         _logger = logger;
+        _premiumAccessService = premiumAccessService;
     }
 
-    public RoomActionResult CreateRoom(CreateRoomRequest request, string hostPlayerId)
+    public async Task<RoomActionResult> CreateRoomAsync(CreateRoomRequest request, string hostPlayerId)
     {
+        await _premiumAccessService
+            .EnsureUsersCanAccessMinigameAsync([hostPlayerId], request.MinigameType)
+            .ConfigureAwait(false);
+
         var existingRoom = _roomManager.GetRoomByPlayerId(hostPlayerId);
         if (existingRoom != null)
             return RoomActionResult.Error($"Player is already in room {existingRoom.RoomId}");
@@ -76,6 +84,10 @@ public class GameRoomService
         var room = _roomManager.GetRoom(roomId);
         if (room == null)
             return RoomActionResult.Error("Room not found");
+
+        await _premiumAccessService
+            .EnsureUsersCanAccessMinigameAsync([playerId], room.MinigameType)
+            .ConfigureAwait(false);
 
         bool shouldLaunch;
 
@@ -205,6 +217,11 @@ public class GameRoomService
         try
         {
             var playerIds = room.AllPlayerIds.ToList();
+
+            await _premiumAccessService
+                .EnsureUsersCanAccessMinigameAsync(playerIds, room.MinigameType)
+                .ConfigureAwait(false);
+
             var teams = room.Teams
                 .Select(t => new TeamInfo(t.TeamIndex, t.Name, t.Players.ToList()))
                 .ToList();

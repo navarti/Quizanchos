@@ -7,4 +7,5 @@ public record MarketCatalogItemDto(
     string ImageUrl,
     int PriceCoins,
     bool IsFree,
-    bool IsActive);
+    bool IsActive,
+    int? DurationMonths);

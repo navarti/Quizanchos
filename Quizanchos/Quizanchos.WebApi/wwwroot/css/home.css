@@ -7,6 +7,23 @@
     --card-bg: rgba(255, 255, 255, 0.95);
 }
 
+.quiz-btn-disabled {
+    background: #6b7280;
+    cursor: default;
+}
+
+.premium-badge {
+    display: inline-block;
+    margin: 0.4rem 0 0.6rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: #facc15;
+    color: #1f2937;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
 * {
     margin: 0;
     padding: 0;

@@ -44,6 +44,7 @@ public class MarketController : ControllerBase
                 x.ImageUrl,
                 x.PriceCoins,
                 x.IsFree,
+                x.DurationMonths,
                 isOwned,
                 isLocked);
         }).ToList();

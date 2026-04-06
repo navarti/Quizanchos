@@ -27,6 +27,9 @@ public class MarketItemConfiguration : IEntityTypeConfiguration<MarketItem>
         builder.Property(x => x.IsFree)
             .IsRequired();
 
+        builder.Property(x => x.DurationMonths)
+            .IsRequired(false);
+
         builder.Property(x => x.IsActive)
             .IsRequired();
 
@@ -34,5 +37,8 @@ public class MarketItemConfiguration : IEntityTypeConfiguration<MarketItem>
             .IsUnique();
 
         builder.HasCheckConstraint("CK_MarketItems_PriceCoins_NonNegative", "[PriceCoins] >= 0");
+        builder.HasCheckConstraint(
+            "CK_MarketItems_DurationMonths_ByType",
+            "([Type] <> 2 AND [DurationMonths] IS NULL) OR ([Type] = 2 AND [DurationMonths] IS NOT NULL AND [DurationMonths] > 0)");
     }
 }

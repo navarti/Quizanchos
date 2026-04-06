@@ -156,6 +156,7 @@ public static class Startup
         services.AddScoped<IUserOwnedItemRepository, UserOwnedItemRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
         services.AddScoped<IUserMinigameScoreRepository, UserMinigameScoreRepository>();
+        services.AddScoped<PremiumAccessService>();
         services.AddScoped<UserScoreService>();
         services.AddScoped<MarketService>();
         services.AddScoped<GameService>();

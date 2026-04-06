@@ -47,7 +47,8 @@ public class MarketService
                 x.ImageUrl,
                 x.PriceCoins,
                 x.IsFree,
-                x.IsActive))
+                x.IsActive,
+                x.DurationMonths))
             .ToList();
     }
 
@@ -91,33 +92,56 @@ public class MarketService
                 throw HandledExceptionFactory.Create("This item is not available for purchase.");
             }
 
-            var existingOwnership = await _userOwnedItemRepository
-                .FindByUserAndItemAsync(userId, marketItemId)
-                .ConfigureAwait(false);
-
-            if (existingOwnership is not null)
-            {
-                throw HandledExceptionFactory.Create("Item is already owned.");
-            }
-
             var user = await _dbContext.ApplicationUsers
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == userId)
                 .ConfigureAwait(false)
                 ?? throw HandledExceptionFactory.Create("User was not found.");
 
-            if (!marketItem.IsFree)
+            if (marketItem.Type != MarketItemType.PremiumSubscription)
             {
-                var updatedRows = await _dbContext.ApplicationUsers
-                    .Where(x => x.Id == userId && x.Coins >= marketItem.PriceCoins)
-                    .ExecuteUpdateAsync(setters =>
-                        setters.SetProperty(x => x.Coins, x => x.Coins - marketItem.PriceCoins))
+                var existingOwnership = await _userOwnedItemRepository
+                    .FindByUserAndItemAsync(userId, marketItemId)
                     .ConfigureAwait(false);
 
-                if (updatedRows == 0)
+                if (existingOwnership is not null)
+                {
+                    throw HandledExceptionFactory.Create("Item is already owned.");
+                }
+            }
+
+            if (!marketItem.IsFree)
+            {
+                if (user.Coins < marketItem.PriceCoins)
                 {
                     throw HandledExceptionFactory.Create("Not enough coins.");
                 }
+
+                user.Coins -= marketItem.PriceCoins;
+            }
+
+            var purchasedAtUtc = DateTime.UtcNow;
+
+            if (marketItem.Type == MarketItemType.PremiumSubscription)
+            {
+                if (marketItem.DurationMonths is null or <= 0)
+                {
+                    throw HandledExceptionFactory.Create("Subscription item is configured incorrectly.");
+                }
+
+                DateTime premiumBaseUtc = user.PremiumUntilUtc.HasValue && user.PremiumUntilUtc.Value > purchasedAtUtc
+                    ? user.PremiumUntilUtc.Value
+                    : purchasedAtUtc;
+
+                user.PremiumUntilUtc = premiumBaseUtc.AddMonths(marketItem.DurationMonths.Value);
+
+                await _dbContext.SaveChangesAsync().ConfigureAwait(false);
+                await transaction.CommitAsync().ConfigureAwait(false);
+
+                return new MarketPurchaseResultDto(
+                    marketItem.Id,
+                    purchasedAtUtc,
+                    user.Coins,
+                    user.PremiumUntilUtc);
             }
 
             var ownership = new UserOwnedItem
@@ -125,22 +149,19 @@ public class MarketService
                 Id = Guid.NewGuid(),
                 ApplicationUserId = userId,
                 MarketItemId = marketItem.Id,
-                PurchasedAtUtc = DateTime.UtcNow
+                PurchasedAtUtc = purchasedAtUtc
             };
 
             await _dbContext.UserOwnedItems.AddAsync(ownership).ConfigureAwait(false);
             await _dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            int remainingCoins = await _dbContext.ApplicationUsers
-                .AsNoTracking()
-                .Where(x => x.Id == userId)
-                .Select(x => x.Coins)
-                .FirstAsync()
-                .ConfigureAwait(false);
-
             await transaction.CommitAsync().ConfigureAwait(false);
 
-            return new MarketPurchaseResultDto(ownership.MarketItemId, ownership.PurchasedAtUtc, remainingCoins);
+            return new MarketPurchaseResultDto(
+                ownership.MarketItemId,
+                ownership.PurchasedAtUtc,
+                user.Coins,
+                user.PremiumUntilUtc);
         }
         catch (DbUpdateException)
         {
@@ -179,7 +200,7 @@ public class MarketService
             throw HandledExceptionFactory.Create("Item type is invalid for this action.");
         }
 
-        if (!marketItem.IsFree)
+        if (!marketItem.IsFree && marketItem.Type != MarketItemType.PremiumSubscription)
         {
             var existingOwnership = await _userOwnedItemRepository
                 .FindByUserAndItemAsync(userId, marketItemId)
@@ -198,6 +219,7 @@ public class MarketService
             marketItem.ImageUrl,
             marketItem.PriceCoins,
             marketItem.IsFree,
-            marketItem.IsActive);
+            marketItem.IsActive,
+            marketItem.DurationMonths);
     }
 }

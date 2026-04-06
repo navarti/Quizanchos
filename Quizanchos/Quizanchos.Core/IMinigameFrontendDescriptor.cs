@@ -11,6 +11,7 @@ public interface IMinigameFrontendDescriptor
     int MinigameTypeId { get; }
     string GameKey { get; }
     string DisplayName { get; }
+    bool IsPremium { get; }
     string Description { get; }
     string CardStyle { get; }
     string LobbyUrl { get; }

@@ -9,6 +9,7 @@ public class QuizFrontendDescriptor : IMinigameFrontendDescriptor
     public int MinigameTypeId => 1;
     public string GameKey => "Quiz";
     public string DisplayName => "Quiz";
+    public bool IsPremium => false;
     public string Description => "Challenge yourself with category-based quizzes.";
     public string CardStyle => "background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);";
     public string LobbyUrl => MinigameRoute;

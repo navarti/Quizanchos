@@ -17,6 +17,7 @@ public class Game2048MinigameDescriptor : IMinigameDescriptor
     public int MinigameTypeId => 2;
     public string GameKey => "Game2048";
     public string DisplayName => "2048";
+    public bool IsPremium => false;
     public Type MoveType => typeof(Game2048Move);
     public string MoveDiscriminator => "game2048";
 

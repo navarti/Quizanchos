@@ -20,6 +20,7 @@ public class QuizMultiplayerMinigameDescriptor : IMinigameDescriptor
     public int MinigameTypeId => 3;
     public string GameKey => "QuizMultiplayer";
     public string DisplayName => "Quiz Multiplayer";
+    public bool IsPremium => false;
     public Type MoveType => typeof(QuizMultiplayerMove);
     public string MoveDiscriminator => "quizMultiplayer";
 

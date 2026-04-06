@@ -9,6 +9,7 @@ public class TicketToRideEuropeFrontendDescriptor : IMinigameFrontendDescriptor
     public int MinigameTypeId => 4;
     public string GameKey => "TicketToRideEurope";
     public string DisplayName => "Ticket to Ride: Europe";
+    public bool IsPremium => true;
     public string Description => "Claim routes, complete destination tickets, and build the longest path across Europe.";
     public string CardStyle => "background: linear-gradient(135deg, #1f5d9d 0%, #1fa67a 100%);";
     public string LobbyUrl => MinigameRoute;

@@ -16,23 +16,30 @@ public class GameService
     private readonly IGameNotifier _gameNotifier;
     private readonly ILogger<GameService> _logger;
     private readonly UserScoreService _userScoreService;
+    private readonly PremiumAccessService _premiumAccessService;
 
     public GameService(
         IGameLogicFactory gameLogicFactory,
         IGameSessionRepository gameSessionRepository,
         IGameNotifier gameNotifier,
         ILogger<GameService> logger,
-        UserScoreService userScoreService)
+        UserScoreService userScoreService,
+        PremiumAccessService premiumAccessService)
     {
         _gameLogicFactory = gameLogicFactory;
         _gameSessionRepository = gameSessionRepository;
         _gameNotifier = gameNotifier;
         _logger = logger;
         _userScoreService = userScoreService;
+        _premiumAccessService = premiumAccessService;
     }
 
     public async Task<CreateGameResponse> CreateGameAsync(CreateGameRequest request)
     {
+        await _premiumAccessService
+            .EnsureUsersCanAccessMinigameAsync(request.PlayerIds, request.MinigameType)
+            .ConfigureAwait(false);
+
         foreach (var playerId in request.PlayerIds)
         {
             var activeGame = await _gameSessionRepository.GetActiveByPlayerIdAsync(playerId);
@@ -75,6 +82,10 @@ public class GameService
         Dictionary<string, object>? parameters,
         IReadOnlyList<TeamInfo> teams)
     {
+        await _premiumAccessService
+            .EnsureUsersCanAccessMinigameAsync(playerIds, minigameType)
+            .ConfigureAwait(false);
+
         foreach (var playerId in playerIds)
         {
             var activeGame = await _gameSessionRepository.GetActiveByPlayerIdAsync(playerId);
