@@ -35,14 +35,6 @@ public class ProfileController : Controller
         return View(userDto);
     }
 
-    [HttpGet("Market")]
-    [Authorize(AppRole.User)]
-    public async Task<IActionResult> Market()
-    {
-        FullApplicationUserDto userDto = await _userProfileService.GetUserInfo(User);
-        return View(userDto);
-    }
-
     [HttpPost("Logout")]
     [Authorize]
     [ValidateAntiForgeryToken]

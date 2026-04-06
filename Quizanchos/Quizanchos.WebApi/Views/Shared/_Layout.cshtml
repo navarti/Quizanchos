@@ -23,6 +23,10 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/Minigames">Minigames</a></li>
                 <li><a href="/LeaderBoard">LeaderBoard</a></li>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li><a href="/Market">Market</a></li>
+                }
                 <li><a href="/FAQ">FAQ</a></li>
                 <li><a href="/Contact">Contact</a></li>
             </ul>
@@ -34,9 +38,6 @@
                         <span class="balance-label">Balance:</span>
                         <span class="balance-value" id="user-balance-value">0</span>
                         <span class="balance-currency">coins</span>
-                    </a>
-                    <a href="/Account/Market" class="btn-profile">
-                        <span>Market</span>
                     </a>
                     <a href="/Account/Profile" class="btn-profile">
                         <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">
