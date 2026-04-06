@@ -21,10 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const emojiWheel = document.getElementById('multiplayer-emoji-wheel');
     const emojiToggle = document.getElementById('multiplayer-emoji-toggle');
 
-    if (emojiToggle) {
-        emojiToggle.style.cssText = 'appearance:none;-webkit-appearance:none;border:none;border-radius:50%;width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;color:#fff;background:linear-gradient(145deg,#6a1b9a,#8e24aa);box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer;';
-    }
-
     setEmojiWheelOpen(emojiWheel, false);
 
     const emojiState = {
@@ -173,8 +169,8 @@ function renderEmojiWheel(container, catalog, onSend) {
     }
 
     container.innerHTML = usable.map(item => `
-<button class="emoji-wheel-item" type="button" data-item-id="${item.id}" title="${escapeHtml(item.name)}" style="appearance:none;-webkit-appearance:none;border:none;border-radius:10px;width:56px;height:56px;padding:0;margin:0 auto;background:rgba(255,255,255,0.18);cursor:pointer;display:flex;justify-content:center;align-items:center;">
-    <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" style="width:42px;height:42px;display:block;object-fit:contain;flex-shrink:0;" />
+<button class="emoji-wheel-item" type="button" data-item-id="${item.id}" title="${escapeHtml(item.name)}">
+    <img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" />
 </button>`).join('');
 
     container.querySelectorAll('.emoji-wheel-item').forEach(button => {
@@ -356,7 +352,7 @@ function renderChatLayout() {
 <div class="multiplayer-chat-header">
     <span>Game chat</span>
     <div class="multiplayer-chat-header-actions">
-        <button id="multiplayer-emoji-toggle" type="button" class="multiplayer-header-button" title="Open emoji wheel" style="appearance:none;-webkit-appearance:none;border:none;border-radius:50%;width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;color:#fff;background:linear-gradient(145deg,#6a1b9a,#8e24aa);box-shadow:0 2px 8px rgba(0,0,0,.2);cursor:pointer;">😊</button>
+        <button id="multiplayer-emoji-toggle" type="button" class="multiplayer-header-button" title="Open emoji wheel">😊</button>
     </div>
 </div>
 <div id="multiplayer-chat-messages" class="multiplayer-chat-messages"></div>
