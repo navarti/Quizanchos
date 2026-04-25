@@ -1,0 +1,179 @@
+.ttr-lobby {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    color: #f7f1e8;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    grid-template-areas:
+        "create rooms"
+        "detail detail";
+    gap: 24px;
+}
+
+.ttr-lobby .panel {
+    background: linear-gradient(160deg, rgba(60, 32, 14, 0.92), rgba(40, 22, 10, 0.92));
+    border: 1px solid #c97f3f55;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+}
+
+.ttr-lobby .create-panel { grid-area: create; }
+.ttr-lobby .rooms-panel { grid-area: rooms; }
+.ttr-lobby .room-detail-panel { grid-area: detail; }
+
+.ttr-lobby h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    color: #f3c773;
+    letter-spacing: 0.5px;
+}
+
+.ttr-lobby h2 {
+    margin: 0 0 16px;
+    font-size: 20px;
+    color: #f3c773;
+}
+
+.ttr-lobby .subtitle {
+    margin: 0 0 20px;
+    color: #d6c4a4;
+    font-size: 14px;
+}
+
+.ttr-lobby .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ttr-lobby .form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.ttr-lobby .form-group label {
+    font-size: 12px;
+    color: #d6c4a4;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ttr-lobby .form-control {
+    background: #2a1607;
+    color: #f7f1e8;
+    border: 1px solid #c97f3f88;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.ttr-lobby .btn-create,
+.ttr-lobby .btn-refresh,
+.ttr-lobby .btn-join,
+.ttr-lobby .btn-leave {
+    background: linear-gradient(180deg, #c97f3f, #8a4f1c);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s;
+}
+
+.ttr-lobby .btn-create:hover,
+.ttr-lobby .btn-join:hover {
+    filter: brightness(1.1);
+}
+
+.ttr-lobby .btn-create {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+}
+
+.ttr-lobby .rooms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ttr-lobby .btn-refresh {
+    padding: 6px 10px;
+    font-size: 16px;
+}
+
+.ttr-lobby .rooms-list { display: flex; flex-direction: column; gap: 10px; }
+.ttr-lobby .empty-msg { color: #d6c4a4; font-style: italic; }
+
+.ttr-lobby .room-card {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid #c97f3f55;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.ttr-lobby .room-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    color: #f3c773;
+    font-weight: 600;
+}
+
+.ttr-lobby .room-team {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.ttr-lobby .tag-full {
+    color: #c97f3f;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.ttr-lobby .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ttr-lobby .team-card {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid #c97f3f55;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.ttr-lobby .team-card h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #f3c773;
+}
+
+.ttr-lobby .team-count { color: #d6c4a4; font-size: 12px; }
+
+.ttr-lobby .player-slot {
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+.ttr-lobby .player-slot.filled { background: rgba(243, 199, 115, 0.2); color: #f3c773; }
+.ttr-lobby .player-slot.empty { background: rgba(255, 255, 255, 0.05); color: #6b5b46; }
+
+.ttr-lobby .room-status {
+    color: #d6c4a4;
+    margin: 0 0 16px;
+    font-size: 13px;
+}
