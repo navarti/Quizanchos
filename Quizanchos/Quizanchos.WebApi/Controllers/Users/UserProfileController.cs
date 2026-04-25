@@ -49,7 +49,7 @@ public class UserProfileController : Controller
     }
 
     [HttpPost]
-    [Authorize(AppRole.User)]
+    [Authorize(AppRole.Admin)]
     public async Task<IActionResult> AddCoins(int coinsToAdd)
     {
         await _userProfileService.AddCoins(User, coinsToAdd);

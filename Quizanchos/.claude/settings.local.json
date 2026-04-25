@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(sort find:*)"
+      "Bash(sort find:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet ef:*)",
+      "Bash(cd:*)"
     ]
   }
 }
