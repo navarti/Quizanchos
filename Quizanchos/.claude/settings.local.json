@@ -4,7 +4,8 @@
       "Bash(sort find:*)",
       "Bash(dotnet build:*)",
       "Bash(dotnet ef:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(xargs grep:*)"
     ]
   }
 }
