@@ -46,4 +46,14 @@ public class TopUpOrderRepository : EntityRepositoryBase<Guid, TopUpOrder>, ITop
     {
         return await _dbSet.AnyAsync(x => x.BinanceTxId == txId).ConfigureAwait(false);
     }
+
+    public async Task<List<TopUpOrder>> GetNonPendingAsync(int take)
+    {
+        return await _dbSet
+            .Include(x => x.ApplicationUser)
+            .Where(x => x.Status != TopUpOrderStatus.Pending)
+            .OrderByDescending(x => x.CompletedAtUtc ?? x.CreatedAtUtc)
+            .Take(take)
+            .ToListAsync().ConfigureAwait(false);
+    }
 }

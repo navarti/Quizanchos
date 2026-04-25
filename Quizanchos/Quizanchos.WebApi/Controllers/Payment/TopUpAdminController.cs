@@ -24,6 +24,13 @@ public class TopUpAdminController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("history")]
+    public async Task<IActionResult> GetOrderHistory()
+    {
+        var result = await _topUpService.GetOrderHistoryAsync().ConfigureAwait(false);
+        return Ok(result);
+    }
+
     [HttpPost("{orderId}/confirm")]
     public async Task<IActionResult> ConfirmOrder(Guid orderId, [FromQuery] string? txId)
     {

@@ -9,4 +9,5 @@ public interface ITopUpOrderRepository : IEntityRepository<Guid, TopUpOrder>
     Task<List<TopUpOrder>> GetAllPendingAsync();
     Task<List<TopUpOrder>> GetExpiredCandidatesAsync(DateTime cutoffUtc);
     Task<bool> ExistsByBinanceTxIdAsync(string txId);
+    Task<List<TopUpOrder>> GetNonPendingAsync(int take);
 }

@@ -125,6 +125,16 @@ public class TopUpService
             o.AmountUSDT, o.Network, o.CoinsToCredit, o.CreatedAtUtc)).ToList();
     }
 
+    public async Task<List<AdminOrderHistoryDto>> GetOrderHistoryAsync(int take = 50)
+    {
+        var orders = await _orderRepository.GetNonPendingAsync(take).ConfigureAwait(false);
+
+        return orders.Select(o => new AdminOrderHistoryDto(
+            o.Id, o.ApplicationUserId, o.ApplicationUser.UserName ?? "",
+            o.AmountUSDT, o.Network, o.CoinsToCredit, o.Status.ToString(),
+            o.CreatedAtUtc, o.CompletedAtUtc)).ToList();
+    }
+
     public async Task ConfirmOrderAsync(Guid orderId, string? txId)
     {
         await using var transaction = await _dbContext.Database.BeginTransactionAsync().ConfigureAwait(false);

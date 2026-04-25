@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const pendingSection = document.getElementById('pending-section');
     const pendingList = document.getElementById('pending-orders-list');
 
-    // Modal elements
     const modal = document.getElementById('payment-modal');
     const modalCloseBtn = document.getElementById('modal-close-btn');
     const stepNetwork = document.getElementById('step-network');
@@ -35,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) return;
             renderPackages(await res.json());
         } catch {
-            packagesGrid.innerHTML = '<p style="color:#dc2626;text-align:center;">Failed to load packages.</p>';
+            packagesGrid.innerHTML = '<p style="color:#fee2e2;text-align:center;">Failed to load packages.</p>';
         }
     }
 
@@ -43,16 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
         packagesGrid.innerHTML = '';
         packages.forEach(pkg => {
             const card = document.createElement('div');
-            card.className = 'market-item balance-pkg';
+            card.className = 'balance-pkg-card';
             card.innerHTML =
                 `<div class="balance-pkg-coins">${pkg.coins} coins</div>` +
                 `<div class="balance-pkg-name">${pkg.name}</div>` +
                 `<div class="balance-pkg-price">${pkg.priceUSDT} USDT</div>` +
-                `<button class="market-item-action" data-id="${pkg.id}">Buy</button>`;
+                `<button class="balance-pkg-buy" data-id="${pkg.id}">Buy</button>`;
             packagesGrid.appendChild(card);
         });
 
-        packagesGrid.querySelectorAll('.market-item-action').forEach(btn => {
+        packagesGrid.querySelectorAll('.balance-pkg-buy').forEach(btn => {
             btn.addEventListener('click', () => {
                 selectedPackageId = parseInt(btn.dataset.id);
                 openModal();
@@ -83,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stepNetwork.style.display = '';
     });
 
-    document.querySelectorAll('.balance-network-btn').forEach(btn => {
+    document.querySelectorAll('.balance-network-opt').forEach(btn => {
         btn.addEventListener('click', () => createOrder(btn.dataset.network));
     });
 
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadPendingOrders();
                 showStatus('Order expired. Please create a new one.', false);
             } else {
-                showStatus('Payment not yet detected. It may take 1-2 minutes.', false);
+                showStatus('Payment not yet detected. It may take 1–2 minutes.', false);
             }
         } catch {
             showStatus('Error checking status.', false);
@@ -254,11 +253,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch { /* ignore */ }
     }
 
-    // ---- Status banner (reuses market-status) ----
+    // ---- Status banner ----
 
     function showStatus(msg, success) {
         balanceStatus.textContent = msg;
-        balanceStatus.className = 'market-status ' + (success ? 'success' : 'error');
+        balanceStatus.className = 'balance-status-banner ' + (success ? 'success' : 'error');
         balanceStatus.style.display = '';
         setTimeout(() => { balanceStatus.style.display = 'none'; }, 5000);
     }

@@ -48,5 +48,12 @@ namespace Quizanchos.WebApi.ViewControllers
         {
             return View();
         }
+
+        [HttpGet("/Admin/TopUp")]
+        [Authorize(AppRole.Admin)]
+        public IActionResult TopUp()
+        {
+            return View();
+        }
     }
 }
