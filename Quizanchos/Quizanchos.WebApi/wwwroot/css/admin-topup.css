@@ -1,0 +1,227 @@
+/* Admin Top-Up page — extends admindash.css */
+
+.topup-admin-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.topup-admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.topup-admin-header h1 {
+    color: #fff;
+    font-size: 1.6rem;
+    margin: 0;
+}
+
+.topup-back-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.topup-back-link:hover {
+    color: #fff;
+}
+
+/* Status */
+.topup-status-msg {
+    border-radius: 0.5rem;
+    padding: 0.7rem 1rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.topup-status-msg.success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.topup-status-msg.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Tabs */
+.topup-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1rem;
+}
+
+.topup-tab {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.75);
+    border: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.topup-tab:first-child {
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.topup-tab:last-child {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.topup-tab.active {
+    background: #fff;
+    color: #1f2937;
+}
+
+/* Table in white card */
+.topup-table {
+    background: #fff;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.topup-table th {
+    background: #f8f8f8;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    letter-spacing: 0.03em;
+}
+
+.topup-table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.topup-table .topup-btn-sm {
+    padding: 0.35rem 0.8rem;
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 0.3rem;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.topup-table .topup-btn-sm:hover {
+    background: #059669;
+}
+
+.topup-empty {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 2rem;
+    font-size: 0.95rem;
+}
+
+/* Status badges */
+.topup-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.topup-badge.completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.topup-badge.expired {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.topup-badge.manual {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Confirm modal content */
+.topup-confirm-content {
+    max-width: 440px;
+}
+
+.topup-confirm-detail {
+    font-size: 0.88rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.topup-confirm-field {
+    margin-bottom: 1rem;
+}
+
+.topup-confirm-field label {
+    display: block;
+    font-size: 0.85rem;
+    color: #374151;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.topup-confirm-field input {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 0.3rem;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+}
+
+.topup-confirm-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+.topup-btn-confirm {
+    flex: 1;
+    padding: 0.6rem;
+    background: #10b981;
+    color: #fff;
+    border: none;
+    border-radius: 0.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.topup-btn-confirm:hover {
+    background: #059669;
+}
+
+.topup-btn-confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.topup-btn-cancel {
+    flex: 1;
+    padding: 0.6rem;
+    background: #e5e7eb;
+    color: #374151;
+    border: none;
+    border-radius: 0.3rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.topup-btn-cancel:hover {
+    background: #d1d5db;
+}
