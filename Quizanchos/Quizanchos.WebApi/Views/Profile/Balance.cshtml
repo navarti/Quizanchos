@@ -6,24 +6,88 @@
 
 <link rel="stylesheet" href="/css/site.css">
 <link rel="stylesheet" href="/css/profile.css">
+<link rel="stylesheet" href="/css/market.css">
 <link rel="stylesheet" href="/css/balance.css">
 
 <div class="profile-container">
     <h1 class="profile-header">Balance</h1>
 
     <div class="profile-card balance-card">
-        <div class="balance-main-info">
-            <p class="balance-username">@Model.UserName</p>
-            <p class="balance-caption">Current balance</p>
-            <p class="balance-amount" id="balance-amount">@Model.Coins coins</p>
+        <div class="market-balance-row">
+            <div>
+                <p class="market-balance-caption">Current balance</p>
+                <p class="market-balance-value"><span id="balance-amount-value">@Model.Coins</span> coins</p>
+            </div>
+            <a href="/Market" class="save-button market-balance-link">Go to Market</a>
         </div>
 
-        <div class="profile-info">
-            <div class="info-group">
-                <label class="info-label" for="coins-to-add">Add coins</label>
-                <input type="number" id="coins-to-add" class="info-value" min="1" value="100" step="1">
+        <h2 class="market-section-title">Top Up with USDT</h2>
+        <div id="balance-status" class="market-status" style="display:none;"></div>
+        <div id="packages-grid" class="market-grid"></div>
+
+        <div id="pending-section" style="display:none;">
+            <h2 class="market-section-title">Active Orders</h2>
+            <div id="pending-orders-list"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal — uses the site.css verify-modal pattern -->
+<div class="verify-modal" id="payment-modal">
+    <div class="verify-modal-content balance-modal-content">
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+
+        <!-- Step 1: Pick network -->
+        <div id="step-network">
+            <h2 class="balance-modal-title">Select Network</h2>
+            <p class="balance-modal-desc">Choose the USDT network you want to send from.</p>
+            <div class="balance-network-btns">
+                <button class="balance-network-btn" data-network="BEP20">
+                    <span class="balance-network-name">BEP20</span>
+                    <span class="balance-network-chain">BNB Smart Chain</span>
+                </button>
+                <button class="balance-network-btn" data-network="TRC20">
+                    <span class="balance-network-name">TRC20</span>
+                    <span class="balance-network-chain">Tron Network</span>
+                </button>
             </div>
-            <button type="button" class="save-button" id="add-coins-button">Add coins</button>
+        </div>
+
+        <!-- Step 2: Payment details -->
+        <div id="step-payment" style="display:none;">
+            <h2 class="balance-modal-title">Send Payment</h2>
+
+            <div class="balance-pay-field">
+                <label class="balance-pay-label">Amount</label>
+                <div class="balance-pay-copyrow">
+                    <span class="balance-pay-value balance-pay-amount" id="pay-amount"></span>
+                    <button class="balance-pay-copybtn" id="copy-amount-btn">Copy</button>
+                </div>
+            </div>
+
+            <div class="balance-pay-field">
+                <label class="balance-pay-label">Wallet Address</label>
+                <div class="balance-pay-copyrow">
+                    <span class="balance-pay-value balance-pay-addr" id="pay-address"></span>
+                    <button class="balance-pay-copybtn" id="copy-address-btn">Copy</button>
+                </div>
+            </div>
+
+            <div class="balance-pay-field">
+                <label class="balance-pay-label">Network</label>
+                <span class="balance-pay-value" id="pay-network"></span>
+            </div>
+
+            <div class="balance-pay-timer">
+                Expires in <span id="pay-timer" class="balance-timer-val"></span>
+            </div>
+
+            <div class="balance-pay-notice">
+                Send the exact amount above. Payment is detected automatically within 1-2 minutes.
+            </div>
+
+            <button class="verify-btn" id="check-status-btn">Check Status</button>
+            <button class="resend-btn" id="back-btn">Change Network</button>
         </div>
     </div>
 </div>

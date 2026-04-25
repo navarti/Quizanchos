@@ -19,6 +19,8 @@ using Quizanchos.WebApi.Services.Rooms;
 using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
 using Quizanchos.WebApi.Hubs;
+using Quizanchos.WebApi.Options;
+using Quizanchos.WebApi.Services.Payment;
 using System.Runtime.Loader;
 using System.Reflection;
 
@@ -169,8 +171,15 @@ public static class Startup
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<AuthorizationService>(); 
-        services.AddScoped<UserProfileService>(); 
-        services.AddTransient<LeaderBoardService>(); 
+        services.AddScoped<UserProfileService>();
+        services.AddTransient<LeaderBoardService>();
+
+        services.Configure<BinanceApiOptions>(configuration.GetSection("BinanceApi"));
+        services.Configure<List<CoinPackageOption>>(configuration.GetSection("CoinPackages"));
+        services.AddHttpClient("Binance", c => c.BaseAddress = new Uri("https://api.binance.com"));
+        services.AddScoped<BinanceDepositService>();
+        services.AddScoped<TopUpService>();
+        services.AddScoped<ITopUpOrderRepository, TopUpOrderRepository>();
 
         services.AddQuartz(q =>
         {
@@ -180,6 +189,20 @@ public static class Startup
                 .ForJob(jobKey)
                 .WithIdentity("MonthlyTaskTrigger")
                 .WithCronSchedule("0 0 0 1 * ?"));
+
+            var depositCheckerKey = new JobKey("DepositChecker");
+            q.AddJob<DepositCheckerJob>(opts => opts.WithIdentity(depositCheckerKey));
+            q.AddTrigger(opts => opts
+                .ForJob(depositCheckerKey)
+                .WithIdentity("DepositCheckerTrigger")
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(60).RepeatForever()));
+
+            var orderExpiryKey = new JobKey("OrderExpiry");
+            q.AddJob<OrderExpiryJob>(opts => opts.WithIdentity(orderExpiryKey));
+            q.AddTrigger(opts => opts
+                .ForJob(orderExpiryKey)
+                .WithIdentity("OrderExpiryTrigger")
+                .WithSimpleSchedule(x => x.WithIntervalInMinutes(5).RepeatForever()));
         });
 
         services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

@@ -1,30 +1,205 @@
+/* Balance page — extends market.css and profile.css */
+
 .balance-card {
-    max-width: 600px;
+    max-width: 920px;
     margin: 0 auto;
 }
 
-.balance-main-info {
+/* Package cards — extend .market-item */
+.balance-pkg {
     text-align: center;
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    background: linear-gradient(145deg, #fef3c7, #fde68a);
+    padding: 18px 12px;
 }
 
-.balance-username {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #6b21a8;
-    margin-bottom: 0.5rem;
-}
-
-.balance-caption {
-    color: #4b5563;
-    margin-bottom: 0.5rem;
-}
-
-.balance-amount {
-    font-size: 2rem;
+.balance-pkg-coins {
+    font-size: 1.4rem;
     font-weight: 700;
+    color: #7c3aed;
+    margin-bottom: 2px;
+}
+
+.balance-pkg-name {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+
+.balance-pkg-price {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+/* Pending orders */
+.balance-pending-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.balance-pending-row.is-expired {
+    opacity: 0.45;
+}
+
+.balance-pending-coins {
+    font-weight: 600;
+    color: #7c3aed;
+}
+
+.balance-pending-amount {
+    font-weight: 500;
+    color: #374151;
+}
+
+.balance-pending-network {
+    color: #6b7280;
+}
+
+.balance-pending-badge {
+    font-weight: 500;
+    color: #d97706;
+}
+
+/* ===== Payment modal (extends verify-modal) ===== */
+.balance-modal-content {
+    max-width: 480px;
+    text-align: left;
+    padding: 32px 28px;
+}
+
+.balance-modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #311b92;
+    margin-bottom: 6px;
+}
+
+.balance-modal-desc {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+.balance-network-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.balance-network-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.balance-network-btn:hover {
+    border-color: #7c3aed;
+    background: #f5f3ff;
+}
+
+.balance-network-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #111827;
+}
+
+.balance-network-chain {
+    font-size: 0.82rem;
+    color: #6b7280;
+}
+
+/* Payment details */
+.balance-pay-field {
+    margin-bottom: 14px;
+}
+
+.balance-pay-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.balance-pay-copyrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.balance-pay-value {
+    flex: 1;
+    word-break: break-all;
+    color: #374151;
+    font-weight: 500;
+}
+
+.balance-pay-amount {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #7c3aed;
+}
+
+.balance-pay-addr {
+    font-family: monospace;
+    font-size: 0.78rem;
+}
+
+.balance-pay-copybtn {
+    padding: 5px 12px;
+    background: #8b5cf6;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.balance-pay-copybtn:hover {
+    background: #7c3aed;
+}
+
+.balance-pay-timer {
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.balance-timer-val {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #dc2626;
+    margin-left: 4px;
+}
+
+.balance-pay-notice {
+    font-size: 0.82rem;
     color: #92400e;
+    background: #fef3c7;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 18px;
 }
