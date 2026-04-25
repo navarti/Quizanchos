@@ -10,6 +10,9 @@
   <Folder Name="/Minigames/QuizMultiplayer/">
     <Project Path="Minigames/QuizMultiplayer/Quizanchos.QuizMultiplayer/Quizanchos.QuizMultiplayer.csproj" />
   </Folder>
+  <Folder Name="/Minigames/TicketToRideEurope/">
+    <Project Path="Minigames/TicketToRideEurope/Quizanchos.TicketToRideEurope/Quizanchos.TicketToRideEurope.csproj" />
+  </Folder>
   <Project Path="Quizanchos.Common/Quizanchos.Common.csproj" />
   <Project Path="Quizanchos.Core/Quizanchos.Core.csproj" />
   <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />
