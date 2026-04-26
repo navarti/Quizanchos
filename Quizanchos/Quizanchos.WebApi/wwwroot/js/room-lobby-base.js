@@ -50,6 +50,28 @@ window.RoomLobbyBase = (function () {
 
         await loadRooms();
 
+        setInterval(tickExpiry, 1000);
+
+        function tickExpiry() {
+            const elements = document.querySelectorAll('[data-expires-at]');
+            let shouldRefreshList = false;
+
+            elements.forEach(el => {
+                const secsLeft = secondsRemaining(el.dataset.expiresAt);
+                el.textContent = formatTimeRemaining(secsLeft);
+                el.classList.toggle('expiring-soon', secsLeft > 0 && secsLeft < 60);
+
+                if (secsLeft <= 0 && el.closest('#roomsList') && !el.dataset.expiredHandled) {
+                    el.dataset.expiredHandled = '1';
+                    shouldRefreshList = true;
+                }
+            });
+
+            if (shouldRefreshList) {
+                loadRooms();
+            }
+        }
+
         async function createRoom(event) {
             event.preventDefault();
 
@@ -165,6 +187,9 @@ window.RoomLobbyBase = (function () {
             const teams = room.teams || room.Teams || [];
             const current = room.currentPlayerCount ?? room.CurrentPlayerCount ?? 0;
             const max = room.maxPlayers ?? room.MaxPlayers ?? 0;
+            const expiresAt = room.expiresAtUtc ?? room.ExpiresAtUtc;
+            const secsLeft = secondsRemaining(expiresAt);
+            const expiresClass = secsLeft > 0 && secsLeft < 60 ? ' expiring-soon' : '';
 
             const teamsHtml = teams.map(team => {
                 const teamIndex = team.teamIndex ?? team.TeamIndex;
@@ -184,6 +209,7 @@ window.RoomLobbyBase = (function () {
             return `<div class="room-card">
                         <div class="room-card-header">
                             <span class="room-id">${roomId.substring(0, 8)}...</span>
+                            <span class="room-expires${expiresClass}" data-expires-at="${expiresAt}" title="Time left to join">${formatTimeRemaining(secsLeft)}</span>
                             <span class="room-players">${current}/${max} players</span>
                         </div>
                         <div class="room-teams">${teamsHtml}</div>
@@ -196,10 +222,21 @@ window.RoomLobbyBase = (function () {
             const current = room.currentPlayerCount ?? room.CurrentPlayerCount ?? 0;
             const max = room.maxPlayers ?? room.MaxPlayers ?? 0;
             const teams = room.teams || room.Teams || [];
+            const expiresAt = room.expiresAtUtc ?? room.ExpiresAtUtc;
             const statusLabels = ['Waiting for players', 'Launching', 'Game started', 'Closed'];
 
             document.getElementById('roomTitle').textContent = `Room ${roomId.substring(0, 8)}...`;
-            document.getElementById('roomStatus').textContent = `${statusLabels[status] || 'Unknown'} • ${current}/${max} players`;
+
+            const statusText = `${statusLabels[status] || 'Unknown'} • ${current}/${max} players`;
+            const statusEl = document.getElementById('roomStatus');
+            const showExpiry = status === 0 && expiresAt;
+            if (showExpiry) {
+                const secsLeft = secondsRemaining(expiresAt);
+                const expiresClass = secsLeft > 0 && secsLeft < 60 ? ' expiring-soon' : '';
+                statusEl.innerHTML = `${statusText} • <span class="room-expires${expiresClass}" data-expires-at="${expiresAt}" title="Time left to join">${formatTimeRemaining(secsLeft)}</span>`;
+            } else {
+                statusEl.textContent = statusText;
+            }
 
             const grid = document.getElementById('teamsGrid');
             grid.innerHTML = teams.map(team => {
@@ -221,6 +258,18 @@ window.RoomLobbyBase = (function () {
 
     function getRoomId(room) {
         return room.roomId || room.RoomId;
+    }
+
+    function secondsRemaining(expiresAt) {
+        if (!expiresAt) return 0;
+        return Math.max(0, Math.floor((new Date(expiresAt) - new Date()) / 1000));
+    }
+
+    function formatTimeRemaining(secsLeft) {
+        if (secsLeft <= 0) return 'Expired';
+        const m = Math.floor(secsLeft / 60);
+        const s = secsLeft % 60;
+        return `${m}m ${s.toString().padStart(2, '0')}s`;
     }
 
     async function tryReadError(response) {
