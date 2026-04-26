@@ -1,7 +1,9 @@
 using CloudinaryDotNet;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Quartz;
+using System.Threading.RateLimiting;
 using Quizanchos.Core;
 using Quizanchos.Domain;
 using Quizanchos.Domain.Entities;
@@ -46,12 +48,15 @@ public static class Startup
 
         app.UseRouting();
 
+        app.UseRateLimiter();
+
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
         app.MapHub<GameHub>("/hubs/game");
         app.MapHub<GameRoomHub>("/hubs/room");
+        app.MapHealthChecks("/health");
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -119,6 +124,22 @@ public static class Startup
         {
             options.UseSqlServer(connectionString);
         }, ServiceLifetime.Scoped);
+
+        services.AddHealthChecks().AddDbContextCheck<QuizanchosDbContext>();
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.AddPolicy("auth", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 5,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    }));
+        });
 
         // ========== MINIGAME REGISTRATION SYSTEM ==========
         var pluginAssemblies = LoadPluginAssemblies();
@@ -372,7 +393,6 @@ public static class Startup
         services.AddTransient<EmailSenderService>();
         services.AddTransient<DefaultUserRegistrationService>();
         services.AddTransient<EmailConfirmationUserRegistrationService>();
-        services.AddTransient<EmailConfirmationPasswordUpdaterService>();
         services.AddTransient<IUserPasswordUpdaterService, EmailConfirmationPasswordUpdaterService>();
         services.AddTransient<IUserRegistrationService, EmailConfirmationUserRegistrationService>();
 

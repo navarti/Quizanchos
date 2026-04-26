@@ -237,12 +237,12 @@ function changePassword(email, newPassword) {
     const codeInput = document.getElementById('codeInput');
     const errorContainer = document.getElementById('errorContainer');
 
-    fetch('/Authorization/UpdatePassword', {
+    fetch('/Authorization/RequestPasswordReset', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ Email: email, NewPassword: newPassword }),
+        body: JSON.stringify({ Email: email }),
     })
         .then((response) => {
             if (response.ok) {
@@ -261,12 +261,12 @@ function changePassword(email, newPassword) {
                             return;
                         }
 
-                        fetch("/EmailConfirmation/ConfirmPassword", {
+                        fetch("/Authorization/ConfirmPasswordReset", {
                             method: "POST",
                             headers: {
-                                "Content-Type": "application/x-www-form-urlencoded",
+                                "Content-Type": "application/json",
                             },
-                            body: new URLSearchParams({ code: code }),
+                            body: JSON.stringify({ Email: email, Code: code, NewPassword: newPassword }),
                         })
                             .then((response) => {
                                 if (response.ok) {

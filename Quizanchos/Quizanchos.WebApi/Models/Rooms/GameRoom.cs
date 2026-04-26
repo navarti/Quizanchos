@@ -55,6 +55,12 @@ public class GameRoom
 
     public bool IsFull => AllPlayerIds.Count >= MaxPlayers;
     public IReadOnlyList<string> AllPlayerIds => Teams.SelectMany(t => t.Players).ToList();
+    /// <summary>
+    /// Lock used to serialize mutations of <see cref="Teams"/>, <see cref="Status"/>,
+    /// and <see cref="LaunchedGameId"/>. Critical sections MUST be synchronous (no
+    /// awaits inside the lock block) and as short as possible. Never lock more than
+    /// one room's <see cref="SyncRoot"/> in the same call stack.
+    /// </summary>
     public object SyncRoot => _syncRoot;
 
     public GameRoom(

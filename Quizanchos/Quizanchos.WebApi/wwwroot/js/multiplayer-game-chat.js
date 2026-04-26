@@ -365,6 +365,9 @@ function renderChatLayout() {
     document.body.appendChild(widget);
 }
 
+// SECURITY: messages arrive unescaped from the server (see GameHub.SendChatMessage).
+// Always assign sender / message via .textContent. Do not switch to innerHTML or
+// template strings — that would introduce stored XSS.
 function appendMessage(container, payload, currentUserId) {
     if (!container) {
         return;

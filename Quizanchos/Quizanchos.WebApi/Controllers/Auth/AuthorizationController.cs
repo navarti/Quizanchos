@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Services.Auth;
@@ -19,6 +20,7 @@ public class AuthorizationController : Controller
 
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> SignIn([FromBody] LoginModelDto loginModelDto)
     {
         await _authorizationService.SignIn(loginModelDto);
@@ -27,6 +29,7 @@ public class AuthorizationController : Controller
 
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> SignUp([FromBody] RegisterModelDto registerModelDto)
     {
         RegisterUserResult result = await _authorizationService.RegisterUser(registerModelDto);
@@ -43,9 +46,27 @@ public class AuthorizationController : Controller
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordModelDto passwordModelDto)
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDto dto)
     {
-        await _authorizationService.UpdatePassword(passwordModelDto);
+        await _authorizationService.RequestPasswordReset(dto);
+        return Ok();
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    [EnableRateLimiting("auth")]
+    public async Task<IActionResult> ConfirmPasswordReset([FromBody] ConfirmPasswordResetDto dto)
+    {
+        await _authorizationService.ConfirmPasswordReset(dto);
+        return Ok();
+    }
+
+    [HttpPost]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+    {
+        await _authorizationService.ChangePassword(User, dto);
         return Ok();
     }
 }

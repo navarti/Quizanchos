@@ -18,4 +18,7 @@
   <Project Path="Quizanchos.Domain/Quizanchos.Domain.csproj" />
   <Project Path="Quizanchos.Migrations/Quizanchos.Migrations.csproj" />
   <Project Path="Quizanchos.WebApi/Quizanchos.WebApi.csproj" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Quizanchos.Quiz.Tests/Quizanchos.Quiz.Tests.csproj" />
+  </Folder>
 </Solution>

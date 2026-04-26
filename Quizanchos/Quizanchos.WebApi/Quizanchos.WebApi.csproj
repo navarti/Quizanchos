@@ -9,18 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Dto\Abstractions\**" />
-    <Content Remove="Dto\Abstractions\**" />
-    <EmbeddedResource Remove="Dto\Abstractions\**" />
-    <None Remove="Dto\Abstractions\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CloudinaryDotNet" Version="1.28.0" />
     <PackageReference Include="FluentEmail.Mailgun" Version="3.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="10.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
     <PackageReference Include="Quartz" Version="3.17.1" />
     <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.17.1" />

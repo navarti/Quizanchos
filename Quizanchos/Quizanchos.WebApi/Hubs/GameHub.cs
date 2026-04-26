@@ -22,6 +22,10 @@ public class GameHub : Hub
     private static readonly ConcurrentDictionary<string, HashSet<string>> UserGameConnections = new();
     private static readonly ConcurrentDictionary<string, (string UserId, Guid GameId)> ConnectionSubscriptions = new();
     private static readonly ConcurrentDictionary<string, DateTime> LastEmojiSentAt = new();
+
+    // Lock convention: critical sections under PresenceSync / EmojiThrottleSync MUST be
+    // synchronous (no awaits inside the lock block) and as short as possible. The two
+    // locks are independent — never acquire both in the same call stack.
     private static readonly object PresenceSync = new();
     private static readonly object EmojiThrottleSync = new();
     private static readonly TimeSpan EmojiSendThrottleWindow = TimeSpan.FromMilliseconds(900);
@@ -102,6 +106,9 @@ public class GameHub : Hub
         }
     }
 
+    // Chat messages are broadcast verbatim. Clients MUST render them with textContent
+    // (not innerHTML) — see wwwroot/js/multiplayer-game-chat.js::appendMessage. Adding
+    // server-side HTML escaping here would double-escape on safe clients.
     public async Task SendChatMessage(Guid gameId, string message)
     {
         string? userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -214,7 +221,7 @@ public class GameHub : Hub
 
         _logger.LogInformation("Player {PlayerId} submitted move via SignalR for game {GameId}", userId, gameId);
 
-        // Respond to the caller with an acknowledgement � 
+        // Respond to the caller with an acknowledgement � 
         // the actual state push happens via IGameNotifier after GameService processes the move.
         await Clients.Caller.SendAsync("MoveReceived", new { GameId = gameId, PlayerId = userId });
     }
