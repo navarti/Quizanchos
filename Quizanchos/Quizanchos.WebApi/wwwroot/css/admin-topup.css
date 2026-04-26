@@ -1,227 +1,220 @@
-/* Admin Top-Up page — extends admindash.css */
+/* =========================================================================
+   Admin Top-Up — extends admin.css / admindash.css.
+   ======================================================================== */
 
 .topup-admin-page {
-    max-width: 900px;
+    max-width: 1024px;
     margin: 0 auto;
-    padding: 2rem 1rem;
 }
 
 .topup-admin-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
 }
 
 .topup-admin-header h1 {
-    color: #fff;
-    font-size: 1.6rem;
+    font-size: var(--font-size-2xl);
     margin: 0;
+    color: var(--color-gray-900);
 }
 
 .topup-back-link {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-primary-700);
     text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
 }
+.topup-back-link::before { content: '← '; }
+.topup-back-link:hover { text-decoration: underline; }
 
-.topup-back-link:hover {
-    color: #fff;
-}
-
-/* Status */
+/* Status banner */
 .topup-status-msg {
-    border-radius: 0.5rem;
-    padding: 0.7rem 1rem;
-    margin-bottom: 1rem;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
     font-weight: 500;
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     text-align: center;
+    border: 1px solid transparent;
 }
-
 .topup-status-msg.success {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--color-success-100);
+    color: #065f46;
+    border-color: #6ee7b7;
 }
-
 .topup-status-msg.error {
-    background: #fee2e2;
+    background: var(--color-danger-100);
     color: #991b1b;
+    border-color: #fca5a5;
 }
 
 /* Tabs */
 .topup-tabs {
     display: flex;
-    gap: 0;
-    margin-bottom: 1rem;
+    background: var(--color-gray-100);
+    padding: var(--space-1);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-5);
+    gap: var(--space-1);
+    width: fit-content;
 }
 
 .topup-tab {
-    flex: 1;
-    padding: 0.7rem 1rem;
-    background: rgba(255, 255, 255, 0.2);
-    color: rgba(255, 255, 255, 0.75);
+    padding: var(--space-2) var(--space-5);
+    background: transparent;
+    color: var(--color-gray-600);
     border: none;
+    border-radius: var(--radius-md);
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-
-.topup-tab:first-child {
-    border-radius: 0.5rem 0 0 0.5rem;
-}
-
-.topup-tab:last-child {
-    border-radius: 0 0.5rem 0.5rem 0;
-}
-
+.topup-tab:hover { color: var(--color-primary-700); }
 .topup-tab.active {
-    background: #fff;
-    color: #1f2937;
+    background: var(--color-surface);
+    color: var(--color-primary-700);
+    box-shadow: var(--shadow-sm);
 }
 
-/* Table in white card */
+/* Tables */
 .topup-table {
-    background: #fff;
-    border-radius: 0.5rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
 }
 
 .topup-table th {
-    background: #f8f8f8;
-    font-size: 0.82rem;
+    background: var(--color-gray-50);
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
-    color: #6b7280;
-    letter-spacing: 0.03em;
+    color: var(--color-gray-700);
+    letter-spacing: 0.04em;
+    font-weight: 600;
 }
 
 .topup-table td {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     vertical-align: middle;
+    color: var(--color-gray-700);
 }
 
 .topup-table .topup-btn-sm {
-    padding: 0.35rem 0.8rem;
-    background: #10b981;
-    color: #fff;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-success-500);
+    color: var(--color-text-inverse);
     border: none;
-    border-radius: 0.3rem;
+    border-radius: var(--radius-sm);
     font-weight: 600;
-    font-size: 0.82rem;
+    font-size: var(--font-size-xs);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color var(--transition-fast);
 }
-
-.topup-table .topup-btn-sm:hover {
-    background: #059669;
-}
+.topup-table .topup-btn-sm:hover { background: var(--color-success-600); }
 
 .topup-empty {
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border-strong);
     text-align: center;
-    color: rgba(255, 255, 255, 0.7);
-    padding: 2rem;
-    font-size: 0.95rem;
+    color: var(--color-gray-500);
+    padding: var(--space-10);
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-lg);
 }
 
 /* Status badges */
 .topup-badge {
     display: inline-block;
-    padding: 0.2rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
-
 .topup-badge.completed {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--color-success-100);
+    color: #065f46;
 }
-
 .topup-badge.expired {
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--color-gray-100);
+    color: var(--color-gray-600);
 }
-
 .topup-badge.manual {
     background: #dbeafe;
     color: #1e40af;
 }
 
-/* Confirm modal content */
-.topup-confirm-content {
-    max-width: 440px;
-}
+/* Confirm modal */
+.topup-confirm-content { max-width: 480px; padding: var(--space-6); }
 
 .topup-confirm-detail {
-    font-size: 0.88rem;
-    color: #6b7280;
-    margin-bottom: 1rem;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
+    margin-bottom: var(--space-4);
 }
 
 .topup-confirm-field {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4);
 }
 
 .topup-confirm-field label {
     display: block;
-    font-size: 0.85rem;
-    color: #374151;
-    margin-bottom: 4px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-700);
+    margin-bottom: var(--space-2);
+    font-weight: 600;
 }
 
 .topup-confirm-field input {
     width: 100%;
-    padding: 0.5rem 0.7rem;
-    border: 1px solid #ddd;
-    border-radius: 0.3rem;
-    font-size: 0.9rem;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     box-sizing: border-box;
+}
+.topup-confirm-field input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .topup-confirm-actions {
     display: flex;
-    gap: 0.6rem;
-    margin-top: 1rem;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
 }
 
 .topup-btn-confirm {
     flex: 1;
-    padding: 0.6rem;
-    background: #10b981;
-    color: #fff;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-success-500);
+    color: var(--color-text-inverse);
     border: none;
-    border-radius: 0.3rem;
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color var(--transition-fast);
 }
-
-.topup-btn-confirm:hover {
-    background: #059669;
-}
-
-.topup-btn-confirm:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+.topup-btn-confirm:hover { background: var(--color-success-600); }
+.topup-btn-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .topup-btn-cancel {
     flex: 1;
-    padding: 0.6rem;
-    background: #e5e7eb;
-    color: #374151;
-    border: none;
-    border-radius: 0.3rem;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-gray-100);
+    color: var(--color-gray-700);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background-color var(--transition-fast);
 }
-
-.topup-btn-cancel:hover {
-    background: #d1d5db;
-}
+.topup-btn-cancel:hover { background: var(--color-gray-200); }

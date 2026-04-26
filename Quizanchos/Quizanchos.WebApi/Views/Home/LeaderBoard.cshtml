@@ -1,83 +1,84 @@
 @model HomeViewModel
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quizanchos - Leaderboard</title>
-    <link rel="stylesheet" href="/css/leaderboard.css">
-</head>
-<body>
-<main>
-    <div class="hero">
+@{
+    ViewData["Title"] = "Leaderboard";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="/css/leaderboard.css" asp-append-version="true">
+}
+
+<section class="leaderboard-page">
+    <header class="hero">
         <h1>Leaderboard</h1>
-        <button class="prize-btn">
-            <span class="trophy">🏆</span>
+        <button class="prize-btn" type="button" aria-haspopup="dialog" aria-controls="prizeModal">
+            <span class="trophy" aria-hidden="true">🏆</span>
             Monthly Prizes
         </button>
-    </div>
+    </header>
 
     <div class="leaderboard-container">
-        <div class="filters">
-            <button class="filter-btn active" data-minigame="">All</button>
+        <div class="filters" role="tablist" aria-label="Filter by minigame">
+            <button class="filter-btn active" type="button" data-minigame="">All</button>
             @foreach (var minigame in Model.Minigames.OrderBy(x => x.Order))
             {
-                <button class="filter-btn" data-minigame="@minigame.MinigameTypeId">@minigame.DisplayName</button>
+                <button class="filter-btn" type="button" data-minigame="@minigame.MinigameTypeId">@minigame.DisplayName</button>
             }
         </div>
 
-        <div class="leaderboard" data-current-user="@Model.CurrentUserName">
-            @foreach (var user in Model.Users.Select(user => new { User = user, Rank = user.Position }))
+        <div class="leaderboard" data-current-user="@Model.CurrentUserName" aria-live="polite">
+            @foreach (var user in Model.Users.Select(u => new { User = u, Rank = u.Position }))
             {
                 <div class="leaderboard-item @(Model.CurrentUserName == user.User.UserName ? "current-user" : "")">
-                    <div class="rank">@user.Rank</div>
+                    <div class="rank" aria-label="Rank @user.Rank">@user.Rank</div>
                     <div class="player-info">
-                        <img src="@user.User.AvatarUrl" alt="@user.User.UserName" class="player-avatar">
+                        <img src="@user.User.AvatarUrl" alt="" class="player-avatar" aria-hidden="true">
                         <span class="player-name">@user.User.UserName</span>
                     </div>
                     <div class="score">
-                        <span class="trophy">@((user.Rank == 1) ? "🏆" : "")</span>
-                        @user.User.Score
+                        @if (user.Rank == 1)
+                        {
+                            <span class="trophy" aria-hidden="true">🏆</span>
+                        }
+                        <span>@user.User.Score</span>
                     </div>
                 </div>
             }
         </div>
 
-        <div class="pagination">
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <button class="page-btn @(i == Model.CurrentPage ? "active" : "")" data-page="@i">@i</button>
-            }
-        </div>
+        @if (Model.TotalPages > 1)
+        {
+            <nav class="pagination" aria-label="Leaderboard pagination">
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <button class="page-btn @(i == Model.CurrentPage ? "active" : "")" type="button" data-page="@i" aria-label="Page @i" aria-current="@(i == Model.CurrentPage ? "page" : null)">@i</button>
+                }
+            </nav>
+        }
     </div>
+</section>
 
-    <!-- Prize Modal -->
-    <div class="modal" id="prizeModal">
-        <div class="modal-content">
-            <h2>Monthly Prizes 🏆</h2>
-            <div class="prizes">
-                <div class="prize">
-                    <div class="prize-medal">🥇</div>
-                    <h3>1st Place</h3>
-                    <p>$100 Amazon Gift Card</p>
-                </div>
-                <div class="prize">
-                    <div class="prize-medal">🥈</div>
-                    <h3>2nd Place</h3>
-                    <p>$50 Amazon Gift Card</p>
-                </div>
-                <div class="prize">
-                    <div class="prize-medal">🥉</div>
-                    <h3>3rd Place</h3>
-                    <p>$25 Amazon Gift Card</p>
-                </div>
+<div class="modal" id="prizeModal" role="dialog" aria-modal="true" aria-labelledby="prizeModalTitle">
+    <div class="modal-content">
+        <h2 id="prizeModalTitle">Monthly Prizes 🏆</h2>
+        <div class="prizes">
+            <div class="prize">
+                <div class="prize-medal" aria-hidden="true">🥇</div>
+                <h3>1st Place</h3>
+                <p>$100 Amazon Gift Card</p>
             </div>
-            <button class="close-modal">Close</button>
+            <div class="prize">
+                <div class="prize-medal" aria-hidden="true">🥈</div>
+                <h3>2nd Place</h3>
+                <p>$50 Amazon Gift Card</p>
+            </div>
+            <div class="prize">
+                <div class="prize-medal" aria-hidden="true">🥉</div>
+                <h3>3rd Place</h3>
+                <p>$25 Amazon Gift Card</p>
+            </div>
         </div>
+        <button class="close-modal" type="button">Close</button>
     </div>
-</main>
+</div>
 
 <script src="/js/leaderboard.js" asp-append-version="true"></script>
-
-</body>
-</html>

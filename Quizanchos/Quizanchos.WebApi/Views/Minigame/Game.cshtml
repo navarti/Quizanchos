@@ -3,16 +3,20 @@
     ViewData["Title"] = $"{Model.DisplayName} Game";
 }
 
-@foreach (var style in Model.Styles)
-{
-    <link rel="stylesheet" href="@style" asp-append-version="@(!style.StartsWith("http", StringComparison.OrdinalIgnoreCase))" />
+@section Styles {
+    @foreach (var style in Model.Styles)
+    {
+        <link rel="stylesheet" href="@style" asp-append-version="@(!style.StartsWith("http", StringComparison.OrdinalIgnoreCase))" />
+    }
 }
 
-<div id="minigame-root"
-     data-game-key="@Model.GameKey"
-     data-view-mode="@Model.ViewMode"
-     data-game-id="@Model.GameId"
-     data-minigame-type-id="@Model.MinigameTypeId"></div>
+<section class="minigame-shell" aria-label="@Model.DisplayName game">
+    <div id="minigame-root"
+         data-game-key="@Model.GameKey"
+         data-view-mode="@Model.ViewMode"
+         data-game-id="@Model.GameId"
+         data-minigame-type-id="@Model.MinigameTypeId"></div>
+</section>
 
 <script>
     window.minigameConfig = {
@@ -27,7 +31,9 @@
     };
 </script>
 
-@foreach (var script in Model.Scripts)
-{
-    <script src="@script" asp-append-version="@(!script.StartsWith("http", StringComparison.OrdinalIgnoreCase))"></script>
+@section Scripts {
+    @foreach (var script in Model.Scripts)
+    {
+        <script src="@script" asp-append-version="@(!script.StartsWith("http", StringComparison.OrdinalIgnoreCase))"></script>
+    }
 }

@@ -1,235 +1,204 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* =========================================================================
+   Home & Minigames pages — hero, sessions card, stats, minigame catalogue.
+   Inherits design tokens from site.css.
+   ======================================================================== */
 
-:root {
-    --primary: #8B5CF6;
-    --primary-dark: #7C3AED;
-    --background: #F3F4F6;
-    --card-bg: rgba(255, 255, 255, 0.95);
-}
-
-.quiz-btn-disabled {
-    background: #6b7280;
-    cursor: default;
-}
-
-.premium-badge {
-    display: inline-block;
-    margin: 0.4rem 0 0.6rem;
-    padding: 0.2rem 0.55rem;
-    border-radius: 999px;
-    background: #facc15;
-    color: #1f2937;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(45deg, #4F46E5, #7C3AED);
-    color: #333;
-    min-height: 100vh;
-}
-main {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-.hero-section {
+.home-hero {
     text-align: center;
-    color: white;
-    margin-bottom: 3rem;
+    padding: var(--space-12) var(--space-4) var(--space-8);
+    margin-bottom: var(--space-6);
 }
-
-.hero-section h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+.home-hero h1 {
+    font-size: clamp(2rem, 4vw + 1rem, 3rem);
+    background: linear-gradient(90deg, var(--color-primary-700), var(--color-accent-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
 }
-
-.subtitle {
-    font-size: 1.1rem;
-    opacity: 0.9;
-    margin-bottom: 2rem;
-}
-
-.featured-quizzes {
-    width: 90%;
-    max-width: 1400px;
+.home-hero .subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-gray-600);
+    max-width: 680px;
     margin: 0 auto;
+}
+
+/* Active session card -------------------------------------------------- */
+.sessions-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-6);
+    box-shadow: var(--shadow-sm);
+}
+.sessions-card h2 {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-3);
+    color: var(--color-gray-900);
+}
+.sessions-card p { color: var(--color-gray-700); }
+
+.session-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-gray-50);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+.session-info p { margin: 0; }
+
+.join-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-primary-600);
+    color: var(--color-text-inverse);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+.join-btn:hover {
+    background: var(--color-primary-700);
+    color: var(--color-text-inverse);
+    transform: translateY(-1px);
+}
+
+/* Stats grid ----------------------------------------------------------- */
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Две колонки */
-    gap: 2rem; /* Отступ между карточками */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.stat-card {
+    background: var(--color-surface);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-xs);
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+.stat-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.stat-card h3 {
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: var(--space-3);
+}
+
+.stat-number {
+    font-size: var(--font-size-3xl);
+    font-weight: 800;
+    color: var(--color-primary-700);
+    line-height: 1;
+}
+
+/* Minigames grid ------------------------------------------------------- */
+.featured-quizzes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-5);
+    margin-top: var(--space-6);
 }
 
 .quiz-card {
-    background: var(--card-bg);
-    border-radius: 1rem;
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    transition: transform 0.3s;
-    width: 100%; /* Карточка займет всю ширину своей колонки */
-    height: auto; /* Позволит адаптироваться к содержимому */
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    isolation: isolate;
 }
+.quiz-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 
 .quiz-image {
-    height: 300px; /* Высота изображения */
+    position: relative;
+    height: 280px;
     background-size: cover;
     background-position: center;
-    position: relative;
-    overflow: hidden; /* Чтобы затемняющий слой не выходил за пределы карточки */
+    overflow: hidden;
 }
-
 .quiz-image::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Затемнение черным цветом с прозрачностью */
-    z-index: 1; /* Помещаем затемняющий слой выше изображения */
-}
-
-.quiz-card:hover {
-    transform: translateY(-5px);
+    inset: 0;
+    background: linear-gradient(180deg, rgba(17,24,39,0) 30%, rgba(17,24,39,0.85) 100%);
+    z-index: 1;
 }
 
 .quiz-content {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1.5rem;
-    color: white;
-    z-index: 2; /* Контент выше затемнения */
+    inset: auto 0 0 0;
+    padding: var(--space-5);
+    color: var(--color-text-inverse);
+    z-index: 2;
 }
 
-.quiz-header h2,
-.quiz-meta,
-.quiz-btn {
-    z-index: 3; /* Гарантированно выше слоя затемнения */
-    position: relative; /* Убеждаемся, что они не пересекаются с затемнением */
+.quiz-header h2 {
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-2);
 }
-.quiz-meta {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.875rem;
-    margin-top: 1rem;
-    color: white; /* Убедимся, что текст белый */
-    opacity: 1; /* Убедимся, что затемнение не уменьшает видимость */
-    z-index: 2; /* Убедимся, что она выше слоя затемнения */
-    position: relative; /* Чтобы оставаться над затемняющим слоем */
-    justify-content: center;
+.quiz-header p {
+    color: rgba(255, 255, 255, 0.86);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-base);
+    margin-bottom: var(--space-4);
 }
-.quiz-btn {
+
+.premium-badge {
     display: inline-block;
-    background: var(--primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    text-decoration: none;
-    margin-top: 1rem;
-    transition: background-color 0.3s;
+    margin-bottom: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, #fde68a, #f59e0b);
+    color: var(--color-gray-900);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
-.quiz-btn:hover {
-    background: var(--primary-dark);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.stat-card {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    text-align: center;
-}
-
-.stat-number {
-    font-size: 2rem;
-    font-weight: bold;
-    color: var(--primary);
-}
-
-.sessions-card {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: 1rem;
-    margin-bottom: 2rem;
-}
-
-.sessions-list {
-    margin-top: 1rem;
-}
-
-.session-item {
-    display: flex;
-    justify-content: space-between;
+.quiz-btn {
+    display: inline-flex;
     align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.session-item:last-child {
-    border-bottom: none;
-}
-
-.join-btn {
-    background: var(--primary);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
+    gap: var(--space-2);
+    background: var(--color-primary-600);
+    color: var(--color-text-inverse);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
     text-decoration: none;
-    transition: background-color 0.3s;
+    transition: background-color var(--transition-fast);
+}
+.quiz-btn:hover {
+    background: var(--color-primary-700);
+    color: var(--color-text-inverse);
+}
+.quiz-btn-disabled {
+    background: var(--color-gray-500);
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.85;
 }
 
-.join-btn:hover {
-    background: var(--primary-dark);
+@media (max-width: 600px) {
+    .home-hero { padding: var(--space-8) var(--space-3) var(--space-6); }
+    .quiz-image { height: 240px; }
 }
-
-.leaderboards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.leaderboard-card {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: 1rem;
-}
-
-.leaderboard-item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 1rem;
-    padding: 0.5rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.leaderboard-item:last-child {
-    border-bottom: none;
-}
-
-.rank {
-    font-weight: bold;
-    color: var(--primary);
-}
-
-.points {
-    color: var(--primary);
-}
-
-
-

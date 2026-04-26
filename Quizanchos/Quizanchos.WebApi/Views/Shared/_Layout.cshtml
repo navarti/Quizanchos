@@ -1,82 +1,100 @@
-﻿<!DOCTYPE html>
+@{
+    var currentPath = "/" + (ViewContext.RouteData.Values["controller"]?.ToString() ?? "");
+    var requestPath = Context.Request.Path.Value ?? "";
+    bool IsActive(string path)
+    {
+        return string.Equals(requestPath, path, StringComparison.OrdinalIgnoreCase) ||
+               (path != "/" && requestPath.StartsWith(path, StringComparison.OrdinalIgnoreCase));
+    }
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"] - Quizzes</title>
+    <meta name="theme-color" content="#7c3aed">
+    <title>@ViewData["Title"] · Quizanchos</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/site.css">
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true">
     <link rel="stylesheet" href="/css/multiplayer-game-chat.css" asp-append-version="true">
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body data-user-id="@(User.Identity?.IsAuthenticated == true ? User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) : "")">
 
-<header class="navbar">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<header class="navbar" role="banner">
     <div class="container">
-        <a href="/" class="logo">Quizanchos</a>
-        <button class="burger-menu" aria-label="Toggle navigation">
-            <span></span>
-            <span></span>
-            <span></span>
+        <a href="/" class="logo" aria-label="Quizanchos home">Quizanchos</a>
+
+        <button class="burger-menu"
+                aria-label="Toggle navigation"
+                aria-controls="primary-nav"
+                aria-expanded="false">
+            <span></span><span></span><span></span>
         </button>
-        <nav class="nav-list">
+
+        <nav class="nav-list" id="primary-nav" aria-label="Primary">
             <ul>
-                <li><a href="/">Home</a></li>
-                <li><a href="/Minigames">Minigames</a></li>
-                <li><a href="/LeaderBoard">LeaderBoard</a></li>
+                <li><a href="/" class="@(IsActive("/") && requestPath == "/" ? "active" : "")">Home</a></li>
+                <li><a href="/Minigames" class="@(IsActive("/Minigames") ? "active" : "")">Minigames</a></li>
+                <li><a href="/LeaderBoard" class="@(IsActive("/LeaderBoard") ? "active" : "")">Leaderboard</a></li>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <li><a href="/Market">Market</a></li>
+                    <li><a href="/Market" class="@(IsActive("/Market") ? "active" : "")">Market</a></li>
                 }
-                <li><a href="/FAQ">FAQ</a></li>
-                <li><a href="/Contact">Contact</a></li>
+                <li><a href="/FAQ" class="@(IsActive("/FAQ") ? "active" : "")">FAQ</a></li>
+                <li><a href="/Contact" class="@(IsActive("/Contact") ? "active" : "")">Contact</a></li>
             </ul>
         </nav>
-            <div class="auth-buttons">
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <a href="/PremiumStatus" class="user-status-chip" id="user-status-chip">
-                        Status:<span id="user-status-value">Ordinary</span>
-                    </a>
-                    <a href="/Account/Balance" class="user-balance" id="user-balance">
-                        <span class="balance-label">Balance:</span>
-                        <span class="balance-value" id="user-balance-value">0</span>
-                        <span class="balance-currency">coins</span>
-                    </a>
-                    <a href="/Account/Profile" class="btn-profile">
-                        <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="Profile Icon" class="profile-icon">
-                        <span>Profile</span>
-                    </a>
+
+        <div class="auth-buttons">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a href="/PremiumStatus" class="user-status-chip" id="user-status-chip" title="View premium status">
+                    <span class="sr-only">Status: </span>
+                    <span id="user-status-value">Ordinary</span>
+                </a>
+                <a href="/Account/Balance" class="user-balance" id="user-balance" title="View balance">
+                    <span class="balance-label">Balance</span>
+                    <span class="balance-value" id="user-balance-value">0</span>
+                    <span class="balance-currency">coins</span>
+                </a>
+                <a href="/Account/Profile" class="btn-profile" title="Open profile">
+                    <img src="https://cdn-icons-png.flaticon.com/512/7153/7153150.png" alt="" class="profile-icon" aria-hidden="true">
+                    <span>Profile</span>
+                </a>
                 <a href="javascript:void(0);" class="btn-logout" onclick="logout()">Logout</a>
-                }
-                else
-                {
-                    <a href="/Signup" class="btn btn-secondary">Sign up</a>
-                    <a href="/Signin" class="btn btn-primary">Sign in</a>
-                }
-            </div>
+            }
+            else
+            {
+                <a href="/Signup" class="btn btn-secondary">Sign up</a>
+                <a href="/Signin" class="btn btn-primary">Sign in</a>
+            }
+        </div>
     </div>
 </header>
 
-
-<main class="container">
+<main id="main-content" class="container app-shell" role="main">
     @RenderBody()
-    <div id="errorModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-btn" id="closeModal">&times;</span>
-            <h2 id="modalHeader">Notification</h2>
-            <p id="modalErrorText"></p>
-            <div id="modalButtons" class="modal-buttons"></div>
-        </div>
-    </div>
 </main>
 
-<footer class="border-top footer text-muted fixed-bottom quiz-footer">
+<div id="errorModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalHeader" aria-hidden="true">
+    <div class="modal-content">
+        <button class="close-btn" id="closeModal" aria-label="Close notification" type="button">&times;</button>
+        <h2 id="modalHeader">Notification</h2>
+        <p id="modalErrorText"></p>
+        <div id="modalButtons" class="modal-buttons"></div>
+    </div>
+</div>
+
+<footer class="quiz-footer" role="contentinfo">
     <div class="container">
-        <span>&copy; 2026</span>
-        <span class="footer-separator">•</span>
-        <span>Course work by: Danchos &amp; Vanchos</span>
-        <span class="footer-separator">•</span>
-        <a href="https://github.com/navarti/Quizanchos" class="footer-link" target="_blank" rel="noopener noreferrer">Github</a>
+        <span>&copy; @DateTime.Now.Year Quizanchos</span>
+        <span class="footer-separator" aria-hidden="true">•</span>
+        <span>Course work by Danchos &amp; Vanchos</span>
+        <span class="footer-separator" aria-hidden="true">•</span>
+        <a href="https://github.com/navarti/Quizanchos" class="footer-link" target="_blank" rel="noopener noreferrer">GitHub</a>
     </div>
 </footer>
 

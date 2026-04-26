@@ -1,0 +1,15 @@
+@model AdminPageHeaderViewModel
+
+<header class="admin-page-header">
+    <div>
+        <h1>@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+        {
+            <p class="admin-page-sub">@Model.Subtitle</p>
+        }
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.BackUrl))
+    {
+        <a href="@Model.BackUrl" class="admin-back-link">@Model.BackLabel</a>
+    }
+</header>

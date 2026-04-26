@@ -1,0 +1,12 @@
+@model AdminAlertViewModel
+@{
+    var severityClass = Model.Severity.ToString().ToLowerInvariant();
+}
+
+<div class="admin-alert admin-alert--@severityClass" role="alert">
+    @if (!string.IsNullOrWhiteSpace(Model.Title))
+    {
+        <p class="admin-alert__title">@Model.Title</p>
+    }
+    <p class="admin-alert__message">@Model.Message</p>
+</div>

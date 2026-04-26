@@ -1,38 +1,49 @@
 @{
     ViewData["Title"] = "Users";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/admindash.css">
-</head>
-<body>
-<div id="userManagementModal" class="user-management-modal" style="display: block">
+
+@section Styles {
+    <link rel="stylesheet" href="/css/admindash.css" asp-append-version="true">
+}
+
+@await Html.PartialAsync("Partials/_AdminPageHeader", new AdminPageHeaderViewModel
+{
+    Title = "User Management",
+    Subtitle = "Search and review platform users.",
+    BackUrl = "/Admin",
+})
+
+<div id="userManagementModal" class="user-management-modal admin-inline-panel" role="region" aria-labelledby="user-mgmt-title">
     <div class="user-management-content">
-        <span class="modal-close-btn" onclick="closeModal('userManagementModal')">&times;</span>
-        <h2>User Management</h2>
-        <input type="text" id="userSearchInput" class="user-search-input" placeholder="Search by name...">
+        <button class="modal-close-btn" type="button" onclick="closeModal('userManagementModal')" aria-label="Close">&times;</button>
+        <h2 id="user-mgmt-title">User Management</h2>
+        <input type="text" id="userSearchInput" class="user-search-input" placeholder="Search by name…" aria-label="Search users by name">
+
+        <div id="userTableLoading" class="admin-loading" hidden>Loading users…</div>
+        <div id="userTableEmpty" class="admin-empty" hidden>
+            <p class="admin-empty__message">No users match this search.</p>
+            <p class="admin-empty__hint">Try a different search term or clear the filter.</p>
+        </div>
+        <div id="userTableError" class="admin-alert admin-alert--error" hidden role="alert"></div>
+
         <table id="userTable" class="user-table">
             <thead>
-            <tr>
-                <th>Name</th>
-                <th>Score</th>
-            </tr>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Score</th>
+                    <th scope="col" aria-label="Actions"></th>
+                </tr>
             </thead>
-            <tbody>
-            </tbody>
+            <tbody></tbody>
         </table>
         <div class="user-pagination">
-            <button onclick="changePage(-1)">Previous</button>
-            <button onclick="changePage(1)">Next</button>
+            <button type="button" onclick="changePage(-1)">Previous</button>
+            <button type="button" onclick="changePage(1)">Next</button>
         </div>
     </div>
 </div>
-<script src="/js/common.js" asp-append-version="true"></script>
-<script src="/js/admindash.js"></script>
-</body>
-</html> 
+
+@section Scripts {
+    <script src="/js/common.js" asp-append-version="true"></script>
+    <script src="/js/admindash.js" asp-append-version="true"></script>
+}

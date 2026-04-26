@@ -1,0 +1,15 @@
+@model AdminEmptyStateViewModel
+
+<div class="admin-empty" role="status">
+    @if (!string.IsNullOrWhiteSpace(Model.IconKey))
+    {
+        <div class="admin-empty__icon" aria-hidden="true">
+            @await Html.PartialAsync("Partials/_AdminIcon", Model.IconKey)
+        </div>
+    }
+    <p class="admin-empty__message">@Model.Message</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Hint))
+    {
+        <p class="admin-empty__hint">@Model.Hint</p>
+    }
+</div>

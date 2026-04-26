@@ -1,48 +1,46 @@
 @{
-    ViewData["Title"] = "Admin Signup";
+    ViewData["Title"] = "Admin Sign up";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="/css/admin.css">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-</head>
-<body>
-<div class="container">
-    <h1 class="title">Admin Signup</h1>
+<section class="admin-auth-shell" aria-labelledby="admin-signup-title">
+    <div class="admin-auth-card">
+        @await Html.PartialAsync("Partials/_AdminAuthHeader", new AdminAuthHeaderViewModel
+        {
+            Title = "Admin Sign Up",
+            Subtitle = "Create an admin-level account.",
+        })
 
-    <form id="registerAdminForm" class="signup-form">
-        <div class="form-group">
-            <label for="registerAdminEmail">Email:</label>
-            <input type="email" id="registerAdminEmail" name="email" required placeholder="Enter your email" class="input-field" />
-            <span id="registerAdminEmailError" class="error-message" style="display:none;"></span>
-        </div>
-        <div class="form-group">
-            <label for="registerAdminPassword">Password:</label>
-            <input type="password" id="registerAdminPassword" name="password" required placeholder="Enter your password" class="input-field" />
-            <span id="registerAdminPasswordError" class="error-message" style="display:none;"></span>
-        </div>
-        <div class="form-group">
-            <label for="registerAdminConfirmPassword">Confirm Password:</label>
-            <input type="password" id="registerAdminConfirmPassword" name="confirmPassword" required placeholder="Confirm your password" class="input-field" />
-            <span id="registerAdminConfirmPasswordError" class="error-message" style="display:none;"></span>
-        </div>
-        <button type="button" id="registerAdminButton" class="submit-button">Register</button>
-    </form>
+        <form id="registerAdminForm" class="signup-form" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="registerAdminEmail">Email</label>
+                <input type="email" id="registerAdminEmail" name="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
+                <span id="registerAdminEmailError" class="error-message" role="alert" style="display:none;"></span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="registerAdminPassword">Password</label>
+                <input type="password" id="registerAdminPassword" name="password" class="form-input" placeholder="Enter your password" autocomplete="new-password" required>
+                <span id="registerAdminPasswordError" class="error-message" role="alert" style="display:none;"></span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="registerAdminConfirmPassword">Confirm Password</label>
+                <input type="password" id="registerAdminConfirmPassword" name="confirmPassword" class="form-input" placeholder="Confirm your password" autocomplete="new-password" required>
+                <span id="registerAdminConfirmPasswordError" class="error-message" role="alert" style="display:none;"></span>
+            </div>
+            <button type="button" id="registerAdminButton" class="btn btn-primary btn-block">Register</button>
+        </form>
+    </div>
+</section>
 
-    <div id="errorModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" id="closeModal">&times;</span>
-            <h2 id="modalHeader">Notification</h2>
-            <p id="modalErrorText"></p>
-        </div>
+<div id="errorModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalHeader">
+    <div class="modal-content">
+        <button class="close-btn" id="closeModal" type="button" aria-label="Close">&times;</button>
+        <h2 id="modalHeader">Notification</h2>
+        <p id="modalErrorText"></p>
+        <div id="modalButtons" class="modal-buttons"></div>
     </div>
 </div>
-<script src="/js/common.js" asp-append-version="true"></script>
-<script src="/js/admin.js"></script>
-</body>
-</html>
+
+@section Scripts {
+    <script src="/js/common.js" asp-append-version="true"></script>
+    <script src="/js/admin.js" asp-append-version="true"></script>
+}

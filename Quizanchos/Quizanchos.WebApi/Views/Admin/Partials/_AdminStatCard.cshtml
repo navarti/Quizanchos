@@ -1,0 +1,19 @@
+@model AdminStatCardViewModel
+
+<article class="admin-stat-card admin-accent-@Model.Accent @(Model.IsAvailable ? "" : "is-unavailable")"
+         data-stat-key="@Model.Key"
+         aria-label="@Model.Title">
+    <div class="admin-stat-card__icon" aria-hidden="true">
+        @await Html.PartialAsync("Partials/_AdminIcon", Model.IconKey ?? "info")
+    </div>
+    <div class="admin-stat-card__body">
+        <p class="admin-stat-card__title">@Model.Title</p>
+        <p class="admin-stat-card__value" title="@(Model.IsAvailable ? null : Model.UnavailableReason)">
+            @Model.Value
+        </p>
+        @if (!string.IsNullOrWhiteSpace(Model.Caption))
+        {
+            <p class="admin-stat-card__caption">@Model.Caption</p>
+        }
+    </div>
+</article>
