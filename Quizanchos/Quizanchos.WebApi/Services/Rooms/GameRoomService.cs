@@ -93,6 +93,9 @@ public class GameRoomService
 
         lock (room.SyncRoot)
         {
+            if (room.IsJoinExpired)
+                return RoomActionResult.Error("Room has expired and is no longer accepting players");
+
             if (room.Status != GameRoomStatus.WaitingForPlayers)
                 return RoomActionResult.Error("Room is no longer accepting players");
 
@@ -292,6 +295,7 @@ public class GameRoomService
                 IsFull = t.IsFull
             }).ToList(),
             CreatedAt = room.CreatedAt,
+            ExpiresAtUtc = room.ExpiresAtUtc,
             LaunchedGameId = room.LaunchedGameId
         };
     }

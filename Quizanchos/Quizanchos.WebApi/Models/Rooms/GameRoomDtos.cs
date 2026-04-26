@@ -37,6 +37,7 @@ public record GameRoomDto
     public GameRoomStatus Status { get; init; }
     public IReadOnlyList<GameRoomTeamDto> Teams { get; init; } = Array.Empty<GameRoomTeamDto>();
     public DateTime CreatedAt { get; init; }
+    public DateTime ExpiresAtUtc { get; init; }
     public Guid? LaunchedGameId { get; init; }
 }
 

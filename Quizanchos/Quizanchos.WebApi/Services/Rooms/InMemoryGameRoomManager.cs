@@ -33,7 +33,8 @@ public class InMemoryGameRoomManager : IGameRoomManager
 
     public IReadOnlyList<GameRoom> GetAvailableRooms(int? minigameType = null)
     {
-        var query = _rooms.Values.Where(r => r.Status == GameRoomStatus.WaitingForPlayers);
+        var query = _rooms.Values.Where(r =>
+            r.Status == GameRoomStatus.WaitingForPlayers && !r.IsJoinExpired);
 
         if (minigameType.HasValue)
             query = query.Where(r => r.MinigameType == minigameType.Value);

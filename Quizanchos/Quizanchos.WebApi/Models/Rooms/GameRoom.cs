@@ -41,6 +41,8 @@ public class GameRoomTeam
 
 public class GameRoom
 {
+    public static readonly TimeSpan JoinWindow = TimeSpan.FromMinutes(15);
+
     private readonly object _syncRoot = new();
 
     public Guid RoomId { get; }
@@ -52,6 +54,9 @@ public class GameRoom
     public GameRoomStatus Status { get; set; } = GameRoomStatus.WaitingForPlayers;
     public DateTime CreatedAt { get; } = DateTime.UtcNow;
     public Guid? LaunchedGameId { get; set; }
+
+    public DateTime ExpiresAtUtc => CreatedAt + JoinWindow;
+    public bool IsJoinExpired => DateTime.UtcNow >= ExpiresAtUtc;
 
     public bool IsFull => AllPlayerIds.Count >= MaxPlayers;
     public IReadOnlyList<string> AllPlayerIds => Teams.SelectMany(t => t.Players).ToList();
