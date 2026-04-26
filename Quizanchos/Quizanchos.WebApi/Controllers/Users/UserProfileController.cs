@@ -55,4 +55,21 @@ public class UserProfileController : Controller
         await _userProfileService.AddCoins(User, coinsToAdd);
         return Ok();
     }
+
+    [HttpGet]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> ExportData()
+    {
+        UserDataExportDto data = await _userProfileService.ExportDataAsync(User);
+        Response.Headers.ContentDisposition = "attachment; filename=user-data.json";
+        return Ok(data);
+    }
+
+    [HttpDelete]
+    [Authorize(AppRole.User)]
+    public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountDto dto)
+    {
+        await _userProfileService.DeleteAccountAsync(User, dto.CurrentPassword);
+        return Ok();
+    }
 }

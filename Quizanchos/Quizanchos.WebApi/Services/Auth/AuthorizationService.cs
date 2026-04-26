@@ -5,6 +5,7 @@ using Quizanchos.WebApi.Constants;
 using Quizanchos.Common.Util;
 using Quizanchos.WebApi.Util;
 using Quizanchos.Common.Enums;
+using System.Security.Claims;
 
 namespace Quizanchos.WebApi.Services.Auth;
 
@@ -38,10 +39,30 @@ public class AuthorizationService
         }
     }
 
-    public async Task UpdatePassword(UpdatePasswordModelDto updatePasswordModelDto)
+    public async Task RequestPasswordReset(RequestPasswordResetDto dto)
     {
-        _ = updatePasswordModelDto ?? throw HandledExceptionFactory.CreateNullException(nameof(updatePasswordModelDto));
-        await _userPasswordUpdaterService.UpdatePasswordAsync(updatePasswordModelDto.Email, updatePasswordModelDto.NewPassword);
+        _ = dto ?? throw HandledExceptionFactory.CreateNullException(nameof(dto));
+        await _userPasswordUpdaterService.RequestPasswordResetAsync(dto.Email);
+    }
+
+    public async Task ConfirmPasswordReset(ConfirmPasswordResetDto dto)
+    {
+        _ = dto ?? throw HandledExceptionFactory.CreateNullException(nameof(dto));
+        await _userPasswordUpdaterService.ConfirmPasswordResetAsync(dto.Email, dto.Code, dto.NewPassword);
+    }
+
+    public async Task ChangePassword(ClaimsPrincipal claimsPrincipal, ChangePasswordDto dto)
+    {
+        _ = dto ?? throw HandledExceptionFactory.CreateNullException(nameof(dto));
+
+        ApplicationUser user = await _userManager.GetUserAsync(claimsPrincipal)
+            ?? throw HandledExceptionFactory.CreateNullException(nameof(ApplicationUser));
+
+        IdentityResult result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+        if (!result.Succeeded)
+        {
+            throw HandledExceptionFactory.Create(string.Concat(result.Errors.Select(e => e.Description)));
+        }
     }
 
     public async Task<RegisterUserResult> RegisterUser(RegisterModelDto registerModelDto) => await RegisterWithRole(registerModelDto, AppRole.User, UserStatusEnum.Ordinary);

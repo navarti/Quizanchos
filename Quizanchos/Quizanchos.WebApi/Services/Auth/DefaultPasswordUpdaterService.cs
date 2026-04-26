@@ -1,31 +1,22 @@
-﻿using Microsoft.AspNetCore.Identity;
 using Quizanchos.Common.Util;
-using Quizanchos.Domain.Entities;
-using Quizanchos.WebApi.Util;
 
 namespace Quizanchos.WebApi.Services.Auth;
 
+// Used when EmailConfirmation:ShouldUse = "0". Password reset by email is not
+// available because no email channel is configured, so both endpoints refuse
+// rather than silently succeeding (the previous implementation reset any
+// account by email alone, which was a full-takeover bug).
 public class DefaultPasswordUpdaterService : IUserPasswordUpdaterService
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public DefaultPasswordUpdaterService(UserManager<ApplicationUser> userManager)
+    public Task RequestPasswordResetAsync(string email)
     {
-        _userManager = userManager;
+        throw HandledExceptionFactory.Create(
+            "Password reset is unavailable: email confirmation is disabled on this server.");
     }
 
-    public async Task<RegisterUserResult> UpdatePasswordAsync(string email, string newPassword)
+    public Task ConfirmPasswordResetAsync(string email, string code, string newPassword)
     {
-        ApplicationUser user = await _userManager.FindByEmailAsync(email)
-            ?? throw HandledExceptionFactory.Create("The user with this email does not exist");
-        
-        string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-        IdentityResult result = await _userManager.ResetPasswordAsync(user, resetToken, newPassword);
-        if (!result.Succeeded)
-        {
-            throw CriticalExceptionFactory.CreateIdentityResultException(result);
-        }
-
-        return RegisterUserResult.Registered;
+        throw HandledExceptionFactory.Create(
+            "Password reset is unavailable: email confirmation is disabled on this server.");
     }
 }
