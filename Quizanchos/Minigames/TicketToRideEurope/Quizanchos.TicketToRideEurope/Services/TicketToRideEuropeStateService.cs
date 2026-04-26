@@ -23,7 +23,12 @@ public class TicketToRideEuropeStateService
         if (state == null) return null;
 
         state.GameId = sessionState.GameSessionId;
-        state.Players = sessionState.GameSession.Players.Select(p => p.ApplicationUserId).ToList();
+        // Derive Players from PlayerStates (preserved in JSON in original turn order).
+        // GameSession.Players is an EF navigation collection with no guaranteed ordering,
+        // so reading from it would scramble the turn rotation after a reload, making
+        // Players[CurrentPlayerIndex] disagree with PlayerStates[CurrentPlayerIndex] and
+        // causing every move to be rejected as "Player can not commit now".
+        state.Players = state.PlayerStates.Select(p => p.PlayerId).ToList();
         state.IsFinished = sessionState.GameSession.IsFinished;
         return state;
     }
