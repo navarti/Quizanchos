@@ -1,0 +1,9 @@
+@model AdminAuthHeaderViewModel
+
+<header class="admin-auth-card__header">
+    <h1 class="admin-auth-card__title">@Model.Title</h1>
+    @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+    {
+        <p class="admin-auth-card__subtitle">@Model.Subtitle</p>
+    }
+</header>

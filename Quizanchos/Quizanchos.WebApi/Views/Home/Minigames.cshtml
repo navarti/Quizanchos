@@ -2,52 +2,41 @@
 @{
     ViewData["Title"] = "Minigames";
 }
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/home.css">
-</head>
-<body>
-<div class="hero-waves">
-    <div class="wave"></div>
-    <div class="wave"></div>
-    <div class="wave"></div>
-</div>
-<main>
-    <div class="hero-section" style="margin-top: 40px;">
-        <h1>Minigames</h1>
-        <p class="subtitle">Try other fun games!</p>
-        <div class="featured-quizzes">
-            @foreach (var minigame in Model.Minigames)
-            {
-                <div class="quiz-card">
-                    <div class="quiz-image" style="@minigame.CardStyle">
-                        <div class="quiz-content">
-                            <div class="quiz-header">
-                                <h2>@minigame.DisplayName</h2>
-                                @if (minigame.IsPremium)
-                                {
-                                    <span class="premium-badge">Premium</span>
-                                }
-                                <p>@minigame.Description</p>
-                            </div>
-                            @if (minigame.CanAccess)
-                            {
-                                <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
-                            }
-                            else
-                            {
-                                <span class="quiz-btn quiz-btn-disabled">Premium required</span>
-                            }
-                        </div>
-                    </div>
+
+@section Styles {
+    <link rel="stylesheet" href="/css/home.css" asp-append-version="true">
+}
+
+<section class="home-hero" aria-labelledby="minigames-title">
+    <h1 id="minigames-title">Minigames</h1>
+    <p class="subtitle">Pick a game and challenge yourself — solo or with friends.</p>
+</section>
+
+<div class="featured-quizzes" role="list">
+    @foreach (var minigame in Model.Minigames)
+    {
+        <article class="quiz-card" role="listitem">
+            <div class="quiz-image" style="@minigame.CardStyle" aria-hidden="true"></div>
+            <div class="quiz-content">
+                <div class="quiz-header">
+                    @if (minigame.IsPremium)
+                    {
+                        <span class="premium-badge">Premium</span>
+                    }
+                    <h2>@minigame.DisplayName</h2>
+                    <p>@minigame.Description</p>
                 </div>
-            }
-        </div>
-    </div>
-</main>
+                @if (minigame.CanAccess)
+                {
+                    <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
+                }
+                else
+                {
+                    <span class="quiz-btn quiz-btn-disabled" aria-disabled="true">Premium required</span>
+                }
+            </div>
+        </article>
+    }
+</div>
 
 <script src="/js/home.js" asp-append-version="true"></script>
-</body>
-</html>

@@ -1,55 +1,53 @@
 @model Quizanchos.WebApi.Dto.FullApplicationUserDto
-
 @{
-    ViewData["Title"] = "User Profile";
+    ViewData["Title"] = "Profile";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Page</title>
-    <link rel="stylesheet" href="/css/site.css">
-    <link rel="stylesheet" href="/css/profile.css">
-</head>
-<body>
-<div class="profile-container">
+@section Styles {
+    <link rel="stylesheet" href="/css/profile.css" asp-append-version="true">
+}
+
+<section class="profile-container">
     <h1 class="profile-header">Profile Settings</h1>
 
     <div class="profile-card">
-        <div class="nav-container">
-            <button class="nav-button active" onclick="switchView('profile', this)">Profile Settings</button>
-            <button class="nav-button" onclick="switchView('password', this)">Change Password</button>
+        <div class="nav-container" role="tablist" aria-label="Profile sections">
+            <button class="nav-button active" type="button" role="tab" aria-selected="true" aria-controls="profile-view" onclick="switchView('profile', this)">Profile</button>
+            <button class="nav-button" type="button" role="tab" aria-selected="false" aria-controls="password-view" onclick="switchView('password', this)">Change Password</button>
         </div>
-        <div id="profile-view" class="view-section">
+
+        <div id="profile-view" class="view-section" role="tabpanel">
             <form id="profile-form" onsubmit="handleSubmit(event)">
                 <div class="avatar-section">
                     <div class="avatar-container">
-                        <img id="avatar" class="avatar" src="@(!string.IsNullOrEmpty(Model.AvatarUrl) ? Model.AvatarUrl : "https://via.placeholder.com/150")" alt="Profile Avatar">
-                        <label for="avatar-input" class="avatar-upload">📷</label>
+                        <img id="avatar" class="avatar"
+                             src="@(!string.IsNullOrEmpty(Model.AvatarUrl) ? Model.AvatarUrl : "https://via.placeholder.com/150")"
+                             alt="Your profile avatar">
+                        <label for="avatar-input" class="avatar-upload" aria-label="Upload new avatar">
+                            <span aria-hidden="true">📷</span>
+                        </label>
                         <input type="file" id="avatar-input" hidden accept="image/*">
                     </div>
                 </div>
 
                 <div class="profile-info">
                     <div class="info-group">
-                        <label class="info-label">
-                            Username
+                        <label class="info-label" for="username">
+                            <span>Username</span>
                             <button type="button" class="edit-button" id="edit-username-btn" onclick="toggleEdit('username')">Edit</button>
                         </label>
                         <input type="text" id="username" class="info-value" value="@Model.UserName" readonly>
                     </div>
 
                     <div class="info-group">
-                        <label class="info-label">Email</label>
+                        <label class="info-label" for="email">Email</label>
                         <input type="email" id="email" class="info-value" value="@Model.Email" readonly>
                     </div>
 
                     <button type="button" class="save-button" onclick="saveChanges('username')">Save Changes</button>
                 </div>
 
-                <div class="stats-section">
+                <div class="stats-section" aria-label="Your stats">
                     <div class="stat-card">
                         <div class="stat-value">15</div>
                         <div class="stat-label">Quizzes Taken</div>
@@ -66,49 +64,45 @@
             </form>
         </div>
 
-        <div id="password-view" class="view-section" style="display: none;">
-            <h1 class="profile-header">Change Password</h1>
-            <form id="password-form" onsubmit="handlePasswordSubmit(event)">
+        <div id="password-view" class="view-section" role="tabpanel" style="display: none;">
+            <h2 class="profile-header">Change Password</h2>
+            <form id="password-form" class="profile-info" onsubmit="handlePasswordSubmit(event)">
                 <div class="info-group">
-                    <label class="info-label">New Password</label>
-                    <input type="password" id="new-password" class="info-value" required>
+                    <label class="info-label" for="new-password">New Password</label>
+                    <input type="password" id="new-password" class="info-value" autocomplete="new-password" required>
                 </div>
                 <div class="info-group">
-                    <label class="info-label">Confirm Password</label>
-                    <input type="password" id="confirm-password" class="info-value" required>
+                    <label class="info-label" for="confirm-password">Confirm Password</label>
+                    <input type="password" id="confirm-password" class="info-value" autocomplete="new-password" required>
                 </div>
                 <button type="submit" class="save-button">Change Password</button>
             </form>
         </div>
     </div>
-    <div id="verifyModal" class="verify-modal">
-        <div class="verify-modal-content">
-            <button class="modal-close" onclick="closeVerifyModal()">&times;</button>
-            <h2>Verify your email</h2>
-            <p>We've sent a verification code to your email address.<br>Please enter it below to continue.</p>
 
-            <div id="messageContainer" class="message-container"></div>
+    <div id="verifyModal" class="verify-modal" role="dialog" aria-modal="true" aria-labelledby="verify-title">
+        <div class="verify-modal-content">
+            <button class="modal-close" type="button" onclick="closeVerifyModal()" aria-label="Close verification dialog">&times;</button>
+            <h2 id="verify-title">Verify your email</h2>
+            <p>We've sent a verification code to your email address. Please enter it below to continue.</p>
+
+            <div id="messageContainer" class="message-container" role="status" aria-live="polite"></div>
 
             <div class="input-container">
-                <svg class="mail-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="mail-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
                     <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
-                <input id="codeInput" type="text" placeholder="Enter verification code" maxlength="6">
+                <input id="codeInput" type="text" placeholder="Enter verification code" maxlength="6" inputmode="numeric" autocomplete="one-time-code" aria-label="Verification code">
             </div>
-            <span id="errorContainer" class="error-message"></span>
+            <span id="errorContainer" class="error-message" role="alert"></span>
 
             <div class="resend-container">
                 <p>Didn't receive the code?</p>
-                <button class="resend-btn" id="resendButton">Resend</button>
+                <button class="resend-btn" id="resendButton" type="button">Resend</button>
             </div>
 
-            <button class="verify-btn" id="verifyButton">Verify Email</button>
-            
+            <button class="verify-btn" id="verifyButton" type="button">Verify Email</button>
         </div>
     </div>
-</div>
-<script src="/js/common.js" asp-append-version="true"></script>
-<script src="/js/profile.js" asp-append-version="true"></script>
-</body>
-</html>
+</section>

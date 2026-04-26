@@ -1,87 +1,86 @@
 @{
     ViewData["Title"] = "Top-Up Orders";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/admindash.css">
-    <link rel="stylesheet" href="/css/admin-topup.css">
-</head>
-<body>
+
+@section Styles {
+    <link rel="stylesheet" href="/css/admindash.css" asp-append-version="true">
+    <link rel="stylesheet" href="/css/admin-topup.css" asp-append-version="true">
+}
+
+@await Html.PartialAsync("Partials/_AdminPageHeader", new AdminPageHeaderViewModel
+{
+    Title = "Top-Up Orders",
+    Subtitle = "Confirm or review crypto payments.",
+    BackUrl = "/Admin",
+})
+
 <div class="topup-admin-page">
-    <div class="topup-admin-header">
-        <h1>Top-Up Orders</h1>
-        <a href="/Admin" class="topup-back-link">Back to Admin</a>
+    <div id="topup-status" class="topup-status-msg" style="display:none;" role="status" aria-live="polite"></div>
+
+    <div class="topup-tabs" role="tablist" aria-label="Top-up order status">
+        <button class="topup-tab active" type="button" data-tab="pending" role="tab" aria-selected="true">Pending</button>
+        <button class="topup-tab" type="button" data-tab="history" role="tab" aria-selected="false">History</button>
     </div>
 
-    <div id="topup-status" class="topup-status-msg" style="display:none;"></div>
-
-    <!-- Tabs -->
-    <div class="topup-tabs">
-        <button class="topup-tab active" data-tab="pending">Pending</button>
-        <button class="topup-tab" data-tab="history">History</button>
-    </div>
-
-    <!-- Pending orders -->
-    <div id="tab-pending" class="topup-tab-panel">
+    <section id="tab-pending" class="topup-tab-panel" role="tabpanel" aria-label="Pending orders">
+        <div id="pending-loading" class="admin-loading" hidden>Loading pending orders…</div>
         <div id="pending-empty" class="topup-empty" style="display:none;">No pending orders.</div>
+        <div id="pending-error" class="admin-alert admin-alert--error" hidden role="alert"></div>
+
         <table id="pending-table" class="user-table topup-table" style="display:none;">
             <thead>
-            <tr>
-                <th>User</th>
-                <th>Amount</th>
-                <th>Coins</th>
-                <th>Network</th>
-                <th>Created</th>
-                <th>Action</th>
-            </tr>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Coins</th>
+                    <th scope="col">Network</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Action</th>
+                </tr>
             </thead>
             <tbody id="pending-tbody"></tbody>
         </table>
-    </div>
+    </section>
 
-    <!-- History (completed / expired / manually confirmed) -->
-    <div id="tab-history" class="topup-tab-panel" style="display:none;">
+    <section id="tab-history" class="topup-tab-panel" role="tabpanel" aria-label="Order history" style="display:none;">
+        <div id="history-loading" class="admin-loading" hidden>Loading order history…</div>
         <div id="history-empty" class="topup-empty" style="display:none;">No order history.</div>
+        <div id="history-error" class="admin-alert admin-alert--error" hidden role="alert"></div>
+
         <table id="history-table" class="user-table topup-table" style="display:none;">
             <thead>
-            <tr>
-                <th>User</th>
-                <th>Amount</th>
-                <th>Coins</th>
-                <th>Network</th>
-                <th>Status</th>
-                <th>Completed</th>
-            </tr>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Coins</th>
+                    <th scope="col">Network</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Completed</th>
+                </tr>
             </thead>
             <tbody id="history-tbody"></tbody>
         </table>
-    </div>
+    </section>
 </div>
 
-<!-- Confirm modal -->
-<div id="confirm-modal" class="user-management-modal">
+<div id="confirm-modal" class="user-management-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
     <div class="user-management-content topup-confirm-content">
-        <span class="modal-close-btn" id="confirm-close">&times;</span>
-        <h2>Confirm Top-Up</h2>
+        <button class="modal-close-btn" id="confirm-close" type="button" aria-label="Close">&times;</button>
+        <h2 id="confirm-title">Confirm Top-Up</h2>
         <p>Credit <strong id="confirm-coins"></strong> coins to <strong id="confirm-user"></strong>?</p>
-        <p class="topup-confirm-detail">Amount: <span id="confirm-amount"></span> USDT | Network: <span id="confirm-network"></span></p>
+        <p class="topup-confirm-detail">Amount: <span id="confirm-amount"></span> USDT · Network: <span id="confirm-network"></span></p>
         <div class="topup-confirm-field">
             <label for="confirm-txid">Transaction ID (optional)</label>
-            <input type="text" id="confirm-txid" placeholder="Binance TxId...">
+            <input type="text" id="confirm-txid" placeholder="Binance TxId…">
         </div>
         <div class="topup-confirm-actions">
-            <button class="topup-btn-confirm" id="confirm-yes">Confirm &amp; Credit</button>
-            <button class="topup-btn-cancel" id="confirm-no">Cancel</button>
+            <button class="topup-btn-confirm" id="confirm-yes" type="button">Confirm &amp; Credit</button>
+            <button class="topup-btn-cancel" id="confirm-no" type="button">Cancel</button>
         </div>
     </div>
 </div>
 
-<script src="/js/common.js" asp-append-version="true"></script>
-<script src="/js/admin-topup.js" asp-append-version="true"></script>
-</body>
-</html>
+@section Scripts {
+    <script src="/js/common.js" asp-append-version="true"></script>
+    <script src="/js/admin-topup.js" asp-append-version="true"></script>
+}

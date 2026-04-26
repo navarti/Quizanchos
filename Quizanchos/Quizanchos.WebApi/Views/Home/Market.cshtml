@@ -1,14 +1,14 @@
 @model Quizanchos.WebApi.Dto.FullApplicationUserDto
-
 @{
     ViewData["Title"] = "Market";
 }
 
-<link rel="stylesheet" href="/css/site.css">
-<link rel="stylesheet" href="/css/profile.css">
-<link rel="stylesheet" href="/css/market.css">
+@section Styles {
+    <link rel="stylesheet" href="/css/profile.css" asp-append-version="true">
+    <link rel="stylesheet" href="/css/market.css" asp-append-version="true">
+}
 
-<div class="profile-container">
+<section class="profile-container">
     <h1 class="profile-header">Market</h1>
 
     <div class="profile-card market-card">
@@ -17,10 +17,10 @@
                 <p class="market-balance-caption">Available balance</p>
                 <p class="market-balance-value"><span id="market-balance">@Model.Coins</span> coins</p>
             </div>
-            <a href="/Account/Balance" class="save-button market-balance-link">Top up</a>
+            <a href="/Account/Balance" class="btn btn-primary market-balance-link">Top up</a>
         </div>
 
-        <div id="market-status" class="market-status" style="display:none;"></div>
+        <div id="market-status" class="market-status" style="display:none;" role="status" aria-live="polite"></div>
 
         <h2 class="market-section-title">Premium Subscriptions</h2>
         <div id="market-grid-premium" class="market-grid"></div>
@@ -28,7 +28,7 @@
         <h2 class="market-section-title">Emoji Catalog</h2>
         <div id="market-grid-emoji" class="market-grid"></div>
     </div>
-</div>
+</section>
 
 @section Scripts {
     <script src="/js/market.js" asp-append-version="true"></script>

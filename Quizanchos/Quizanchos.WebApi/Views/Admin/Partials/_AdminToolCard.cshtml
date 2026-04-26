@@ -1,0 +1,34 @@
+@model AdminToolCardViewModel
+
+<article class="admin-tool-card @(Model.IsEnabled ? "" : "is-disabled")" data-tool-key="@Model.Key">
+    <h2 class="admin-tool-card__title">
+        <span class="admin-tool-card__icon" aria-hidden="true">
+            @await Html.PartialAsync("Partials/_AdminIcon", Model.IconKey)
+        </span>
+        @Model.Title
+    </h2>
+    <p class="admin-tool-card__description">@Model.Description</p>
+
+    @if (Model.IsEnabled && !string.IsNullOrWhiteSpace(Model.ActionUrl))
+    {
+        <a href="@Model.ActionUrl" class="admin-tool-card__action">@Model.ActionLabel</a>
+    }
+    else if (Model.IsEnabled && !string.IsNullOrWhiteSpace(Model.OpenModalId))
+    {
+        <button type="button"
+                class="admin-tool-card__action"
+                onclick="openModal('@Model.OpenModalId')">
+            @Model.ActionLabel
+        </button>
+    }
+    else
+    {
+        <button type="button"
+                class="admin-tool-card__action"
+                disabled
+                aria-disabled="true"
+                title="@Model.DisabledReason">
+            @Model.ActionLabel
+        </button>
+    }
+</article>

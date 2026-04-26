@@ -1,83 +1,77 @@
 @model Quizanchos.WebApi.Dto.FullApplicationUserDto
-
 @{
     ViewData["Title"] = "Balance";
 }
 
-<link rel="stylesheet" href="/css/balance.css">
+@section Styles {
+    <link rel="stylesheet" href="/css/balance.css" asp-append-version="true">
+}
 
-<div class="balance-page">
-    <div class="balance-hero">
+<section class="balance-page">
+    <header class="balance-hero">
         <h1>Balance</h1>
-        <p class="balance-subtitle">Top up your account with USDT</p>
-    </div>
+        <p class="balance-subtitle">Top up your account with USDT.</p>
+    </header>
 
-    <!-- Current balance card -->
-    <div class="balance-wallet-card">
-        <div class="balance-wallet-left">
+    <article class="balance-wallet-card" aria-label="Current balance">
+        <div>
             <span class="balance-wallet-label">Current balance</span>
             <span class="balance-wallet-amount"><span id="balance-amount-value">@Model.Coins</span> coins</span>
         </div>
         <a href="/Market" class="balance-action-btn">Go to Market</a>
-    </div>
+    </article>
 
-    <!-- Status banner -->
-    <div id="balance-status" class="balance-status-banner" style="display:none;"></div>
+    <div id="balance-status" class="balance-status-banner" style="display:none;" role="status" aria-live="polite"></div>
 
-    <!-- Packages grid -->
     <h2 class="balance-section-title">Choose a Package</h2>
     <div id="packages-grid" class="balance-packages-grid"></div>
 
-    <!-- Pending orders -->
     <div id="pending-section" style="display:none;">
         <h2 class="balance-section-title">Active Orders</h2>
         <div id="pending-orders-list"></div>
     </div>
-</div>
+</section>
 
-<!-- Payment Modal -->
-<div class="balance-overlay" id="payment-modal">
+<div class="balance-overlay" id="payment-modal" role="dialog" aria-modal="true" aria-labelledby="balance-modal-heading">
     <div class="balance-modal">
-        <button class="balance-modal-close" id="modal-close-btn">&times;</button>
+        <button class="balance-modal-close" id="modal-close-btn" type="button" aria-label="Close payment dialog">&times;</button>
 
-        <!-- Step 1: Pick network -->
         <div id="step-network">
-            <h2 class="balance-modal-heading">Select Network</h2>
-            <p class="balance-modal-sub">Choose the USDT network you want to send from</p>
+            <h2 id="balance-modal-heading" class="balance-modal-heading">Select Network</h2>
+            <p class="balance-modal-sub">Choose the USDT network you want to send from.</p>
             <div class="balance-network-list">
-                <button class="balance-network-opt" data-network="BEP20">
+                <button class="balance-network-opt" type="button" data-network="BEP20">
                     <span class="balance-network-label">BEP20</span>
                     <span class="balance-network-desc">BNB Smart Chain — low fees</span>
                 </button>
-                <button class="balance-network-opt" data-network="TRC20">
+                <button class="balance-network-opt" type="button" data-network="TRC20">
                     <span class="balance-network-label">TRC20</span>
                     <span class="balance-network-desc">Tron Network — widely supported</span>
                 </button>
             </div>
         </div>
 
-        <!-- Step 2: Payment details -->
         <div id="step-payment" style="display:none;">
             <h2 class="balance-modal-heading">Send Payment</h2>
 
             <div class="balance-field">
-                <label class="balance-field-label">Amount</label>
+                <label class="balance-field-label" for="pay-amount">Amount</label>
                 <div class="balance-field-row">
                     <span class="balance-field-val balance-field-amount" id="pay-amount"></span>
-                    <button class="balance-copy-btn" id="copy-amount-btn">Copy</button>
+                    <button class="balance-copy-btn" id="copy-amount-btn" type="button">Copy</button>
                 </div>
             </div>
 
             <div class="balance-field">
-                <label class="balance-field-label">Wallet Address</label>
+                <label class="balance-field-label" for="pay-address">Wallet Address</label>
                 <div class="balance-field-row">
                     <span class="balance-field-val balance-field-addr" id="pay-address"></span>
-                    <button class="balance-copy-btn" id="copy-address-btn">Copy</button>
+                    <button class="balance-copy-btn" id="copy-address-btn" type="button">Copy</button>
                 </div>
             </div>
 
             <div class="balance-field">
-                <label class="balance-field-label">Network</label>
+                <label class="balance-field-label" for="pay-network">Network</label>
                 <span class="balance-field-val" id="pay-network"></span>
             </div>
 
@@ -85,12 +79,12 @@
                 Expires in <span id="pay-timer" class="balance-timer-countdown"></span>
             </div>
 
-            <div class="balance-notice">
+            <p class="balance-notice">
                 Send the exact amount shown above. Payment is detected automatically within 1–2 minutes.
-            </div>
+            </p>
 
-            <button class="balance-primary-btn" id="check-status-btn">Check Status</button>
-            <button class="balance-secondary-btn" id="back-btn">Change Network</button>
+            <button class="balance-primary-btn" id="check-status-btn" type="button">Check Status</button>
+            <button class="balance-secondary-btn" id="back-btn" type="button">Change Network</button>
         </div>
     </div>
 </div>

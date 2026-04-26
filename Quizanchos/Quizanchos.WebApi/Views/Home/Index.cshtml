@@ -1,61 +1,59 @@
-﻿@model HomeViewModel
+@model HomeViewModel
 @{
     ViewData["Title"] = "Home";
 }
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/home.css">
-</head>
-<body>
-<div class="hero-waves">
-    <div class="wave"></div>
-    <div class="wave"></div>
-    <div class="wave"></div>
-</div>
-<main>
-        @if (User.Identity?.IsAuthenticated == true)
-        {
-        if (Model.ActiveSession != null)
-        {
-            <div class="sessions-card">
-                <h2>Your Active Session</h2>
-                <div class="session-item">
-                    <div class="session-info">
-                        <p><strong>Minigame:</strong> @(Model.ActiveSessionMinigameName ?? Model.ActiveSession.MinigameType.ToString())</p>
-                    </div>
-                    @if (!string.IsNullOrWhiteSpace(Model.ActiveSessionUrl))
-                    {
-                        <a href="@Model.ActiveSessionUrl" class="join-btn">Continue →</a>
-                    }
+
+@section Styles {
+    <link rel="stylesheet" href="/css/home.css" asp-append-version="true">
+}
+
+<section class="home-hero" aria-labelledby="home-hero-title">
+    <h1 id="home-hero-title">Welcome to Quizanchos</h1>
+    <p class="subtitle">Pick a minigame, climb the leaderboard, and play with friends.</p>
+</section>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    if (Model.ActiveSession != null)
+    {
+        <article class="sessions-card" aria-labelledby="active-session-title">
+            <h2 id="active-session-title">Your Active Session</h2>
+            <div class="session-item">
+                <div class="session-info">
+                    <p><strong>Minigame:</strong> @(Model.ActiveSessionMinigameName ?? Model.ActiveSession.MinigameType.ToString())</p>
                 </div>
+                @if (!string.IsNullOrWhiteSpace(Model.ActiveSessionUrl))
+                {
+                    <a href="@Model.ActiveSessionUrl" class="join-btn">Continue →</a>
+                }
             </div>
-        }
-        else
-        {
-            <div class="sessions-card">
-                <h2>Active Sessions</h2>
-                <p>No active sessions available.</p>
-            </div>
-        }
+        </article>
     }
     else
     {
-        <p>Please log in to view your active sessions.</p>
+        <article class="sessions-card" aria-labelledby="active-session-title">
+            <h2 id="active-session-title">Active Sessions</h2>
+            <p>You don't have any active sessions right now. <a href="/Minigames">Browse minigames</a> to start a new game.</p>
+        </article>
     }
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h3>Total Minigames</h3>
-            <p class="stat-number">@Model.Minigames.Count</p>
-        </div>
-        <div class="stat-card">
-            <h3>Active Users</h3>
-            <p class="stat-number">@Model.ActiveUsersCount</p>
-        </div>
+}
+else
+{
+    <article class="sessions-card">
+        <h2>Get Started</h2>
+        <p>Please <a href="/Signin">sign in</a> to see your active sessions and stats. New here? <a href="/Signup">Create an account</a>.</p>
+    </article>
+}
+
+<section class="stats-grid" aria-label="Platform stats">
+    <div class="stat-card">
+        <h3>Total Minigames</h3>
+        <p class="stat-number">@Model.Minigames.Count</p>
     </div>
-</main>
+    <div class="stat-card">
+        <h3>Active Users</h3>
+        <p class="stat-number">@Model.ActiveUsersCount</p>
+    </div>
+</section>
 
 <script src="/js/home.js" asp-append-version="true"></script>
-</body>
-</html>

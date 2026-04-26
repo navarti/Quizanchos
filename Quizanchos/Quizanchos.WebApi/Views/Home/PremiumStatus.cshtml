@@ -1,15 +1,12 @@
 @model Quizanchos.WebApi.Dto.FullApplicationUserDto
-
 @{
     ViewData["Title"] = "Premium Status";
     bool hasActivePremium = Model.PremiumUntilUtc.HasValue && Model.PremiumUntilUtc.Value > DateTime.UtcNow;
 }
 
-<link rel="stylesheet" href="/css/site.css" />
-
-<div class="premium-status-container">
-    <div class="premium-status-card">
-        <h1>Premium Status</h1>
+<section class="premium-status-container">
+    <article class="premium-status-card" aria-labelledby="premium-status-title">
+        <h1 id="premium-status-title">Premium Status</h1>
 
         <p>
             Current status:
@@ -19,7 +16,7 @@
         </p>
 
         <p>
-            Premium valid till:
+            Premium valid until:
             <strong>
                 @(Model.PremiumUntilUtc.HasValue
                     ? Model.PremiumUntilUtc.Value.ToString("yyyy-MM-dd HH:mm 'UTC'")
@@ -28,5 +25,5 @@
         </p>
 
         <a href="/Market" class="premium-status-link">Go to Market</a>
-    </div>
-</div>
+    </article>
+</section>
