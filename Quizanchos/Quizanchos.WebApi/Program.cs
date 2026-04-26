@@ -1,16 +1,40 @@
 using Quizanchos.WebApi;
+using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// Add services to the container.
-builder.AddAuthorizaiton();
-builder.AddApplicationServices();
+try
+{
+    Log.Information("Starting Quizanchos.WebApi");
 
-var app = builder.Build();
+    var builder = WebApplication.CreateBuilder(args);
 
-// Configure the HTTP request pipeline.
-app.Configure();
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
 
-await app.SeedData(builder.Configuration);
+    // Add services to the container.
+    builder.AddAuthorizaiton();
+    builder.AddApplicationServices();
 
-app.Run();
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    app.UseSerilogRequestLogging();
+    app.Configure();
+
+    await app.SeedData(builder.Configuration);
+
+    app.Run();
+}
+catch (Exception ex) when (ex is not HostAbortedException)
+{
+    Log.Fatal(ex, "Quizanchos.WebApi terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

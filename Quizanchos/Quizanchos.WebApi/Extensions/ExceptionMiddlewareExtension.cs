@@ -1,4 +1,4 @@
-﻿using Quizanchos.Common.Util;
+using Quizanchos.Common.Util;
 using System.Text.Json;
 
 namespace Quizanchos.WebApi.Extensions;
@@ -6,14 +6,12 @@ namespace Quizanchos.WebApi.Extensions;
 public class ExceptionMiddlewareExtension
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionMiddlewareExtension> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ExceptionMiddlewareExtension"/> class.
-    /// </summary>
-    /// <param name="next">Next delegate.</param>
-    public ExceptionMiddlewareExtension(RequestDelegate next)
+    public ExceptionMiddlewareExtension(RequestDelegate next, ILogger<ExceptionMiddlewareExtension> logger)
     {
         _next = next;
+        _logger = logger;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -24,17 +22,17 @@ public class ExceptionMiddlewareExtension
         }
         catch (UnauthorizedAccessException ex)
         {
-            string messageForUser = ex.Message;
-            await HandleExceptionAsync(context, messageForUser, StatusCodes.Status403Forbidden).ConfigureAwait(false);
+            _logger.LogWarning(ex, "Unauthorized access on {Method} {Path}", context.Request.Method, context.Request.Path);
+            await HandleExceptionAsync(context, ex.Message, StatusCodes.Status403Forbidden).ConfigureAwait(false);
         }
         catch (QuizanchosException ex)
         {
-            string messageForUser = ex.Message;
-            await HandleExceptionAsync(context, messageForUser, StatusCodes.Status400BadRequest).ConfigureAwait(false);
+            _logger.LogWarning(ex, "Domain exception on {Method} {Path}", context.Request.Method, context.Request.Path);
+            await HandleExceptionAsync(context, ex.Message, StatusCodes.Status400BadRequest).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            _logger.LogError(ex, "Unhandled exception on {Method} {Path}", context.Request.Method, context.Request.Path);
 
             string messageForUser = "Internal Server Error. Please try again later or contact support.";
             await HandleExceptionAsync(context, messageForUser, StatusCodes.Status500InternalServerError).ConfigureAwait(false);
