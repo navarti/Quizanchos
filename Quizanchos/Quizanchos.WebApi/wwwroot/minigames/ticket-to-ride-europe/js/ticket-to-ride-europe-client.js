@@ -54,6 +54,10 @@ class TicketToRideEuropeClient extends GameClient {
         return this.makeMove(gameId, playerId, this.createMoveObject('tunnelSkip'));
     }
 
+    resign(gameId, playerId) {
+        return this.makeMove(gameId, playerId, this.createMoveObject('resign'));
+    }
+
     async getTtrState(gameId) {
         const response = await this.getGameState(gameId);
         const state = response.state || response.State;

@@ -123,6 +123,8 @@
     flex-wrap: wrap;
 }
 .player-row.turn { background: rgba(243, 199, 115, 0.15); outline: 1px solid var(--accent); }
+.player-row.resigned { opacity: 0.45; }
+.player-row.resigned .player-name { text-decoration: line-through; }
 .player-chip {
     width: 14px; height: 14px; border-radius: 50%;
     border: 1px solid #000;
@@ -137,7 +139,7 @@
     color: var(--text-dim);
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary, .btn-secondary, .btn-danger {
     background: linear-gradient(180deg, var(--accent), #8a4f1c);
     color: #fff;
     border: none;
@@ -150,7 +152,8 @@
     width: 100%;
 }
 .btn-secondary { background: linear-gradient(180deg, #555, #333); }
-.btn-primary:hover, .btn-secondary:hover { filter: brightness(1.1); }
+.btn-danger { background: linear-gradient(180deg, #c0392b, #7a2419); margin-top: 10px; }
+.btn-primary:hover, .btn-secondary:hover, .btn-danger:hover { filter: brightness(1.1); }
 
 .faceup-row {
     display: flex;

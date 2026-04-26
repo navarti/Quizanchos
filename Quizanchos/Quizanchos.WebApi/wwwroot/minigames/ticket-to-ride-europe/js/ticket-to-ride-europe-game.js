@@ -1,6 +1,12 @@
 // Ticket to Ride: Europe — Game page
 // Renders the SVG map and player UI; talks to the server via SignalR + HTTP.
 
+// Wrapped in an IIFE so helpers like `r`, `showModal`, `showError`, etc. do not
+// leak to global scope and collide with the same-named globals defined in the
+// shared /js/common.js (which loads after this script via _Layout.cshtml and
+// would otherwise overwrite our showModal/showError implementations).
+(function () {
+
 // Map data must mirror the C# TicketToRideEuropeMap class.
 const TTR_MAP = {
     width: 920,
@@ -192,6 +198,9 @@ let currentUserId = null;
 let currentGameId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    if (window.__ttrInited) return;
+    window.__ttrInited = true;
+
     ensureGameLayout();
 
     const container = document.getElementById('ttr-container');
@@ -530,12 +539,17 @@ function renderPlayers() {
     let html = '<h3>Players</h3>';
     for (const p of players) {
         const id = p.playerId || p.PlayerId;
-        const isTurn = id === getCurrentTurnPlayerId(currentState);
+        const resigned = p.hasResigned ?? p.HasResigned ?? false;
+        const isTurn = !resigned && id === getCurrentTurnPlayerId(currentState);
         const color = p.color || p.Color;
         const isMe = id === currentUserId;
-        html += `<div class="player-row ${isTurn ? 'turn' : ''}">
+        const tags = [];
+        if (isMe) tags.push('you');
+        if (resigned) tags.push('resigned');
+        const tagSuffix = tags.length ? ` (${tags.join(', ')})` : '';
+        html += `<div class="player-row ${isTurn ? 'turn' : ''} ${resigned ? 'resigned' : ''}">
             <span class="player-chip" style="background:${PLAYER_HEX[color]}"></span>
-            <span class="player-name">${shortId(id)}${isMe ? ' (you)' : ''}</span>
+            <span class="player-name">${shortId(id)}${tagSuffix}</span>
             <div class="player-stats">
                 <span title="Trains">🚂 ${p.trainsRemaining ?? p.TrainsRemaining}</span>
                 <span title="Stations used">🏛 ${p.stationsBuilt ?? p.StationsBuilt}/3</span>
@@ -558,41 +572,45 @@ function renderActions() {
     const phase = getPhase(currentState);
     const pending = getPendingAction(currentState);
     const myTurn = isMyTurn(currentState);
+    const me = findPlayer(currentState, currentUserId);
+    const isResigned = !!(me && (me.hasResigned ?? me.HasResigned));
+    const isEnded = phase === 'ended' || currentState.isFinished;
 
-    if (phase !== 'play') {
-        root.innerHTML = '<h3>Actions</h3><p class="muted">Waiting...</p>';
-        return;
-    }
-
-    if (!myTurn) {
-        root.innerHTML = `<h3>Actions</h3><p class="muted">Waiting for ${shortId(getCurrentTurnPlayerId(currentState))}...</p>`;
-        return;
-    }
-
-    if (pending === 'tunnelDecision') {
-        root.innerHTML = '<h3>Actions</h3><p class="muted">Resolve the tunnel attempt</p>';
-        return;
-    }
-
-    if (pending === 'keepDrawnTickets') {
-        root.innerHTML = '<h3>Actions</h3><p class="muted">Choose tickets to keep</p>';
-        return;
-    }
-
-    if (pending === 'drawSecondCard') {
-        root.innerHTML = `<h3>Actions</h3>
-            <p class="muted">Draw your second train card from the deck or market.</p>
+    let body;
+    if (isResigned) {
+        body = '<p class="muted">You have resigned from this game.</p>';
+    } else if (phase === 'init') {
+        body = '<p class="muted">Choose your starting tickets in the dialog.</p>';
+    } else if (phase !== 'play') {
+        body = '<p class="muted">Waiting...</p>';
+    } else if (!myTurn) {
+        body = `<p class="muted">Waiting for ${shortId(getCurrentTurnPlayerId(currentState))}...</p>`;
+    } else if (pending === 'tunnelDecision') {
+        body = '<p class="muted">Resolve the tunnel attempt</p>';
+    } else if (pending === 'keepDrawnTickets') {
+        body = '<p class="muted">Choose tickets to keep</p>';
+    } else if (pending === 'drawSecondCard') {
+        body = `<p class="muted">Draw your second train card from the deck or market.</p>
             <button id="ttr-draw-deck" class="btn-primary">Draw from deck</button>`;
-        document.getElementById('ttr-draw-deck').onclick = () => doDrawDeck();
-        return;
+    } else {
+        body = `<button id="ttr-draw-deck" class="btn-primary">Draw 2 train cards</button>
+            <button id="ttr-draw-tickets" class="btn-primary">Draw destination tickets</button>
+            <p class="muted">Click a route on the map to claim it. Click a city to build a station.</p>`;
     }
 
-    root.innerHTML = `<h3>Actions</h3>
-        <button id="ttr-draw-deck" class="btn-primary">Draw 2 train cards</button>
-        <button id="ttr-draw-tickets" class="btn-primary">Draw destination tickets</button>
-        <p class="muted">Click a route on the map to claim it. Click a city to build a station.</p>`;
-    document.getElementById('ttr-draw-deck').onclick = () => doDrawDeck();
-    document.getElementById('ttr-draw-tickets').onclick = () => doDrawTickets();
+    // Resign is available to any non-resigned player whenever the game is still in progress.
+    const resignBtn = (me && !isResigned && !isEnded)
+        ? '<button id="ttr-resign" class="btn-danger">Resign</button>'
+        : '';
+
+    root.innerHTML = `<h3>Actions</h3>${body}${resignBtn}`;
+
+    const drawDeckBtn = document.getElementById('ttr-draw-deck');
+    if (drawDeckBtn) drawDeckBtn.onclick = () => doDrawDeck();
+    const drawTixBtn = document.getElementById('ttr-draw-tickets');
+    if (drawTixBtn) drawTixBtn.onclick = () => doDrawTickets();
+    const resignEl = document.getElementById('ttr-resign');
+    if (resignEl) resignEl.onclick = () => doResign();
 }
 
 function renderFaceUp() {
@@ -743,6 +761,11 @@ async function doDrawTickets() {
     try { await ttrClient.drawTickets(currentGameId, currentUserId); await refreshState(); }
     catch (e) { showError(e.message); }
 }
+async function doResign() {
+    if (!window.confirm('Resign from this game? You will forfeit your points and the game may end if you are the last opponent.')) return;
+    try { await ttrClient.resign(currentGameId, currentUserId); await refreshState(); }
+    catch (e) { showError(e.message); }
+}
 
 function openClaimRouteModal(route) {
     if (!canClaimRoute(route)) return;
@@ -764,11 +787,13 @@ function openClaimRouteModal(route) {
         const colorCount = route.length - o.locomotives;
         html += `<button class="claim-option" data-i="${i}">${colorCount > 0 ? `${colorCount} × ${colorTag}` : ''}${locoTag || (colorCount === 0 ? '' : '')}</button>`;
     });
-    html += `</div><div class="modal-actions"><button id="ttr-cancel" class="btn-secondary">Cancel</button></div></div>`;
-    showModal(html);
+    html += `</div><div class="modal-actions"><button class="btn-secondary" data-action="cancel">Cancel</button></div></div>`;
+    const root = showModal(html, 'claim-route');
+    if (!root) return;
 
-    document.getElementById('ttr-cancel').onclick = () => closeModal();
-    document.querySelectorAll('.claim-option').forEach(el => {
+    const cancel = root.querySelector('[data-action="cancel"]');
+    if (cancel) cancel.onclick = () => closeModal();
+    root.querySelectorAll('.claim-option').forEach(el => {
         el.onclick = async () => {
             const o = options[parseInt(el.dataset.i, 10)];
             closeModal();
@@ -796,11 +821,13 @@ function openBuildStationModal(cityId) {
         const colorCount = cost - o.locomotives;
         html += `<button class="claim-option" data-i="${i}">${colorCount > 0 ? `${colorCount} × ${colorTag}` : ''}${locoTag || (colorCount === 0 ? '' : '')}</button>`;
     });
-    html += `</div><div class="modal-actions"><button id="ttr-cancel" class="btn-secondary">Cancel</button></div></div>`;
-    showModal(html);
+    html += `</div><div class="modal-actions"><button class="btn-secondary" data-action="cancel">Cancel</button></div></div>`;
+    const root = showModal(html, 'build-station');
+    if (!root) return;
 
-    document.getElementById('ttr-cancel').onclick = () => closeModal();
-    document.querySelectorAll('.claim-option').forEach(el => {
+    const cancel = root.querySelector('[data-action="cancel"]');
+    if (cancel) cancel.onclick = () => closeModal();
+    root.querySelectorAll('.claim-option').forEach(el => {
         el.onclick = async () => {
             const o = options[parseInt(el.dataset.i, 10)];
             closeModal();
@@ -816,6 +843,8 @@ function showKeepTicketsModal(player, isInitial) {
     const tickets = player.pendingTickets || player.PendingTickets || [];
     const minKeep = player.pendingMinKeep ?? player.PendingMinKeep ?? (isInitial ? 2 : 1);
     if (tickets.length === 0) return;
+    const kind = isInitial ? 'keep-initial' : 'keep-drawn';
+    if (_activeModalKind === kind) return;
 
     let html = `<div class="ttr-modal">
         <h2>${isInitial ? 'Choose your starting tickets' : 'Keep at least one ticket'}</h2>
@@ -829,12 +858,18 @@ function showKeepTicketsModal(player, isInitial) {
         </label>`;
     });
     html += `</div><div class="modal-actions">
-        <button id="ttr-confirm-tickets" class="btn-primary">Confirm</button>
+        <button class="btn-primary" data-action="confirm-tickets">Confirm</button>
     </div></div>`;
-    showModal(html);
+    const root = showModal(html, kind);
+    if (!root) return;
 
-    document.getElementById('ttr-confirm-tickets').onclick = async () => {
-        const flags = Array.from(document.querySelectorAll('.ticket-choice input')).map(c => c.checked);
+    const confirm = root.querySelector('[data-action="confirm-tickets"]');
+    if (!confirm) {
+        console.error('[TTR] keep-tickets confirm button missing after render');
+        return;
+    }
+    confirm.onclick = async () => {
+        const flags = Array.from(root.querySelectorAll('.ticket-choice input')).map(c => c.checked);
         const kept = flags.filter(Boolean).length;
         if (kept < minKeep) {
             alert(`You must keep at least ${minKeep} ticket(s)`);
@@ -886,17 +921,19 @@ function showTunnelModal() {
         <p>You must pay <strong>${need}</strong> additional card(s)${minLoco > 0 ? ` (at least ${minLoco} locomotive)` : ''}.</p>
         <div class="claim-options">${optionsHtml}</div>
         <div class="modal-actions">
-            <button id="ttr-tunnel-skip" class="btn-secondary">Back out (return cards, end turn)</button>
+            <button class="btn-secondary" data-action="tunnel-skip">Back out (return cards, end turn)</button>
         </div>
     </div>`;
-    showModal(html);
+    const root = showModal(html, 'tunnel');
+    if (!root) return;
 
-    document.getElementById('ttr-tunnel-skip').onclick = async () => {
+    const skip = root.querySelector('[data-action="tunnel-skip"]');
+    if (skip) skip.onclick = async () => {
         closeModal();
         try { await ttrClient.tunnelSkip(currentGameId, currentUserId); await refreshState(); }
         catch (e) { showError(e.message); }
     };
-    document.querySelectorAll('.claim-option').forEach(el => {
+    root.querySelectorAll('.claim-option').forEach(el => {
         el.onclick = async () => {
             const l = parseInt(el.dataset.loco, 10);
             closeModal();
@@ -907,6 +944,7 @@ function showTunnelModal() {
 }
 
 function showFinalModal() {
+    if (_activeModalKind === 'final') return;
     if (document.querySelector('.ttr-modal.final-modal')) return;
     const players = getPlayers(currentState);
     const ranked = [...players].sort((a, b) => (b.score ?? b.Score) - (a.score ?? a.Score));
@@ -924,33 +962,46 @@ function showFinalModal() {
     });
     html += `</tbody></table>
         <div class="modal-actions">
-            <button id="ttr-back-lobby" class="btn-primary">Back to lobby</button>
+            <button class="btn-primary" data-action="back-lobby">Back to lobby</button>
         </div></div>`;
-    showModal(html);
-    document.getElementById('ttr-back-lobby').onclick = () => {
+    const root = showModal(html, 'final');
+    if (!root) return;
+    const back = root.querySelector('[data-action="back-lobby"]');
+    if (back) back.onclick = () => {
         window.location.href = window.minigameConfig.lobbyUrl;
     };
 }
 
 // ---- Modal helpers -------------------------------------------------------
 
-function showModal(html) {
+let _activeModalKind = null;
+
+function showModal(html, kind) {
     const root = document.getElementById('ttr-modal-root');
+    if (!root) {
+        console.error('[TTR] modal-root missing — was ensureGameLayout called?');
+        return null;
+    }
     root.innerHTML = html;
     root.style.display = 'flex';
+    _activeModalKind = kind || null;
+    return root;
 }
 function closeModal() {
     const root = document.getElementById('ttr-modal-root');
+    if (!root) return;
     root.innerHTML = '';
     root.style.display = 'none';
+    _activeModalKind = null;
 }
 function showError(message) {
-    showModal(`<div class="ttr-modal">
+    const root = showModal(`<div class="ttr-modal">
         <h2>Action failed</h2>
         <p class="error-text">${escapeHtml(message)}</p>
-        <div class="modal-actions"><button id="ttr-err-ok" class="btn-primary">OK</button></div>
-    </div>`);
-    document.getElementById('ttr-err-ok').onclick = () => closeModal();
+        <div class="modal-actions"><button class="btn-primary" data-action="err-ok">OK</button></div>
+    </div>`, 'error');
+    if (!root) return;
+    root.querySelector('[data-action="err-ok"]').onclick = () => closeModal();
 }
 
 function shortId(id) {
@@ -963,3 +1014,5 @@ function cityName(id) {
 function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+
+})();

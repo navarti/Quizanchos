@@ -61,6 +61,7 @@ public class TicketToRideEuropeState : IGameState
         public int PendingMinKeep { get; set; }
         public bool HasPickedInitialTickets { get; set; }
         public bool HasTakenFinalTurn { get; set; }
+        public bool HasResigned { get; set; }
     }
 
     public class TicketCard

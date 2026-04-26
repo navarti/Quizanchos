@@ -137,6 +137,16 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
         if (state.Phase == State.PhaseEnded)
             return MoveResult.Failure("Game has ended");
 
+        // Resign is allowed at any time, in either phase, irrespective of whose turn it is.
+        if (move.Kind == "resign")
+        {
+            if (player.HasResigned) return MoveResult.Failure("You have already resigned");
+            return MoveResult.Success;
+        }
+
+        if (player.HasResigned)
+            return MoveResult.Failure("You have resigned from this game");
+
         // Init phase: only keepTickets allowed
         if (state.Phase == State.PhaseInit)
         {
@@ -354,6 +364,9 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
             case "tunnelSkip":
                 ApplyTunnelSkip(state, player);
                 break;
+            case "resign":
+                ApplyResign(state, player);
+                break;
         }
     }
 
@@ -378,13 +391,10 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
         if (state.Phase == State.PhaseInit)
         {
             player.HasPickedInitialTickets = true;
-            // If everyone has picked, start play
-            if (state.PlayerStates.All(p => p.HasPickedInitialTickets))
+            // If every non-resigned player has picked, start play
+            if (state.PlayerStates.All(p => p.HasResigned || p.HasPickedInitialTickets))
             {
-                state.Phase = State.PhasePlay;
-                state.CurrentPlayerIndex = 0;
-                state.TurnNumber = 1;
-                AppendLog(state, "system", $"All players ready. {state.PlayerStates[0].PlayerId}'s turn.");
+                StartPlayPhase(state);
             }
             return;
         }
@@ -639,42 +649,128 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
         if (state.LastRoundTriggered)
         {
             state.PlayerStates[state.CurrentPlayerIndex].HasTakenFinalTurn = true;
-            if (state.PlayerStates.All(p => p.HasTakenFinalTurn))
+            if (state.PlayerStates.All(p => p.HasResigned || p.HasTakenFinalTurn))
             {
                 FinaliseGame(state);
                 return;
             }
         }
 
-        // Move to next player who still needs a turn
+        // If only one (or zero) active players remain, end the game now.
+        if (state.PlayerStates.Count(p => !p.HasResigned) <= 1)
+        {
+            FinaliseGame(state);
+            return;
+        }
+
+        // Move to next non-resigned player who still needs a turn.
+        int safety = 0;
         do
         {
             state.CurrentPlayerIndex = (state.CurrentPlayerIndex + 1) % state.PlayerStates.Count;
             if (state.CurrentPlayerIndex == 0) state.TurnNumber++;
-        } while (state.LastRoundTriggered && state.PlayerStates[state.CurrentPlayerIndex].HasTakenFinalTurn);
+            if (++safety > state.PlayerStates.Count * 2)
+            {
+                FinaliseGame(state);
+                return;
+            }
+        } while (state.PlayerStates[state.CurrentPlayerIndex].HasResigned ||
+                 (state.LastRoundTriggered && state.PlayerStates[state.CurrentPlayerIndex].HasTakenFinalTurn));
+    }
+
+    private void StartPlayPhase(State state)
+    {
+        state.Phase = State.PhasePlay;
+        state.TurnNumber = 1;
+        state.CurrentPlayerIndex = 0;
+        for (int i = 0; i < state.PlayerStates.Count; i++)
+        {
+            if (!state.PlayerStates[i].HasResigned)
+            {
+                state.CurrentPlayerIndex = i;
+                break;
+            }
+        }
+        AppendLog(state, "system", $"All players ready. {state.PlayerStates[state.CurrentPlayerIndex].PlayerId}'s turn.");
+    }
+
+    private void ApplyResign(State state, State.PlayerInfo player)
+    {
+        bool wasTheirTurn = state.Phase == State.PhasePlay
+            && state.PlayerStates[state.CurrentPlayerIndex].PlayerId == player.PlayerId;
+
+        player.HasResigned = true;
+
+        // Discard any pending tickets the player was deciding on.
+        if (player.PendingTickets.Count > 0)
+        {
+            state.TicketDiscard.AddRange(player.PendingTickets);
+            player.PendingTickets.Clear();
+        }
+        player.PendingMinKeep = 0;
+
+        // In init phase, mark them as having "picked" so we no longer wait for them.
+        if (state.Phase == State.PhaseInit)
+        {
+            player.HasPickedInitialTickets = true;
+        }
+
+        // If they were mid-tunnel, drop their pending tunnel state (cards already in discard).
+        if (state.PendingTunnel != null && state.PendingTunnel.PlayerId == player.PlayerId)
+        {
+            state.PendingTunnel = null;
+            state.PendingAction = null;
+        }
+
+        AppendLog(state, player.PlayerId, "resigned");
+
+        // If only one active player remains (or none), end the game immediately.
+        if (state.PlayerStates.Count(p => !p.HasResigned) <= 1)
+        {
+            FinaliseGame(state);
+            return;
+        }
+
+        // Init phase: if every remaining (non-resigned) player has picked, start play.
+        if (state.Phase == State.PhaseInit)
+        {
+            if (state.PlayerStates.All(p => p.HasResigned || p.HasPickedInitialTickets))
+            {
+                StartPlayPhase(state);
+            }
+            return;
+        }
+
+        // Play phase: if it was their turn, clear their pending action and move on.
+        if (wasTheirTurn)
+        {
+            state.PendingAction = null;
+            AdvanceTurn(state);
+        }
     }
 
     private void FinaliseGame(State state)
     {
-        // Score destination tickets
+        // Score destination tickets and station bonus for non-resigned players only.
         foreach (State.PlayerInfo p in state.PlayerStates)
         {
+            if (p.HasResigned) continue;
             HashSet<string> playerCities = ConnectedCitiesFor(state, p);
             foreach (State.TicketCard ticket in p.Tickets)
             {
                 bool connected = AreConnected(state, p, ticket.CityA, ticket.CityB, playerCities);
                 p.Score += connected ? ticket.Points : -ticket.Points;
             }
-            // Station bonus: 4 points per UNUSED station
             int unused = MaxStations - p.StationsBuilt;
             p.Score += unused * StationBonus;
         }
 
-        // Longest path bonus
+        // Longest path bonus (resigned players excluded).
         int longest = 0;
         List<State.PlayerInfo> longestHolders = new();
         foreach (State.PlayerInfo p in state.PlayerStates)
         {
+            if (p.HasResigned) continue;
             int len = LongestPathLength(state, p);
             if (len > longest)
             {
@@ -693,6 +789,10 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
 
         state.Phase = State.PhaseEnded;
         state.IsFinished = true;
+        // Set Winner here too: when ApplyResign triggers FinaliseGame the engine's
+        // post-move CheckFinished branch may not run (the move has not yet completed
+        // a "round" in the engine's eyes), so Winner would otherwise stay null.
+        state.Winner = DetermineWinner(state);
         AppendLog(state, "system", "Game over. Final scores calculated.");
     }
 
@@ -700,9 +800,13 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
 
     public string? DetermineWinner(State state)
     {
-        if (state.PlayerStates.Count == 0) return null;
-        int top = state.PlayerStates.Max(p => p.Score);
-        List<State.PlayerInfo> winners = state.PlayerStates.Where(p => p.Score == top).ToList();
+        List<State.PlayerInfo> active = state.PlayerStates.Where(p => !p.HasResigned).ToList();
+        if (active.Count == 0) return null;
+        // Last player standing always wins regardless of score.
+        if (active.Count == 1) return active[0].PlayerId;
+
+        int top = active.Max(p => p.Score);
+        List<State.PlayerInfo> winners = active.Where(p => p.Score == top).ToList();
         if (winners.Count == 1) return winners[0].PlayerId;
         // Tiebreaker 1: most completed tickets
         winners = winners
@@ -722,13 +826,22 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
 
     public IEnumerable<string> GetExpectedPlayers(State state)
     {
-        if (state.Phase == State.PhaseInit)
-        {
-            return state.PlayerStates.Where(p => !p.HasPickedInitialTickets).Select(p => p.PlayerId);
-        }
         if (state.Phase == State.PhaseEnded) return Enumerable.Empty<string>();
         if (state.PlayerStates.Count == 0) return Enumerable.Empty<string>();
-        return new[] { state.Players[state.CurrentPlayerIndex] };
+
+        if (state.Phase == State.PhaseInit)
+        {
+            return state.PlayerStates
+                .Where(p => !p.HasResigned && !p.HasPickedInitialTickets)
+                .Select(p => p.PlayerId);
+        }
+
+        // Play phase: return all non-resigned players so that any of them can submit
+        // a "resign" move at any time. ValidateMove enforces turn order for the
+        // game-action moves; only resign is exempt.
+        return state.PlayerStates
+            .Where(p => !p.HasResigned)
+            .Select(p => p.PlayerId);
     }
 
     public bool NeedToFinish(State state) => false;
@@ -738,7 +851,8 @@ public class TicketToRideEuropeLogic : IGameLogic<TicketToRideEuropeState, Ticke
         Dictionary<string, int> scores = new();
         foreach (State.PlayerInfo p in state.PlayerStates)
         {
-            scores[p.PlayerId] = Math.Max(0, p.Score);
+            // Resigned players forfeit any awarded points.
+            scores[p.PlayerId] = p.HasResigned ? 0 : Math.Max(0, p.Score);
         }
         return scores;
     }
