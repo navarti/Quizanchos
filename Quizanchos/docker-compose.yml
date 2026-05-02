@@ -27,7 +27,7 @@ services:
         condition: service_healthy
     volumes:
       - ./logs:/app/logs
-      - dataprotection-keys:/home/appuser/.aspnet/DataProtection-Keys
+      - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
     ports:
       - "127.0.0.1:8080:8080"
     healthcheck:

@@ -25,9 +25,10 @@ RUN dotnet publish Quizanchos.WebApi/Quizanchos.WebApi.csproj \
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-RUN useradd -u 1000 -m appuser && mkdir -p /app/logs && chown -R appuser:appuser /app
-COPY --from=build --chown=appuser:appuser /app/publish ./
-USER appuser
+# The aspnet:10.0 image ships with a non-root `app` user (UID 1000) by default.
+RUN mkdir -p /app/logs && chown -R app:app /app
+COPY --from=build --chown=app:app /app/publish ./
+USER app
 
 ENV ASPNETCORE_URLS=http://+:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
