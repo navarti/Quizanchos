@@ -28,8 +28,8 @@ services:
     volumes:
       - ./logs:/app/logs
       - dataprotection-keys:/home/appuser/.aspnet/DataProtection-Keys
-    expose:
-      - "8080"
+    ports:
+      - "127.0.0.1:8080:8080"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
       interval: 30s
@@ -41,6 +41,7 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
+    profiles: ["tunnel"]
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=${CF_TUNNEL_TOKEN}
