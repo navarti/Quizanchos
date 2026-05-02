@@ -21,7 +21,8 @@ RUN dotnet restore Quizanchos.slnx
 # Now copy the rest and publish.
 COPY . .
 RUN dotnet publish Quizanchos.WebApi/Quizanchos.WebApi.csproj \
-    -c Release -o /app/publish --no-restore /p:UseAppHost=false
+    -c Release -o /app/publish --no-restore \
+    /p:UseAppHost=false /p:ErrorOnDuplicatePublishOutputFiles=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
