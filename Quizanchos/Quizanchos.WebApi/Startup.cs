@@ -122,7 +122,10 @@ public static class Startup
         // Single unified DbContext for all entities
         services.AddDbContext<QuizanchosDbContext>(options =>
         {
-            options.UseSqlServer(connectionString);
+            options.UseNpgsql(connectionString, npgsql =>
+            {
+                npgsql.MigrationsHistoryTable("__EFMigrationsHistoryQuizanshos", "entity_framework");
+            });
         }, ServiceLifetime.Scoped);
 
         services.AddHealthChecks().AddDbContextCheck<QuizanchosDbContext>();

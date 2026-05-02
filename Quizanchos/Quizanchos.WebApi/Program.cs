@@ -1,6 +1,10 @@
 using Quizanchos.WebApi;
 using Serilog;
 
+// Npgsql 6+ requires DateTime.Kind == Utc for `timestamp with time zone`.
+// Existing entities don't enforce that, so use legacy behavior to match SQL Server semantics.
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateBootstrapLogger();

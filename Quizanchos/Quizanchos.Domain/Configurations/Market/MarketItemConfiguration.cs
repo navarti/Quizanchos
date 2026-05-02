@@ -36,9 +36,12 @@ public class MarketItemConfiguration : IEntityTypeConfiguration<MarketItem>
         builder.HasIndex(x => new { x.Type, x.Name })
             .IsUnique();
 
-        builder.HasCheckConstraint("CK_MarketItems_PriceCoins_NonNegative", "[PriceCoins] >= 0");
-        builder.HasCheckConstraint(
-            "CK_MarketItems_DurationMonths_ByType",
-            "([Type] <> 2 AND [DurationMonths] IS NULL) OR ([Type] = 2 AND [DurationMonths] IS NOT NULL AND [DurationMonths] > 0)");
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_MarketItems_PriceCoins_NonNegative", "\"PriceCoins\" >= 0");
+            t.HasCheckConstraint(
+                "CK_MarketItems_DurationMonths_ByType",
+                "(\"Type\" <> 2 AND \"DurationMonths\" IS NULL) OR (\"Type\" = 2 AND \"DurationMonths\" IS NOT NULL AND \"DurationMonths\" > 0)");
+        });
     }
 }

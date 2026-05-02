@@ -1,24 +1,21 @@
-﻿using System.Reflection;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Quizanchos.Domain;
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         var config = context.Configuration;
-
         var connectionString = config.GetConnectionString("DefaultConnection");
-
-        var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
 
         services.AddDbContext<QuizanchosDbContext>(options =>
         {
-            options.UseSqlServer(connectionString, opt =>
+            options.UseNpgsql(connectionString, opt =>
             {
-                opt.MigrationsAssembly(migrationsAssembly);
                 opt.MigrationsHistoryTable("__EFMigrationsHistoryQuizanshos", schema: "entity_framework");
             });
         });
