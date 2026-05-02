@@ -27,7 +27,14 @@ RUN dotnet publish Quizanchos.WebApi/Quizanchos.WebApi.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 # The aspnet:10.0 image ships with a non-root `app` user (UID 1000) by default.
-RUN mkdir -p /app/logs && chown -R app:app /app
+# libgssapi-krb5-2: silences Npgsql's Kerberos probe warning at startup.
+# Pre-creating the DataProtection-Keys dir with app ownership lets Docker
+# initialize the named volume with correct perms on first mount.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+ && rm -rf /var/lib/apt/lists/* \
+ && mkdir -p /app/logs /home/app/.aspnet/DataProtection-Keys \
+ && chown -R app:app /app /home/app/.aspnet
 COPY --from=build --chown=app:app /app/publish ./
 USER app
 
