@@ -16,7 +16,7 @@ COPY Minigames/QuizMultiplayer/Quizanchos.QuizMultiplayer/Quizanchos.QuizMultipl
 COPY Minigames/TicketToRideEurope/Quizanchos.TicketToRideEurope/Quizanchos.TicketToRideEurope.csproj  Minigames/TicketToRideEurope/Quizanchos.TicketToRideEurope/
 COPY Tests/Quizanchos.Quiz.Tests/Quizanchos.Quiz.Tests.csproj           Tests/Quizanchos.Quiz.Tests/
 
-RUN dotnet restore Quizanchos.WebApi/Quizanchos.WebApi.csproj
+RUN dotnet restore Quizanchos.slnx
 
 # Now copy the rest and publish.
 COPY . .
