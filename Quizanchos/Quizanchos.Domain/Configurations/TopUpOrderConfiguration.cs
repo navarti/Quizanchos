@@ -44,7 +44,10 @@ public class TopUpOrderConfiguration : IEntityTypeConfiguration<TopUpOrder>
 
         builder.HasIndex(x => new { x.AmountUSDT, x.Network, x.Status });
 
-        builder.HasCheckConstraint("CK_TopUpOrders_AmountUSDT_Positive", "[AmountUSDT] > 0");
-        builder.HasCheckConstraint("CK_TopUpOrders_CoinsToCredit_Positive", "[CoinsToCredit] > 0");
+        builder.ToTable(t =>
+        {
+            t.HasCheckConstraint("CK_TopUpOrders_AmountUSDT_Positive", "\"AmountUSDT\" > 0");
+            t.HasCheckConstraint("CK_TopUpOrders_CoinsToCredit_Positive", "\"CoinsToCredit\" > 0");
+        });
     }
 }

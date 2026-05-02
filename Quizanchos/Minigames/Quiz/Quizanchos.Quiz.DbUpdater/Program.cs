@@ -15,6 +15,8 @@ internal class Program
 {
     public static void Main(string[] args)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         using(IHost host = InitHost())
         {
             while (true)
@@ -45,7 +47,7 @@ internal class Program
 
                 services.AddDbContext<QuizanchosDbContext>(options =>
                 {
-                    options.UseSqlServer(connectionString);
+                    options.UseNpgsql(connectionString);
                 });
 
                 services.AddTransient<IQuizCategoryRepository, QuizCategoryRepository>();

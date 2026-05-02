@@ -17,7 +17,9 @@ dotnet run --project Quizanchos.Migrations
 
 The WebApi project auto-applies EF Core migrations and seeds data on startup — no separate migration step needed for development.
 
-**Database:** SQL Server (LocalDB/SQLEXPRESS). Connection string in `appsettings.json` / user secrets.
+**Database:** PostgreSQL via Npgsql.EntityFrameworkCore.PostgreSQL. Local dev expects Postgres on `localhost:5432` (e.g. `docker run -p 5432:5432 -e POSTGRES_PASSWORD=devpassword postgres:17-alpine`). Connection string in `appsettings.json` / user secrets.
+
+**Npgsql legacy timestamp behavior** is enabled at startup (`AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true)`) so `DateTime` properties don't have to be `Kind=Utc`.
 
 **EF migrations** live in `Quizanchos.Domain/Migrations/`. To add a new migration:
 ```bash

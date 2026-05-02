@@ -25,6 +25,6 @@ public class QuizCardIntConfiguration : IEntityTypeConfiguration<QuizCardInt>
                     c => c.ToList()));
 
         builder.Property(q => q.Options)
-            .HasColumnType("nvarchar(max)");
+            .HasColumnType("text");
     }
 }
