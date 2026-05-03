@@ -317,9 +317,16 @@
     color: transparent;
 }
 
+.prize-intro {
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-bottom: var(--space-4);
+    font-size: var(--font-size-sm);
+}
+
 .prizes {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: var(--space-4);
     margin: var(--space-4) 0 var(--space-6);
 }
