@@ -9,24 +9,28 @@
             Have a question? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
         </p>
 
-        <form>
+        <form id="contactForm" novalidate>
             <div class="form-group">
                 <label class="form-label" for="contact-name">Name</label>
                 <input id="contact-name" type="text" class="form-input" required autocomplete="name">
+                <small class="error-message" id="contact-nameError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contact-email">Email</label>
                 <input id="contact-email" type="email" class="form-input" required autocomplete="email">
+                <small class="error-message" id="contact-emailError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contact-subject">Subject</label>
                 <input id="contact-subject" type="text" class="form-input" required>
+                <small class="error-message" id="contact-subjectError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contact-message">Message</label>
                 <textarea id="contact-message" class="form-input form-textarea" required></textarea>
+                <small class="error-message" id="contact-messageError" role="alert"></small>
             </div>
-            <button type="submit" class="form-submit">Send Message</button>
+            <button type="submit" class="form-submit btn btn-primary" id="contact-submit">Send Message</button>
         </form>
 
         <p class="email-info">
@@ -34,3 +38,39 @@
         </p>
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('contact-submit');
+            if (!form || !submitBtn) return;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                clearErrors();
+                const name = document.getElementById('contact-name');
+                const email = document.getElementById('contact-email');
+                const subject = document.getElementById('contact-subject');
+                const message = document.getElementById('contact-message');
+
+                let valid = true;
+                if (!name.value.trim()) { showError('contact-nameError', 'Please enter your name.'); addErrorClass(name); valid = false; }
+                if (!validateEmail(email.value.trim())) { showError('contact-emailError', 'Please enter a valid email.'); addErrorClass(email); valid = false; }
+                if (!subject.value.trim()) { showError('contact-subjectError', 'Please add a subject.'); addErrorClass(subject); valid = false; }
+                if (!message.value.trim() || message.value.trim().length < 10) { showError('contact-messageError', 'Message must be at least 10 characters.'); addErrorClass(message); valid = false; }
+                if (!valid) return;
+
+                setButtonBusy(submitBtn, true, 'Sending…');
+                // No backend endpoint yet — fall back to mailto so the user's message isn't lost.
+                setTimeout(() => {
+                    setButtonBusy(submitBtn, false);
+                    showToast("Thanks! Opening your mail app to deliver the message.", 'success');
+                    const body = encodeURIComponent(`From: ${name.value.trim()} <${email.value.trim()}>\n\n${message.value.trim()}`);
+                    window.location.href = `mailto:quizanchos@outlook.com?subject=${encodeURIComponent(subject.value.trim())}&body=${body}`;
+                    form.reset();
+                }, 350);
+            });
+        });
+    </script>
+}

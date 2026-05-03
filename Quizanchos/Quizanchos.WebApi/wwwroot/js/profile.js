@@ -1,161 +1,305 @@
-const avatarInput = document.getElementById('avatar-input');
-const avatarImg = document.getElementById('avatar');
-
-const uploadImage = async (file) => {
+/* ------------------------------------------------------------------------
+   Avatar upload
+   ------------------------------------------------------------------------ */
+async function uploadAvatar(file) {
     const formData = new FormData();
     formData.append('formFile', file);
 
-    try {
-        const response = await fetch('/UserProfile/UpdateAvatar', {
-            method: 'POST',
-            body: formData,
-        });
+    const response = await fetch('/UserProfile/UpdateAvatar', {
+        method: 'POST',
+        body: formData,
+    });
 
-        if (response.ok) {
+    if (!response.ok) {
+        let message = 'Failed to upload avatar.';
+        try {
             const data = await response.json();
-            alert('Avatar updated successfully!');
-            return data;
-        } else {
-            const errorMessage = await response.text();
-            alert(`Error: ${errorMessage}`);
-        }
-    } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('Failed to upload avatar. Please try again.');
+            message = data?.message || data?.Message || message;
+        } catch { /* keep default */ }
+        throw new Error(message);
     }
-    return null;
-};
 
-if (avatarInput && avatarImg) {
+    let payload = null;
+    try { payload = await response.json(); } catch { /* server may still return empty */ }
+    return payload;
+}
+
+function initAvatarUpload() {
+    const avatarInput = document.getElementById('avatar-input');
+    const avatarImg = document.getElementById('avatar');
+    if (!avatarInput || !avatarImg) return;
+
+    applyDefaultAvatarFallback(avatarImg);
+
     avatarInput.addEventListener('change', async (event) => {
         const file = event.target.files[0];
-        if (file) {
-            avatarImg.src = URL.createObjectURL(file);
-            const uploadResult = await uploadImage(file);
-            if (uploadResult && uploadResult.newAvatarUrl) {
-                avatarImg.src = uploadResult.newAvatarUrl;
-                console.log("Avatar updated to:", uploadResult.newAvatarUrl);
-            } else {
-                console.error("Failed to update avatar on the server.");
-            }
+        if (!file) return;
+
+        const previewUrl = URL.createObjectURL(file);
+        const previousSrc = avatarImg.src;
+        avatarImg.src = previewUrl;
+
+        try {
+            const result = await uploadAvatar(file);
+            const newUrl = result?.newAvatarUrl ?? result?.NewAvatarUrl ?? result?.avatarUrl ?? result?.AvatarUrl;
+            if (newUrl) avatarImg.src = newUrl;
+            showToast('Avatar updated.', 'success');
+        } catch (err) {
+            avatarImg.src = previousSrc;
+            showToast(err.message || 'Failed to upload avatar.', 'error');
+        } finally {
+            URL.revokeObjectURL(previewUrl);
+            avatarInput.value = '';
         }
     });
 }
 
+/* ------------------------------------------------------------------------
+   Username editing
+   ------------------------------------------------------------------------ */
 function toggleEdit(fieldId) {
     const field = document.getElementById(fieldId);
-    const editButton = document.getElementById('edit-username-btn');
+    const editButton = document.getElementById(`edit-${fieldId}-btn`) || document.getElementById('edit-username-btn');
+    if (!field || !editButton) return;
 
     if (field.readOnly) {
-        field.readOnly = false; // Make field editable
-        field.focus(); // Focus the input field
-        editButton.textContent = "Save"; // Change button text to "Save"
-    } else {
-        field.readOnly = true; // Make field read-only
-        console.log('Updated username:', field.value); // Log updated value
-        editButton.textContent = "Edit"; // Revert button text to "Edit"
-    }
-}
-
-function toggleEdit(fieldId) {
-    const field = document.getElementById(fieldId);
-    const editButton = document.getElementById('edit-username-btn');
-
-    if (editButton.textContent === "Edit") {
         field.readOnly = false;
         field.focus();
-        editButton.textContent = "Save";
+        field.select?.();
+        editButton.textContent = 'Cancel';
+        field.dataset.originalValue = field.value;
     } else {
         field.readOnly = true;
-        editButton.textContent = "Edit";
+        editButton.textContent = 'Edit';
+        if (field.dataset.originalValue !== undefined) {
+            field.value = field.dataset.originalValue;
+            delete field.dataset.originalValue;
+        }
     }
 }
 
 async function saveChanges(fieldId) {
     const field = document.getElementById(fieldId);
-    const value = field.value;
+    const saveBtn = document.querySelector('#profile-form .save-button');
+    if (!field) return;
 
-    console.log("Saving value:", value);
+    const value = field.value.trim();
+    if (!value) {
+        showToast('Username cannot be empty.', 'error');
+        field.focus();
+        return;
+    }
 
+    setButtonBusy(saveBtn, true, 'Saving…');
     try {
         const response = await fetch('/UserProfile/UpdateNickname', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ nickname: value }),
         });
 
-        if (response.ok) {
-            alert('Changes saved successfully!');
-        } else {
-            alert('Failed to save changes.');
+        if (!response.ok) {
+            let message = 'Failed to save changes.';
+            try { const data = await response.json(); message = data?.message || data?.Message || message; } catch {}
+            throw new Error(message);
         }
-    } catch (error) {
-        console.error("Error saving changes:", error);
+
+        field.readOnly = true;
+        delete field.dataset.originalValue;
+        const editButton = document.getElementById('edit-username-btn');
+        if (editButton) editButton.textContent = 'Edit';
+        showToast('Profile updated.', 'success');
+    } catch (err) {
+        showToast(err.message || 'Failed to save changes.', 'error');
+    } finally {
+        setButtonBusy(saveBtn, false);
     }
 }
 
-function deleteCookie(name) {
-    document.cookie = `${name}=; Max-Age=0; path=/; domain=${window.location.hostname}`;
+/* ------------------------------------------------------------------------
+   Logout
+   ------------------------------------------------------------------------ */
+async function logout() {
+    const confirmed = await showConfirm({
+        title: 'Sign out?',
+        message: 'You\'ll need to sign in again to play.',
+        confirmText: 'Sign out',
+        cancelText: 'Stay signed in',
+        danger: true,
+    });
+    if (!confirmed) return;
+
+    try {
+        deleteCookie('Identity.External');
+        deleteCookie('QAuth');
+        await fetch('/Account/Logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+        });
+    } catch (err) {
+        console.error('Logout error:', err);
+    } finally {
+        window.location.href = '/';
+    }
 }
 
-function logout() {
-    showModal(
-        'Confirm Logout',
-        'Are you sure you want to log out?',
-        false,
-        [
-            {
-                text: 'Yes',
-                class: 'btn-yes',
-                onClick: () => {
-                    deleteCookie('Identity.External');
-                    deleteCookie('QAuth');
+/* ------------------------------------------------------------------------
+   View switching (Profile / Change Password tabs)
+   ------------------------------------------------------------------------ */
+function switchView(view, button, replaceHistory = false) {
+    document.querySelectorAll('.nav-button').forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+    });
+    if (button) {
+        button.classList.add('active');
+        button.setAttribute('aria-selected', 'true');
+    }
 
-                    fetch('/Account/Logout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        credentials: 'include',
-                    })
-                        .then(() => {
-                            document.getElementById('errorModal').style.display = 'none';
-                            window.location.reload();
-                        })
-                        .catch((error) => {
-                            console.error('Error during logout:', error);
-                            showModal('Error', 'Logout failed. Please try again.');
-                        });
-                },
-            },
-            {
-                text: 'No',
-                class: 'btn-no',
-                onClick: () => {
-                    document.getElementById('errorModal').style.display = 'none';
-                },
-            },
-        ]
-    );
+    document.querySelectorAll('.view-section').forEach(v => v.style.display = 'none');
+    const selectedView = document.getElementById(`${view}-view`);
+    if (selectedView) selectedView.style.display = 'block';
+
+    const targetHash = `#${view}`;
+    if (window.location.hash !== targetHash) {
+        if (replaceHistory) history.replaceState(null, '', targetHash);
+        else                history.pushState(null, '', targetHash);
+    }
 }
-let elements;
-document.addEventListener('DOMContentLoaded', function () {
 
-    const avatarInput = document.getElementById('avatar-input');
-    const avatarImg = document.getElementById('avatar');
-    const editUsernameBtn = document.getElementById('edit-username-btn');
-    const usernameField = document.getElementById('username');
-    const saveChangesBtn = document.querySelector('.save-button');
-    const logoutBtn = document.getElementById('logout-btn');
-    const closeModalButton = document.getElementById('closeModal');
-    
-    // Initialize elements object
-    elements = {
-        closeModalButton: closeModalButton
+/* ------------------------------------------------------------------------
+   Password change (uses email-confirmation flow)
+   ------------------------------------------------------------------------ */
+function handlePasswordSubmit(event) {
+    event.preventDefault();
+
+    const newPasswordInput = document.getElementById('new-password');
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const emailInput = document.getElementById('email');
+
+    const newPassword = newPasswordInput?.value || '';
+    const confirmPassword = confirmPasswordInput?.value || '';
+    const email = emailInput?.value?.trim() || '';
+
+    if (newPassword.length < 8) {
+        showToast('Password must be at least 8 characters.', 'error');
+        newPasswordInput?.focus();
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        showToast('Passwords do not match.', 'error');
+        confirmPasswordInput?.focus();
+        return;
+    }
+
+    requestPasswordReset(email, newPassword);
+}
+
+async function requestPasswordReset(email, newPassword) {
+    const submitBtn = document.querySelector('#password-form .save-button');
+    setButtonBusy(submitBtn, true, 'Sending code…');
+
+    try {
+        const response = await fetch('/Authorization/RequestPasswordReset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ Email: email }),
+        });
+        if (!response.ok) {
+            let message = 'Failed to start password reset.';
+            try { const data = await response.json(); message = data?.message || data?.Message || message; } catch {}
+            throw new Error(message);
+        }
+        openVerifyModal();
+        bindPasswordResetVerify(email, newPassword);
+    } catch (err) {
+        showToast(err.message || 'Could not request password reset.', 'error');
+    } finally {
+        setButtonBusy(submitBtn, false);
+    }
+}
+
+let passwordResetVerifyHandler = null;
+function bindPasswordResetVerify(email, newPassword) {
+    const verifyButton = document.getElementById('verifyButton');
+    const codeInput = document.getElementById('codeInput');
+    const errorContainer = document.getElementById('errorContainer');
+    const messageContainer = document.getElementById('messageContainer');
+    if (!verifyButton || !codeInput) return;
+
+    if (passwordResetVerifyHandler) {
+        verifyButton.removeEventListener('click', passwordResetVerifyHandler);
+    }
+
+    passwordResetVerifyHandler = async () => {
+        if (errorContainer) errorContainer.textContent = '';
+        if (messageContainer) messageContainer.innerHTML = '';
+        codeInput.classList.remove('error');
+
+        const code = codeInput.value.trim();
+        if (code.length !== 6) {
+            displayError('Code must be exactly 6 characters long.');
+            return;
+        }
+
+        setButtonBusy(verifyButton, true, 'Verifying…');
+        try {
+            const response = await fetch('/Authorization/ConfirmPasswordReset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Email: email, Code: code, NewPassword: newPassword }),
+            });
+            if (!response.ok) {
+                let message = 'Invalid code. Please try again.';
+                try { const data = await response.json(); message = data?.message || data?.Message || message; } catch {}
+                displayError(message);
+                return;
+            }
+            displaySuccess('Password updated. Redirecting…');
+            disableInput();
+            setTimeout(() => { window.location.href = '/Account/Profile'; }, 1200);
+        } catch (err) {
+            displayError('Network error. Please try again.');
+            console.error(err);
+        } finally {
+            setButtonBusy(verifyButton, false);
+        }
     };
-    
+
+    verifyButton.addEventListener('click', passwordResetVerifyHandler);
+}
+
+/* ------------------------------------------------------------------------
+   Cross-tab balance / status sync — keep header chip in sync after another
+   tab buys, tops up, or signs out.
+   ------------------------------------------------------------------------ */
+function applyUserInfoToHeader(userInfo) {
+    if (!userInfo) return;
+    const balanceEl = document.getElementById('user-balance-value');
+    if (balanceEl && userInfo.coins !== null && userInfo.coins !== undefined) {
+        balanceEl.textContent = `${userInfo.coins}`;
+    }
+
+    const statusEl = document.getElementById('user-status-value');
+    const statusChip = document.getElementById('user-status-chip');
+    if (statusEl) {
+        const isPremium = userInfo.premiumUntilUtc && new Date(userInfo.premiumUntilUtc) > new Date();
+        statusEl.textContent = isPremium ? 'Premium' : 'Ordinary';
+        if (statusChip) statusChip.classList.toggle('premium', !!isPremium);
+    }
+}
+
+window.addEventListener('storage', (event) => {
+    if (event.key !== 'quizanchos:user-info' || !event.newValue) return;
+    try { applyUserInfoToHeader(JSON.parse(event.newValue)); } catch { /* ignore */ }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    initAvatarUpload();
+
+    document.querySelectorAll('img.avatar, img.player-avatar, img.profile-icon').forEach(applyDefaultAvatarFallback);
+
     const navButtons = document.querySelectorAll('.nav-button');
     const viewSections = document.querySelectorAll('.view-section');
 
@@ -165,146 +309,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const defaultView = document.getElementById(`${hashView}-view`) ? hashView : fallbackView;
         const defaultButton = document.querySelector(`.nav-button[onclick*="'${defaultView}'"]`)
             || document.querySelector(`.nav-button[onclick*="\"${defaultView}\""]`);
-
-        if (defaultButton) {
-            defaultButton.classList.add('active');
-        }
-
         switchView(defaultView, defaultButton, true);
     }
 
-    if (elements.closeModalButton) {
-        elements.closeModalButton.addEventListener('click', closeVerifyModal);
-    }
+    document.getElementById('closeModal')?.addEventListener('click', closeVerifyModal);
 });
-
-function switchView(view, button, replaceHistory = false) {
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(btn => btn.classList.remove('active'));
-    if (button) {
-        button.classList.add('active');
-    }
-    
-    const views = document.querySelectorAll('.view-section');
-    views.forEach(v => v.style.display = 'none');
-    
-    const selectedView = document.getElementById(`${view}-view`);
-    if (selectedView) {
-        selectedView.style.display = 'block';
-    }
-
-    const targetHash = `#${view}`;
-    if (window.location.hash !== targetHash) {
-        if (replaceHistory) {
-            history.replaceState(null, '', targetHash);
-        } else {
-            history.pushState(null, '', targetHash);
-        }
-    }
-}
-
-function handlePasswordSubmit(event) {
-    event.preventDefault();
-    const newPassword = document.getElementById('new-password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-    const emailInput = document.getElementById('email');
-    const email = emailInput.value.trim();
-    if (newPassword !== confirmPassword) {
-        alert('Passwords do not match');
-        return;
-    }
-
-    if (newPassword.length < 8) {
-        alert('Password must be at least 8 characters long');
-        return;
-    }
-    
-    changePassword(email,newPassword)
-        .then(() => {
-            alert('Password changed successfully');
-            document.getElementById('password-form').reset();
-            switchView('profile');
-        })
-        .catch(error => {
-            alert('Failed to change password: ' + error.message);
-        });
-}
-
-function changePassword(email, newPassword) {
-    const resendButton = document.getElementById('resendButton');
-    const verifyButton = document.getElementById('verifyButton');
-    const messageContainer = document.getElementById('messageContainer');
-    const codeInput = document.getElementById('codeInput');
-    const errorContainer = document.getElementById('errorContainer');
-
-    fetch('/Authorization/RequestPasswordReset', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ Email: email }),
-    })
-        .then((response) => {
-            if (response.ok) {
-                openVerifyModal();
-
-                if (verifyButton) {
-                    verifyButton.addEventListener("click", function () {
-                        if (errorContainer) errorContainer.innerText = "";
-                        if (messageContainer) messageContainer.innerHTML = "";
-                        if (codeInput) codeInput.classList.remove("error");
-
-                        const code = codeInput ? codeInput.value.trim() : "";
-                        if (code.length !== 6) {
-                            if (errorContainer) errorContainer.innerText = "Code must be exactly 6 characters long.";
-                            if (codeInput) codeInput.classList.add("error");
-                            return;
-                        }
-
-                        fetch("/Authorization/ConfirmPasswordReset", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({ Email: email, Code: code, NewPassword: newPassword }),
-                        })
-                            .then((response) => {
-                                if (response.ok) {
-                                    if (messageContainer) {
-                                        messageContainer.innerHTML = `<span class="success-message">Password is changed! Code verified successfully!</span>`;
-                                    }
-                                    if (codeInput) {
-                                        codeInput.value = "";
-                                        codeInput.disabled = true;
-                                        codeInput.classList.add("disabled");
-                                    }
-                                    setTimeout(() => {
-                                        window.location.href = '/Account/Profile';
-                                    }, 2000);
-                                } else {
-                                    if (errorContainer) {
-                                        errorContainer.innerText = "Invalid code. Please try again.";
-                                    }
-                                }
-                            })
-                            .catch((error) => {
-                                if (errorContainer) {
-                                    errorContainer.innerText = "An error occurred. Please try again later.";
-                                }
-                                console.error("Error during verification:", error);
-                            });
-                    });
-                }
-            } else {
-                response.json().then((errorData) => {
-                    throw new Error(errorData.message || 'Failed to change password');
-                });
-            }
-        })
-        .catch((error) => {
-            console.error('Error changing password:', error);
-            if (errorContainer) {
-                errorContainer.innerText = 'An unexpected error occurred. Please try again later.';
-            }
-        });
-}

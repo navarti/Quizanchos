@@ -1,5 +1,6 @@
 @{
     ViewData["Title"] = "Sign in";
+    var returnUrl = Context.Request.Query["returnUrl"].ToString();
 }
 
 <section class="signin-page" aria-labelledby="signin-title">
@@ -8,7 +9,7 @@
         <p id="signin-intro">Sign in to continue and compete for the top spot this month.</p>
 
         <div class="google-signin-container">
-            <button type="button" class="google-signin-btn" onclick="window.location.href='/GoogleAuth/SignIn'">
+            <button type="button" class="google-signin-btn" onclick="window.location.href='/GoogleAuth/SignIn@(string.IsNullOrEmpty(returnUrl) ? "" : "?returnUrl=" + Uri.EscapeDataString(returnUrl))'">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" alt="" aria-hidden="true">
                 <span>Sign in with Google</span>
             </button>
@@ -16,28 +17,71 @@
 
         <div class="separator" aria-hidden="true"><span>or</span></div>
 
-        <form novalidate>
+        <form id="signinForm" novalidate data-return-url="@returnUrl">
             <div class="form-group">
                 <label class="form-label" for="signinEmail">Email address</label>
-                <input type="email" id="signinEmail" name="email" class="form-input" placeholder="you@example.com" autocomplete="email" required>
+                <input type="email" id="signinEmail" name="email" class="form-input" placeholder="you@example.com" autocomplete="email" required autofocus>
                 <small class="error-message" id="signinEmailError" role="alert"></small>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="signinPassword">Password</label>
-                <input type="password" id="signinPassword" name="password" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
+                <div class="password-field">
+                    <input type="password" id="signinPassword" name="password" class="form-input" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="password-toggle" data-toggle-target="signinPassword" aria-label="Show password" aria-pressed="false">Show</button>
+                </div>
                 <small class="error-message" id="signinPasswordError" role="alert"></small>
             </div>
 
-            <a href="#" class="forgot-password">Forgot password?</a>
+            <button type="button" class="forgot-password" id="forgotPasswordBtn">Forgot password?</button>
             <button type="submit" class="btn btn-primary btn-block" id="signinButton">Sign in</button>
         </form>
 
         <p class="signin-footer">
-            Don't have an account? <a href="/Signup">Sign up here.</a>
+            Don't have an account? <a href="/Signup@(string.IsNullOrEmpty(returnUrl) ? "" : "?returnUrl=" + Uri.EscapeDataString(returnUrl))">Sign up here.</a>
         </p>
     </div>
 </section>
+
+<div id="verifyModal" class="verify-modal" role="dialog" aria-modal="true" aria-labelledby="reset-verify-title">
+    <div class="verify-modal-content">
+        <button class="modal-close" type="button" onclick="closeVerifyModal()" aria-label="Close verification dialog">&times;</button>
+        <h2 id="reset-verify-title">Reset your password</h2>
+        <p id="resetIntro">Enter your email — we'll send you a 6-digit code.</p>
+
+        <div id="messageContainer" class="message-container" role="status" aria-live="polite"></div>
+
+        <div id="resetEmailStep">
+            <div class="form-group">
+                <label class="form-label" for="resetEmail">Email</label>
+                <input type="email" id="resetEmail" class="form-input" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="resetNewPassword">New password</label>
+                <input type="password" id="resetNewPassword" class="form-input" placeholder="At least 8 characters" autocomplete="new-password">
+            </div>
+            <button class="verify-btn" id="resetSendCodeBtn" type="button">Send code</button>
+        </div>
+
+        <div id="resetCodeStep" style="display:none;">
+            <div class="input-container">
+                <svg class="mail-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <input id="codeInput" type="text" placeholder="Enter verification code" maxlength="6" inputmode="numeric" autocomplete="one-time-code" aria-label="Verification code">
+            </div>
+            <span id="errorContainer" class="error-message" role="alert"></span>
+
+            <div class="resend-container">
+                <p>Didn't receive the code?</p>
+                <button class="resend-btn" id="resendButton" type="button">Resend</button>
+            </div>
+
+            <button class="verify-btn" id="verifyButton" type="button">Reset password</button>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script src="/js/signin.js" asp-append-version="true"></script>

@@ -79,7 +79,7 @@ public class UserProfileService
         ".png", ".jpg", ".jpeg", ".webp", ".gif"
     };
 
-    public async Task UpdateAvatar(ClaimsPrincipal claimsPrincipal, IFormFile formFile)
+    public async Task<string> UpdateAvatar(ClaimsPrincipal claimsPrincipal, IFormFile formFile)
     {
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
 
@@ -110,6 +110,7 @@ public class UserProfileService
 
         user.AvatarUrl = uploadResult.SecureUrl.AbsoluteUri;
         await _userManager.UpdateAsync(user).ConfigureAwait(false);
+        return user.AvatarUrl;
     }
 
     public async Task AddCoins(ClaimsPrincipal claimsPrincipal, int coinsToAdd)

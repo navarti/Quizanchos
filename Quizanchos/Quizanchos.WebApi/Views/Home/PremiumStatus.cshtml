@@ -2,28 +2,43 @@
 @{
     ViewData["Title"] = "Premium Status";
     bool hasActivePremium = Model.PremiumUntilUtc.HasValue && Model.PremiumUntilUtc.Value > DateTime.UtcNow;
+    var daysLeft = hasActivePremium ? (int)Math.Ceiling((Model.PremiumUntilUtc!.Value - DateTime.UtcNow).TotalDays) : 0;
 }
 
 <section class="premium-status-container">
-    <article class="premium-status-card" aria-labelledby="premium-status-title">
+    <article class="premium-status-card @(hasActivePremium ? "is-premium" : "")" aria-labelledby="premium-status-title">
+        <div class="premium-status-badge" aria-hidden="true">@(hasActivePremium ? "⭐" : "🎮")</div>
         <h1 id="premium-status-title">Premium Status</h1>
 
-        <p>
+        <p class="premium-status-line">
             Current status:
             <strong class="@(hasActivePremium ? "premium-text" : string.Empty)">
                 @(hasActivePremium ? "Premium" : "Ordinary")
             </strong>
         </p>
 
-        <p>
-            Premium valid until:
-            <strong>
-                @(Model.PremiumUntilUtc.HasValue
-                    ? Model.PremiumUntilUtc.Value.ToString("yyyy-MM-dd HH:mm 'UTC'")
-                    : "Not active")
-            </strong>
-        </p>
+        @if (hasActivePremium)
+        {
+            <p class="premium-status-line">
+                Active until: <strong>@Model.PremiumUntilUtc!.Value.ToString("yyyy-MM-dd HH:mm 'UTC'")</strong>
+            </p>
+            <p class="premium-status-line premium-status-line--muted">
+                @daysLeft day@(daysLeft == 1 ? "" : "s") remaining
+            </p>
+        }
+        else
+        {
+            <p class="premium-status-line premium-status-line--muted">
+                Unlock premium minigames and exclusive content from the Market.
+            </p>
+        }
 
-        <a href="/Market" class="premium-status-link">Go to Market</a>
+        <ul class="premium-status-perks">
+            <li><span aria-hidden="true">✓</span> Access to premium minigames</li>
+            <li><span aria-hidden="true">✓</span> Premium badge on the leaderboard</li>
+            <li><span aria-hidden="true">✓</span> Exclusive emojis in chat</li>
+        </ul>
+
+        <a href="/Market" class="premium-status-link">@(hasActivePremium ? "Extend or browse market" : "Go to Market")</a>
     </article>
 </section>

@@ -36,8 +36,8 @@ public class UserProfileController : Controller
     [Authorize(AppRole.User)]
     public async Task<IActionResult> UpdateAvatar(IFormFile formFile)
     {
-        await _userProfileService.UpdateAvatar(User, formFile);
-        return Ok();
+        string newAvatarUrl = await _userProfileService.UpdateAvatar(User, formFile);
+        return Ok(new { newAvatarUrl });
     }
 
     [HttpPost]

@@ -251,7 +251,8 @@ function ensureGameLayout() {
             <svg id="ttr-map" viewBox="0 0 ${TTR_MAP.width} ${TTR_MAP.height}" preserveAspectRatio="xMidYMid meet"></svg>
             <div id="ttr-log" class="ttr-log"></div>
         </div>
-        <aside class="ttr-side">
+        <div id="ttr-side-backdrop" class="ttr-side-backdrop" aria-hidden="true"></div>
+        <aside id="ttr-side" class="ttr-side" aria-label="Game controls">
             <section id="ttr-players" class="ttr-section"></section>
             <section id="ttr-actions" class="ttr-section"></section>
             <section id="ttr-faceup" class="ttr-section"></section>
@@ -259,6 +260,10 @@ function ensureGameLayout() {
             <section id="ttr-tickets" class="ttr-section"></section>
         </aside>
     </div>
+    <button id="ttr-side-toggle" class="ttr-side-toggle" type="button"
+            aria-label="Open controls panel" aria-controls="ttr-side" aria-expanded="false">
+        <span aria-hidden="true">≡</span>
+    </button>
     <div id="ttr-modal-root" class="ttr-modal-root" style="display:none;"></div>
 </div>`;
 }
@@ -266,6 +271,30 @@ function ensureGameLayout() {
 function bindUiHandlers() {
     document.getElementById('ttr-modal-root').addEventListener('click', (e) => {
         if (e.target.classList.contains('ttr-modal-root')) closeModal();
+    });
+
+    const sidePanel = document.getElementById('ttr-side');
+    const sideToggle = document.getElementById('ttr-side-toggle');
+    const sideBackdrop = document.getElementById('ttr-side-backdrop');
+
+    function setSideOpen(isOpen) {
+        if (!sidePanel || !sideToggle || !sideBackdrop) return;
+        sidePanel.classList.toggle('is-open', isOpen);
+        sideBackdrop.classList.toggle('is-visible', isOpen);
+        sideToggle.setAttribute('aria-expanded', String(isOpen));
+        sideToggle.setAttribute('aria-label', isOpen ? 'Close controls panel' : 'Open controls panel');
+    }
+
+    sideToggle?.addEventListener('click', () => {
+        setSideOpen(!sidePanel.classList.contains('is-open'));
+    });
+    sideBackdrop?.addEventListener('click', () => setSideOpen(false));
+
+    /* Close drawer with Escape */
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidePanel?.classList.contains('is-open')) {
+            setSideOpen(false);
+        }
     });
 }
 

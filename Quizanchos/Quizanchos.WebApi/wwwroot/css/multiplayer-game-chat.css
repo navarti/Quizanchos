@@ -1,47 +1,111 @@
+/* =========================================================================
+   Multiplayer chat widget — global widget, used across multiplayer games.
+   Matches the dark tonal variant defined in site.css.
+   ======================================================================== */
+
 .multiplayer-chat-widget {
     position: fixed;
-    right: 18px;
-    bottom: 18px;
+    right: var(--space-5);
+    bottom: calc(var(--space-5) + var(--safe-bottom, 0px));
     width: 320px;
-    max-height: 72vh;
-    z-index: 1200;
+    max-height: min(72dvh, 560px);
+    z-index: 1500;
     display: flex;
     flex-direction: column;
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    background: rgba(18, 24, 38, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+    background: rgba(26, 20, 48, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-xl);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: max-height var(--transition-base), width var(--transition-base), border-radius var(--transition-base);
+}
+
+/* Minimize button */
+.multiplayer-chat-minimize-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--color-text-inverse);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.multiplayer-chat-minimize-btn:hover {
+    background: rgba(255, 255, 255, 0.30);
+    transform: scale(1.06);
+}
+
+/* Collapsed state — show only the header bubble */
+.multiplayer-chat-widget.is-collapsed {
+    width: 56px;
+    max-height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.multiplayer-chat-widget.is-collapsed .multiplayer-chat-header,
+.multiplayer-chat-widget.is-collapsed .multiplayer-chat-messages,
+.multiplayer-chat-widget.is-collapsed .multiplayer-chat-controls,
+.multiplayer-chat-widget.is-collapsed .multiplayer-emoji-wheel {
+    display: none;
+}
+.multiplayer-chat-widget.is-collapsed .multiplayer-chat-minimize-btn {
+    position: static;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--gradient-aurora);
+    font-size: 1.5rem;
+    box-shadow: var(--shadow-lg);
+}
+.multiplayer-chat-widget.is-collapsed .multiplayer-chat-minimize-btn:hover {
+    transform: scale(1.05);
+    background: var(--gradient-aurora);
 }
 
 .multiplayer-chat-header {
-    padding: 10px 12px;
-    color: #fff;
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-text-inverse);
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.08);
+    gap: var(--space-2);
+    background: var(--gradient-aurora);
+    letter-spacing: -0.005em;
 }
 
 .multiplayer-chat-header-actions {
     display: flex;
-    gap: 6px;
+    gap: var(--space-1);
 }
 
 .multiplayer-header-button {
     border: none;
-    color: #fff;
-    border-radius: 8px;
-    padding: 5px 8px;
-    font-size: 0.8rem;
+    color: var(--color-text-inverse);
+    border-radius: var(--radius-md);
+    padding: var(--space-1) var(--space-3);
+    font-family: inherit;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.18);
+    transition: background var(--transition-fast);
 }
 
 .multiplayer-header-button:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.28);
 }
 
 #multiplayer-emoji-toggle {
@@ -59,14 +123,15 @@
     border-radius: 50%;
     font-size: 1rem;
     line-height: 1;
-    color: #fff;
-    background: linear-gradient(145deg, #6a1b9a, #8e24aa);
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.20);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 #multiplayer-emoji-toggle:hover {
-    background: linear-gradient(145deg, #8e24aa, #6a1b9a);
+    background: rgba(255, 255, 255, 0.30);
     transform: translateY(-1px);
 }
 
@@ -75,73 +140,92 @@
 }
 
 .multiplayer-chat-messages {
-    padding: 10px;
+    padding: var(--space-3);
     overflow: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
     min-height: 160px;
     max-height: 260px;
 }
 
 .multiplayer-chat-message {
-    border-radius: 10px;
-    padding: 8px;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    color: var(--color-text-inverse);
+    background: rgba(255, 255, 255, 0.10);
 }
 
 .multiplayer-chat-message.mine {
-    background: rgba(123, 97, 255, 0.45);
+    background: rgba(139, 92, 246, 0.42);
 }
 
 .multiplayer-chat-message .sender {
-    font-size: 0.75rem;
-    opacity: 0.8;
+    font-size: var(--font-size-xs);
+    opacity: 0.85;
     margin-bottom: 2px;
+    font-weight: 600;
 }
 
 .multiplayer-chat-message .text {
-    font-size: 0.9rem;
+    font-size: var(--font-size-sm);
     word-break: break-word;
 }
 
 .multiplayer-chat-system {
-    font-size: 0.75rem;
-    color: #cfd8dc;
-    opacity: 0.9;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.75);
+    text-align: center;
 }
 
 .multiplayer-chat-controls {
     display: flex;
-    gap: 8px;
-    padding: 10px;
+    gap: var(--space-2);
+    padding: var(--space-3);
     background: rgba(255, 255, 255, 0.04);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .multiplayer-chat-controls input {
     flex: 1;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    background: var(--color-white);
+}
+.multiplayer-chat-controls input:focus {
+    outline: none;
+    border-color: var(--color-primary-400);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .multiplayer-chat-controls button {
     border: none;
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: #fff;
-    background: #4fc3f7;
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-text-inverse);
+    background: var(--gradient-aurora);
+    font-family: inherit;
+    font-weight: 600;
     cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.multiplayer-chat-controls button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 .multiplayer-emoji-wheel {
     display: none;
-    padding: 10px;
+    padding: var(--space-3);
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
+    gap: var(--space-2);
     background: rgba(255, 255, 255, 0.06);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .multiplayer-emoji-wheel.open {
@@ -152,7 +236,7 @@
     appearance: none;
     -webkit-appearance: none;
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     width: 56px;
     min-width: 56px;
     height: 56px;
@@ -164,10 +248,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .emoji-wheel-item:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.30);
+    transform: translateY(-1px);
 }
 
 .emoji-wheel-item img {
@@ -179,10 +265,10 @@
 }
 
 .emoji-empty-state {
-    color: #fff;
-    font-size: 0.82rem;
-    opacity: 0.8;
-    padding: 10px;
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-sm);
+    opacity: 0.85;
+    padding: var(--space-3);
     text-align: center;
 }
 
@@ -207,13 +293,8 @@
     animation: emoji-float 2.2s ease-out forwards;
 }
 
-.emoji-overlay-item.mine {
-    bottom: 24%;
-}
-
-.emoji-overlay-item.from-other {
-    bottom: 18%;
-}
+.emoji-overlay-item.mine { bottom: 24%; }
+.emoji-overlay-item.from-other { bottom: 18%; }
 
 .emoji-overlay-burst {
     position: absolute;
@@ -234,8 +315,8 @@
 }
 
 .emoji-overlay-sender {
-    color: #fff;
-    font-size: 0.82rem;
+    color: var(--color-text-inverse);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     text-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
     z-index: 2;
@@ -257,16 +338,54 @@
 }
 
 @keyframes emoji-burst {
-    0% {
-        opacity: 0;
-        transform: scale(0.4);
+    0% { opacity: 0; transform: scale(0.4); }
+    15% { opacity: 0.85; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.35); }
+}
+
+/* Responsive: shrink + collapse-by-default on mobile */
+@media (max-width: 860px) {
+    .multiplayer-chat-widget {
+        width: 280px;
+        right: var(--space-3);
+        bottom: calc(var(--space-3) + var(--safe-bottom, 0px));
     }
-    15% {
-        opacity: 0.8;
-        transform: scale(1);
+    .multiplayer-chat-messages { min-height: 140px; max-height: 220px; }
+}
+
+@media (max-width: 640px) {
+    .multiplayer-chat-widget {
+        width: 280px;
+        max-height: 60dvh;
     }
-    100% {
-        opacity: 0;
-        transform: scale(1.35);
+    .multiplayer-chat-widget:not(.is-collapsed) {
+        width: calc(100vw - 2 * var(--space-3));
+        max-width: 360px;
     }
+    .multiplayer-chat-messages { min-height: 120px; max-height: 36dvh; }
+    .multiplayer-emoji-wheel { grid-template-columns: repeat(5, 1fr); }
+    .emoji-wheel-item { width: 48px; height: 48px; }
+    .emoji-wheel-item img { width: 36px; height: 36px; }
+}
+
+@media (max-width: 480px) {
+    .multiplayer-chat-widget.is-collapsed {
+        width: 48px;
+        max-height: 48px;
+        right: var(--space-3);
+        bottom: calc(var(--space-3) + var(--safe-bottom, 0px));
+    }
+    .multiplayer-chat-widget.is-collapsed .multiplayer-chat-minimize-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .multiplayer-chat-widget:not(.is-collapsed) {
+        width: calc(100vw - 2 * var(--space-2));
+        right: var(--space-2);
+    }
+    .multiplayer-emoji-wheel { grid-template-columns: repeat(4, 1fr); padding: var(--space-2); }
 }
