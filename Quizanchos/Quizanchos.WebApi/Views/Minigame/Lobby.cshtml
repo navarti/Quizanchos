@@ -10,6 +10,16 @@
     }
 }
 
+<nav class="minigame-breadcrumb" aria-label="Breadcrumb">
+    <a href="/Minigames" class="minigame-breadcrumb__link">
+        <span aria-hidden="true">←</span> All minigames
+    </a>
+    <span class="minigame-breadcrumb__separator" aria-hidden="true">/</span>
+    <span class="minigame-breadcrumb__current">@Model.DisplayName</span>
+    <span class="minigame-breadcrumb__sep" aria-hidden="true">/</span>
+    <span class="minigame-breadcrumb__current minigame-breadcrumb__view">Lobby</span>
+</nav>
+
 <section class="minigame-shell" aria-label="@Model.DisplayName lobby">
     <div id="minigame-root"
          data-game-key="@Model.GameKey"

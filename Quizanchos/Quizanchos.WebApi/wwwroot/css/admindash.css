@@ -5,7 +5,7 @@
 
 .admin-dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
     gap: var(--space-4);
 }
 
@@ -258,11 +258,34 @@
     cursor: not-allowed;
 }
 
-@media (max-width: 600px) {
+/* Tables — keep them scrollable horizontally on narrow viewports */
+.user-table,
+.category-table,
+.features-table {
+    min-width: 540px;
+}
+
+@media (max-width: 640px) {
     .user-management-content,
     .category-management-content,
     .edit-features-content {
         margin: var(--space-4) auto;
         padding: var(--space-4);
+        border-radius: var(--radius-lg);
     }
+    .admin-card { padding: var(--space-5); }
+    .admin-card .user-count,
+    .admin-card .content-count { font-size: var(--font-size-2xl); }
+    .user-pagination button,
+    .category-pagination button,
+    .features-pagination button { padding: var(--space-2) var(--space-3); font-size: var(--font-size-xs); }
+}
+
+@media (max-width: 480px) {
+    .user-management-modal,
+    .category-management-modal,
+    .edit-features-modal { padding: var(--space-2); }
+    .user-management-content,
+    .category-management-content,
+    .edit-features-content { margin: var(--space-2) auto; padding: var(--space-3); }
 }

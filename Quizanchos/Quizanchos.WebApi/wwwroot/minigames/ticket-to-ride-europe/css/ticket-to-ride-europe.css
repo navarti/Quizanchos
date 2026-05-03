@@ -11,9 +11,11 @@
     color: var(--text);
     background: var(--bg);
     font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
+    /* Honour iOS safe areas */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .ttr-topbar {
@@ -22,6 +24,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
     border-bottom: 2px solid var(--accent);
 }
 .ttr-title { font-size: 18px; font-weight: 600; color: var(--accent-bright); letter-spacing: 0.5px; }
@@ -40,6 +44,7 @@
     display: flex;
     flex: 1;
     min-height: 0;
+    position: relative;
 }
 
 .ttr-map-wrap {
@@ -58,7 +63,43 @@
     border-radius: 8px;
     border: 1px solid var(--accent);
     box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    min-height: 220px;
 }
+
+/* Toggle button to open the side panel on mobile (hidden on desktop).
+   Sit higher than the multiplayer chat bubble so they don't overlap. */
+.ttr-side-toggle {
+    display: none;
+    position: fixed;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+    z-index: 998;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-bright);
+    background: linear-gradient(180deg, var(--accent), #8a4f1c);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+.ttr-side-toggle:hover { filter: brightness(1.1); }
+
+/* Backdrop shown when side panel is open on mobile */
+.ttr-side-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 996;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+.ttr-side-backdrop.is-visible { display: block; }
 
 #ttr-map .city.clickable circle {
     fill: #f3c773;
@@ -98,6 +139,7 @@
     flex-direction: column;
     gap: 12px;
     border-left: 2px solid var(--accent);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .ttr-section {
@@ -341,3 +383,82 @@
     font-size: 13px;
 }
 .final-table th { color: var(--accent-bright); }
+
+/* =========================================================================
+   Responsive — TTR is dense; collapse the side panel into a slide-up drawer
+   ======================================================================== */
+
+/* Tablet landscape: shrink side panel */
+@media (max-width: 1100px) {
+    .ttr-side { width: 280px; }
+}
+
+/* Tablet portrait: stack side beneath map (still inline) */
+@media (max-width: 900px) {
+    .ttr-main { flex-direction: column; }
+    .ttr-side {
+        width: 100%;
+        max-height: 38dvh;
+        border-left: none;
+        border-top: 2px solid var(--accent);
+    }
+    .ttr-map-wrap { padding: 8px; }
+    #ttr-map { min-height: 320px; }
+}
+
+/* Mobile: side becomes a slide-up drawer accessed via the toggle button */
+@media (max-width: 640px) {
+    .ttr-topbar { padding: 8px 12px; }
+    .ttr-title { font-size: 16px; }
+    .ttr-turn-info { font-size: 12px; flex-wrap: wrap; }
+
+    .ttr-main { flex-direction: column; }
+    .ttr-map-wrap { padding: 6px; gap: 6px; }
+    #ttr-map { min-height: 280px; }
+    .ttr-log { font-size: 11px; padding: 8px 10px; max-height: 100px; }
+
+    .ttr-side {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: min(86vw, 340px);
+        max-height: 100dvh;
+        z-index: 997;
+        transform: translateX(100%);
+        box-shadow: -8px 0 24px rgba(0,0,0,0.5);
+        padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+    .ttr-side.is-open {
+        transform: translateX(0);
+    }
+
+    .ttr-side-toggle { display: inline-flex; }
+
+    /* Slightly tighter cards in mobile drawer */
+    .ttr-section { padding: 8px 10px; }
+    .face-card { width: 36px; height: 50px; font-size: 16px; }
+    .hand-card { width: 32px; height: 44px; font-size: 14px; }
+
+    /* Modal full-bleed-ish on mobile */
+    .ttr-modal {
+        max-width: calc(100vw - 24px);
+        max-height: calc(100dvh - 48px);
+        padding: 16px;
+    }
+    .modal-actions { flex-direction: column-reverse; }
+}
+
+/* Compact phones */
+@media (max-width: 380px) {
+    .ttr-side { width: 90vw; }
+    .ttr-side-toggle { width: 48px; height: 48px; font-size: 18px; bottom: 12px; right: 12px; }
+    .face-card { width: 32px; height: 44px; font-size: 14px; }
+    .hand-card { width: 28px; height: 38px; font-size: 12px; }
+}
+
+/* Hover handling: skip lift effects on touch */
+@media (hover: none) {
+    .face-card.clickable:hover { transform: none; box-shadow: none; }
+    .face-card.clickable:active { box-shadow: 0 0 0 2px var(--accent-bright); }
+}

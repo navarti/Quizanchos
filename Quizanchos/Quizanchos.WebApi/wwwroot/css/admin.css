@@ -130,6 +130,23 @@
 }
 
 /* ---- Tables ---- */
+/* Wrap tables for horizontal scroll on small screens */
+.admin-table-scroll,
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+}
+.admin-table-scroll > table,
+.table-responsive > table {
+    border: 0;
+    border-radius: 0;
+    margin-bottom: 0;
+}
+
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -474,7 +491,27 @@
 /* Mobile responsive rules for the admin shell are inherited from site.css
    (.navbar / .nav-list / .auth-buttons collapse identically to the player
    layout). Admin-specific tweaks below. */
-@media (max-width: 600px) {
+
+/* Make all admin tables horizontally scrollable on narrow viewports */
+.admin-table,
+.user-table,
+.category-table,
+.features-table,
+.topup-table {
+    min-width: 540px;
+}
+
+@media (max-width: 860px) {
+    .admin-stats-grid,
+    .admin-tools-grid {
+        grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    }
+    .admin-stat-card { padding: var(--space-4); gap: var(--space-3); }
+    .admin-stat-card__value { font-size: var(--font-size-xl); }
+    .admin-tool-card { padding: var(--space-5); }
+}
+
+@media (max-width: 640px) {
     .admin-stats-grid,
     .admin-tools-grid {
         grid-template-columns: 1fr;
@@ -482,5 +519,14 @@
     .admin-page-header {
         flex-direction: column;
         align-items: flex-start;
+        gap: var(--space-2);
     }
+    .admin-page-header h1 { font-size: var(--font-size-xl); }
+}
+
+@media (max-width: 480px) {
+    .admin-auth-card { padding: var(--space-6) var(--space-4); border-radius: var(--radius-xl); }
+    .admin-stat-card { flex-direction: column; align-items: flex-start; text-align: left; }
+    .admin-stat-card__icon { width: 36px; height: 36px; }
+    .admin-stat-card__icon svg { width: 18px; height: 18px; }
 }

@@ -1,6 +1,7 @@
 @model Quizanchos.WebApi.Dto.FullApplicationUserDto
 @{
     ViewData["Title"] = "Profile";
+    bool hasPremium = Model.PremiumUntilUtc.HasValue && Model.PremiumUntilUtc.Value > DateTime.UtcNow;
 }
 
 @section Styles {
@@ -8,7 +9,10 @@
 }
 
 <section class="profile-container">
-    <h1 class="profile-header">Profile Settings</h1>
+    <header style="text-align:center; margin-bottom: var(--space-6);">
+        <span class="eyebrow">Your account</span>
+        <h1 class="profile-header">Profile Settings</h1>
+    </header>
 
     <div class="profile-card">
         <div class="nav-container" role="tablist" aria-label="Profile sections">
@@ -17,17 +21,18 @@
         </div>
 
         <div id="profile-view" class="view-section" role="tabpanel">
-            <form id="profile-form" onsubmit="handleSubmit(event)">
+            <form id="profile-form" onsubmit="event.preventDefault(); saveChanges('username');">
                 <div class="avatar-section">
                     <div class="avatar-container">
                         <img id="avatar" class="avatar"
-                             src="@(!string.IsNullOrEmpty(Model.AvatarUrl) ? Model.AvatarUrl : "https://via.placeholder.com/150")"
+                             src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "" : Model.AvatarUrl)"
                              alt="Your profile avatar">
-                        <label for="avatar-input" class="avatar-upload" aria-label="Upload new avatar">
+                        <label for="avatar-input" class="avatar-upload" aria-label="Upload new avatar" title="Upload new avatar">
                             <span aria-hidden="true">📷</span>
                         </label>
-                        <input type="file" id="avatar-input" hidden accept="image/*">
+                        <input type="file" id="avatar-input" hidden accept="image/png,image/jpeg,image/webp,image/gif">
                     </div>
+                    <p class="avatar-hint">PNG, JPEG, WebP, or GIF — up to 5 MB.</p>
                 </div>
 
                 <div class="profile-info">
@@ -36,46 +41,58 @@
                             <span>Username</span>
                             <button type="button" class="edit-button" id="edit-username-btn" onclick="toggleEdit('username')">Edit</button>
                         </label>
-                        <input type="text" id="username" class="info-value" value="@Model.UserName" readonly>
+                        <input type="text" id="username" class="info-value" value="@Model.UserName" readonly autocomplete="username" maxlength="64">
                     </div>
 
                     <div class="info-group">
                         <label class="info-label" for="email">Email</label>
-                        <input type="email" id="email" class="info-value" value="@Model.Email" readonly>
+                        <input type="email" id="email" class="info-value" value="@Model.Email" readonly autocomplete="email">
                     </div>
 
-                    <button type="button" class="save-button" onclick="saveChanges('username')">Save Changes</button>
+                    <button type="submit" class="save-button">Save changes</button>
                 </div>
 
                 <div class="stats-section" aria-label="Your stats">
                     <div class="stat-card">
-                        <div class="stat-value">15</div>
-                        <div class="stat-label">Quizzes Taken</div>
+                        <div class="stat-value">@Model.Score</div>
+                        <div class="stat-label">Total score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">85%</div>
-                        <div class="stat-label">Average Score</div>
+                        <div class="stat-value">@Model.Coins</div>
+                        <div class="stat-label">Coins</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value">8</div>
-                        <div class="stat-label">Achievements</div>
+                        <div class="stat-value @(hasPremium ? "premium-text" : "")">@(hasPremium ? "Premium" : "Ordinary")</div>
+                        <div class="stat-label">Status</div>
                     </div>
                 </div>
+
+                @if (hasPremium)
+                {
+                    <p class="profile-subtle-meta">Premium active until <strong>@Model.PremiumUntilUtc!.Value.ToString("yyyy-MM-dd HH:mm 'UTC'")</strong>.</p>
+                }
             </form>
         </div>
 
         <div id="password-view" class="view-section" role="tabpanel" style="display: none;">
             <h2 class="profile-header">Change Password</h2>
+            <p class="profile-subtle-meta" style="text-align:center;">We'll email a 6-digit code to confirm.</p>
             <form id="password-form" class="profile-info" onsubmit="handlePasswordSubmit(event)">
                 <div class="info-group">
-                    <label class="info-label" for="new-password">New Password</label>
-                    <input type="password" id="new-password" class="info-value" autocomplete="new-password" required>
+                    <label class="info-label" for="new-password">New password</label>
+                    <div class="password-field">
+                        <input type="password" id="new-password" class="info-value" autocomplete="new-password" required minlength="8">
+                        <button type="button" class="password-toggle" data-toggle-target="new-password" aria-label="Show password" aria-pressed="false">Show</button>
+                    </div>
                 </div>
                 <div class="info-group">
-                    <label class="info-label" for="confirm-password">Confirm Password</label>
-                    <input type="password" id="confirm-password" class="info-value" autocomplete="new-password" required>
+                    <label class="info-label" for="confirm-password">Confirm password</label>
+                    <div class="password-field">
+                        <input type="password" id="confirm-password" class="info-value" autocomplete="new-password" required>
+                        <button type="button" class="password-toggle" data-toggle-target="confirm-password" aria-label="Show password" aria-pressed="false">Show</button>
+                    </div>
                 </div>
-                <button type="submit" class="save-button">Change Password</button>
+                <button type="submit" class="save-button">Change password</button>
             </form>
         </div>
     </div>
@@ -84,7 +101,7 @@
         <div class="verify-modal-content">
             <button class="modal-close" type="button" onclick="closeVerifyModal()" aria-label="Close verification dialog">&times;</button>
             <h2 id="verify-title">Verify your email</h2>
-            <p>We've sent a verification code to your email address. Please enter it below to continue.</p>
+            <p>We've sent a 6-digit code to your email address.</p>
 
             <div id="messageContainer" class="message-container" role="status" aria-live="polite"></div>
 
@@ -102,7 +119,7 @@
                 <button class="resend-btn" id="resendButton" type="button">Resend</button>
             </div>
 
-            <button class="verify-btn" id="verifyButton" type="button">Verify Email</button>
+            <button class="verify-btn" id="verifyButton" type="button">Verify</button>
         </div>
     </div>
 </section>

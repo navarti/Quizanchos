@@ -1,6 +1,8 @@
 @model HomeViewModel
 @{
     ViewData["Title"] = "Minigames";
+    var hasLocked = Model.Minigames.Any(m => !m.CanAccess);
+    var isAuthed = User.Identity?.IsAuthenticated == true;
 }
 
 @section Styles {
@@ -8,35 +10,65 @@
 }
 
 <section class="home-hero" aria-labelledby="minigames-title">
+    <span class="eyebrow">Choose your game</span>
     <h1 id="minigames-title">Minigames</h1>
     <p class="subtitle">Pick a game and challenge yourself — solo or with friends.</p>
 </section>
 
-<div class="featured-quizzes" role="list">
-    @foreach (var minigame in Model.Minigames)
-    {
-        <article class="quiz-card" role="listitem">
-            <div class="quiz-image" style="@minigame.CardStyle" aria-hidden="true"></div>
-            <div class="quiz-content">
-                <div class="quiz-header">
-                    @if (minigame.IsPremium)
+@if (!isAuthed)
+{
+    <div class="minigames-banner" role="note">
+        <span aria-hidden="true">🔓</span>
+        <span><a href="/Signin?returnUrl=%2FMinigames">Sign in</a> to save progress and earn coins.</span>
+    </div>
+}
+else if (hasLocked)
+{
+    <div class="minigames-banner minigames-banner--premium" role="note">
+        <span aria-hidden="true">⭐</span>
+        <span>Some minigames are premium. <a href="/Market">Unlock more</a> in the Market.</span>
+    </div>
+}
+
+@if (Model.Minigames.Count == 0)
+{
+    <article class="sessions-card">
+        <h2>No minigames yet</h2>
+        <p>Check back soon — new minigames are coming.</p>
+    </article>
+}
+else
+{
+    <div class="featured-quizzes" role="list">
+        @foreach (var minigame in Model.Minigames)
+        {
+            <article class="quiz-card" role="listitem">
+                <div class="quiz-image" style="@minigame.CardStyle" aria-hidden="true"></div>
+                <div class="quiz-content">
+                    <div class="quiz-header">
+                        @if (minigame.IsPremium)
+                        {
+                            <span class="premium-badge">Premium</span>
+                        }
+                        <h2>@minigame.DisplayName</h2>
+                        <p>@minigame.Description</p>
+                    </div>
+                    @if (!isAuthed)
                     {
-                        <span class="premium-badge">Premium</span>
+                        <a href="/Signin?returnUrl=@(Uri.EscapeDataString(minigame.LobbyUrl))" class="quiz-btn">Sign in to play</a>
                     }
-                    <h2>@minigame.DisplayName</h2>
-                    <p>@minigame.Description</p>
+                    else if (minigame.CanAccess)
+                    {
+                        <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
+                    }
+                    else
+                    {
+                        <a href="/Market" class="quiz-btn quiz-btn-locked">Unlock with Premium</a>
+                    }
                 </div>
-                @if (minigame.CanAccess)
-                {
-                    <a href="@minigame.LobbyUrl" class="quiz-btn">@minigame.ActionText</a>
-                }
-                else
-                {
-                    <span class="quiz-btn quiz-btn-disabled" aria-disabled="true">Premium required</span>
-                }
-            </div>
-        </article>
-    }
-</div>
+            </article>
+        }
+    </div>
+}
 
 <script src="/js/home.js" asp-append-version="true"></script>

@@ -1,5 +1,6 @@
 @{
     ViewData["Title"] = "Sign Up";
+    var returnUrl = Context.Request.Query["returnUrl"].ToString();
 }
 
 <section class="signup-page" aria-labelledby="signup-title">
@@ -8,7 +9,7 @@
         <p>Sign up in 2 minutes and start fighting for the top spot of the month.</p>
 
         <div class="google-signup-container">
-            <button type="button" class="google-signup-btn" onclick="window.location.href='/GoogleAuth/SignIn'">
+            <button type="button" class="google-signup-btn" onclick="window.location.href='/GoogleAuth/SignIn@(string.IsNullOrEmpty(returnUrl) ? "" : "?returnUrl=" + Uri.EscapeDataString(returnUrl))'">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png" alt="" aria-hidden="true">
                 <span>Sign up with Google</span>
             </button>
@@ -16,23 +17,33 @@
 
         <div class="separator" aria-hidden="true"><span>or</span></div>
 
-        <form id="signupForm" novalidate>
+        <form id="signupForm" novalidate data-return-url="@returnUrl">
             <div class="form-group">
                 <label class="form-label" for="email">Email address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" autocomplete="email" required>
+                <input type="email" id="email" name="email" class="form-control" placeholder="you@example.com" autocomplete="email" required autofocus>
                 <small class="error-message" id="emailError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 characters" autocomplete="new-password" required>
+                <div class="password-field">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 characters" autocomplete="new-password" required minlength="8">
+                    <button type="button" class="password-toggle" data-toggle-target="password" aria-label="Show password" aria-pressed="false">Show</button>
+                </div>
+                <div class="password-strength" id="passwordStrength" aria-live="polite">
+                    <div class="password-strength__bar"><span></span></div>
+                    <small class="password-strength__hint">Use 8+ characters with letters, numbers, and a symbol.</small>
+                </div>
                 <small class="error-message" id="passwordError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="repeatPassword">Repeat password</label>
-                <input type="password" id="repeatPassword" name="repeatPassword" class="form-control" placeholder="Repeat your password" autocomplete="new-password" required>
+                <div class="password-field">
+                    <input type="password" id="repeatPassword" name="repeatPassword" class="form-control" placeholder="Repeat your password" autocomplete="new-password" required>
+                    <button type="button" class="password-toggle" data-toggle-target="repeatPassword" aria-label="Show password" aria-pressed="false">Show</button>
+                </div>
                 <small class="error-message" id="repeatPasswordError" role="alert"></small>
             </div>
-            <button type="button" id="submitButton" class="btn btn-primary btn-block">Create account</button>
+            <button type="submit" id="submitButton" class="btn btn-primary btn-block">Create account</button>
         </form>
 
         <div id="verifyModal" class="verify-modal" role="dialog" aria-modal="true" aria-labelledby="verify-title">
@@ -68,7 +79,7 @@
         </div>
 
         <p class="signup-footer">
-            By signing up, you accept our <a href="/terms">Terms and Conditions</a> and <a href="/privacy">Privacy Policy</a>.
+            Already have an account? <a href="/Signin@(string.IsNullOrEmpty(returnUrl) ? "" : "?returnUrl=" + Uri.EscapeDataString(returnUrl))">Sign in here.</a>
         </p>
     </div>
 </section>

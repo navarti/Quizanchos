@@ -62,26 +62,15 @@ function ensureQuizGameLayout() {
     <div class="quiz-options" id="quiz-options"></div>
 </div>
 <div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 100vh;"><div id="loader"></div></div>
-<div id="errorModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close-btn" id="closeModal">&times;</span>
-        <h2 id="modalHeader">Error</h2>
-        <p id="modalErrorText"></p>
-        <div id="modalButtons" class="modal-buttons">
-            <button id="restartQuiz">Restart Quiz</button>
-            <button id="returnToMenu">Return to Menu</button>
-        </div>
-    </div>
-</div>
-<div id="finalStatsModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <h2>Quiz Complete!</h2>
-        <p>Your Score: <strong id="scoreDisplay"></strong> / <span id="totalCardsDisplay"></span></p>
-        <p>Thank you for participating!</p>
-        <button id="goToResults">Return to Main Menu</button>
-    </div>
-</div>
 <div id="preloader"><div id="loader"></div></div>`;
+}
+
+function returnToLobbyButton() {
+    return {
+        text: 'Return to Menu',
+        class: 'btn-primary',
+        onClick: () => { window.location.href = window.minigameConfig.lobbyUrl; },
+    };
 }
 
 async function initializeQuizGame(gameState, gameId, userId) {
@@ -352,32 +341,21 @@ function stopTimeline() {
 }
 
 function showTimeUpModal() {
-    const modal = document.getElementById('errorModal');
-    const modalText = document.getElementById('modalErrorText');
-    modalText.textContent = "Time's up! What's next? Your call!";
-    modal.style.display = 'flex';
+    showModal("Time's up!", "What's next? Your call!", false, [returnToLobbyButton()]);
 }
 
 function showFinalStats(score, total) {
-    const modal = document.getElementById('finalStatsModal');
-    document.getElementById('scoreDisplay').textContent = score;
-    document.getElementById('totalCardsDisplay').textContent = total;
-    modal.style.display = 'flex';
-    
-    document.getElementById('goToResults').addEventListener('click', () => {
-        window.location.href = window.minigameConfig.lobbyUrl;
-    });
+    showModal('Quiz Complete!', `Your Score: ${score} / ${total}\nThank you for participating!`, true, [
+        {
+            text: 'Return to Main Menu',
+            class: 'btn-primary',
+            onClick: () => { window.location.href = window.minigameConfig.lobbyUrl; },
+        },
+    ]);
 }
 
 function showError(message) {
-    const modal = document.getElementById('errorModal');
-    const modalText = document.getElementById('modalErrorText');
-    modalText.textContent = message;
-    modal.style.display = 'flex';
-    
-    document.getElementById('returnToMenu').addEventListener('click', () => {
-        window.location.href = window.minigameConfig.lobbyUrl;
-    });
+    showModal('Error', message, false, [returnToLobbyButton()]);
 }
 
 function setupFinishButton(gameId) {

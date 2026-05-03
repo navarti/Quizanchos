@@ -1,252 +1,411 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+/* =========================================================================
+   Quiz Multiplayer minigame — lobby view.
+   Aligned with site.css "Refined Arcade" tokens.
+   All styles scoped under #minigame-root.
+   ======================================================================== */
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-    color: #fff;
-}
-
-/* ?? Layout ???????????????????????????????????????????????????????? */
-.lobby-container {
-    max-width: 900px;
+#minigame-root .lobby-container {
+    max-width: 920px;
     margin: 0 auto;
-    padding: 30px 20px 60px;
-}
-
-.panel {
-    background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 24px 28px;
-    margin-bottom: 24px;
-}
-
-.panel h1 {
-    font-size: 1.8rem;
-    margin-bottom: 4px;
-}
-
-.subtitle {
-    opacity: 0.75;
-    margin-bottom: 18px;
-    font-size: 0.95rem;
-}
-
-/* ?? Form ?????????????????????????????????????????????????????????? */
-.create-form { display: flex; flex-direction: column; gap: 14px; }
-
-.form-row {
+    padding: var(--space-5) 0 var(--space-10);
+    color: var(--color-text);
     display: flex;
-    gap: 12px;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+#minigame-root .panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6) var(--space-7, var(--space-6));
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    position: relative;
+    overflow: hidden;
+}
+#minigame-root .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--gradient-aurora);
+}
+
+#minigame-root .panel h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw + 1rem, 2.25rem);
+    font-weight: 800;
+    margin-bottom: var(--space-1);
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.025em;
+    line-height: var(--line-height-tight);
+}
+
+#minigame-root .panel .subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-5);
+    font-size: var(--font-size-sm);
+    opacity: 1;
+}
+
+/* Form */
+#minigame-root .create-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+#minigame-root .form-row {
+    display: flex;
+    gap: var(--space-3);
     flex-wrap: wrap;
 }
 
-.form-group {
+#minigame-root .lobby-container .form-group {
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-width: 120px;
+    min-width: 140px;
+    margin-bottom: 0;
 }
 
-.form-group label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    opacity: 0.85;
-}
-
-.form-control {
-    padding: 8px 10px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.15);
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.9rem;
-}
-
-.form-control option { color: #333; }
-
-.btn-create {
-    align-self: flex-start;
-    padding: 10px 32px;
-    border: none;
-    border-radius: 10px;
-    background: #7c4dff;
-    color: #fff;
+#minigame-root .lobby-container .form-group label {
+    font-size: var(--font-size-xs);
     font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
+    margin-bottom: var(--space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-text-muted);
+    opacity: 1;
 }
-.btn-create:hover { background: #651fff; transform: scale(1.03); }
 
-/* ?? Rooms list ???????????????????????????????????????????????????? */
-.rooms-header {
+#minigame-root .lobby-container .form-control {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-white);
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+#minigame-root .lobby-container .form-control:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 4px var(--color-focus-ring);
+}
+#minigame-root .lobby-container .form-control option { color: var(--color-text); }
+
+#minigame-root .btn-create {
+    align-self: flex-start;
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--gradient-aurora);
+    color: var(--color-text-inverse);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+#minigame-root .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Rooms list */
+#minigame-root .rooms-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
 }
 
-.rooms-header h2 { font-size: 1.3rem; }
+#minigame-root .rooms-header h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.015em;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+#minigame-root .rooms-header h2::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--gradient-aurora);
+    border-radius: 2px;
+}
 
-.btn-refresh {
-    background: none;
-    border: 2px solid rgba(255,255,255,0.5);
-    color: #fff;
-    font-size: 1.3rem;
-    width: 36px;
-    height: 36px;
+#minigame-root .btn-refresh {
+    background: var(--color-white);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-primary-700);
+    font-size: 1.1rem;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    transition: border-color 0.2s, transform 0.2s;
+    transition: border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-base), background var(--transition-fast);
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: var(--shadow-xs);
 }
-.btn-refresh:hover { border-color: #fff; transform: rotate(90deg); }
+#minigame-root .btn-refresh:hover {
+    border-color: var(--color-primary-400);
+    color: var(--color-primary-800);
+    background: var(--color-primary-50);
+    transform: rotate(90deg);
+}
 
-.rooms-list { display: flex; flex-direction: column; gap: 12px; }
+#minigame-root .rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
 
-.empty-msg {
+#minigame-root .empty-msg {
     text-align: center;
-    opacity: 0.6;
-    padding: 20px 0;
+    color: var(--color-text-muted);
+    padding: var(--space-6);
+    background: var(--color-surface-alt);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
 }
 
-.room-card {
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 14px 18px;
+#minigame-root .room-card {
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-5);
+    transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+#minigame-root .room-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary-200);
+    box-shadow: var(--shadow-sm);
 }
 
-.room-card-header {
+#minigame-root .room-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: var(--space-3);
     font-weight: 600;
+    flex-wrap: wrap;
+    gap: var(--space-2);
 }
 
-.room-id { font-size: 0.85rem; opacity: 0.7; }
+#minigame-root .room-id {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    background: var(--color-white);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+}
 
-.room-expires {
-    font-size: 0.8rem;
-    opacity: 0.85;
-    color: #ffd54f;
-    font-weight: 600;
+#minigame-root .room-expires {
+    font-size: var(--font-size-xs);
+    color: var(--color-warning-600);
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
 }
-.room-expires.expiring-soon { color: #ff8a65; }
+#minigame-root .room-expires.expiring-soon {
+    color: var(--color-danger-600);
+}
 
-.room-teams { display: flex; gap: 10px; flex-wrap: wrap; }
+#minigame-root .room-teams {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
 
-.room-team {
+#minigame-root .room-team {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255,255,255,0.08);
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 0.9rem;
+    gap: var(--space-2);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
 }
 
-.tag-full {
-    background: rgba(255,255,255,0.15);
-    padding: 2px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
+#minigame-root .tag-full {
+    background: var(--color-danger-100);
+    color: var(--color-danger-600);
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
-.btn-join {
-    padding: 4px 16px;
+#minigame-root .btn-join {
+    padding: var(--space-1) var(--space-4);
     border: none;
-    border-radius: 6px;
-    background: #00e676;
-    color: #1b1b1b;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, var(--color-success-500), var(--color-success-600));
+    color: var(--color-text-inverse);
+    font-family: inherit;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
     cursor: pointer;
-    transition: background 0.2s, transform 0.15s;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
-.btn-join:hover { background: #69f0ae; transform: scale(1.05); }
-
-/* ?? Room detail / waiting ????????????????????????????????????????? */
-.room-detail-panel h2 { margin-bottom: 6px; }
-
-.room-status {
-    font-size: 0.95rem;
-    opacity: 0.75;
-    margin-bottom: 18px;
+#minigame-root .btn-join:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
-.teams-grid {
+/* Room detail / waiting */
+#minigame-root .room-detail-panel h2 {
+    margin-bottom: var(--space-1);
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+}
+
+#minigame-root .room-status {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-5);
+}
+
+#minigame-root .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+#minigame-root .team-card {
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-base), border-color var(--transition-base);
+}
+#minigame-root .team-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary-200);
+}
+#minigame-root .team-card::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4px;
+}
+
+#minigame-root .team-card.team-0::before { background: linear-gradient(90deg, var(--color-primary-600), var(--color-primary-800)); }
+#minigame-root .team-card.team-1::before { background: linear-gradient(90deg, var(--color-info-500), var(--color-info-600)); }
+#minigame-root .team-card.team-2::before { background: linear-gradient(90deg, var(--color-warning-500), var(--color-warning-600)); }
+#minigame-root .team-card.team-3::before { background: linear-gradient(90deg, var(--color-accent-500), var(--color-accent-700)); }
+
+#minigame-root .team-card h3 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.01em;
     display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
 }
 
-.team-card {
-    flex: 1;
-    min-width: 180px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 12px;
-    padding: 16px;
+#minigame-root .team-count {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
 }
 
-.team-card h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
+#minigame-root .player-slot {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-1);
+    font-size: var(--font-size-sm);
+    transition: background var(--transition-fast);
 }
 
-.team-count { opacity: 0.6; font-weight: 400; }
-
-.team-card.team-0 { border-left: 4px solid #7b61ff; }
-.team-card.team-1 { border-left: 4px solid #4fc3f7; }
-.team-card.team-2 { border-left: 4px solid #ffa726; }
-.team-card.team-3 { border-left: 4px solid #f48fb1; }
-
-.player-slot {
-    padding: 6px 10px;
-    border-radius: 6px;
-    margin-bottom: 4px;
-    font-size: 0.85rem;
+#minigame-root .player-slot.filled {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-weight: 500;
 }
 
-.player-slot.filled {
-    background: rgba(255,255,255,0.15);
-}
-
-.player-slot.empty {
-    background: rgba(255,255,255,0.05);
-    opacity: 0.4;
-}
-
-.room-actions { display: flex; gap: 12px; }
-
-.btn-leave {
-    padding: 8px 28px;
-    border: 2px solid rgba(255,70,70,0.7);
-    border-radius: 8px;
+#minigame-root .player-slot.empty {
     background: transparent;
-    color: #ff5252;
-    font-weight: 700;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background 0.2s;
+    border: 1px dashed var(--color-border-strong);
+    color: var(--color-text-muted);
+    font-style: italic;
+    opacity: 0.7;
 }
-.btn-leave:hover { background: rgba(255,70,70,0.15); }
 
-/* ?? Responsive ???????????????????????????????????????????????????? */
-@media (max-width: 600px) {
-    .form-row { flex-direction: column; }
-    .teams-grid { flex-direction: column; }
+#minigame-root .room-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+#minigame-root .btn-leave {
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--color-danger-100);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-danger-600);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+#minigame-root .btn-leave:hover {
+    background: var(--color-danger-500);
+    color: var(--color-text-inverse);
+    border-color: var(--color-danger-500);
+}
+
+@media (max-width: 640px) {
+    #minigame-root .form-row { flex-direction: column; gap: var(--space-2); }
+    #minigame-root .teams-grid { grid-template-columns: 1fr; }
+    #minigame-root .panel { padding: var(--space-5) var(--space-4); }
+    #minigame-root .panel h1 { font-size: clamp(1.5rem, 6vw, 2rem); }
+    #minigame-root .room-card { padding: var(--space-3) var(--space-4); }
+    #minigame-root .room-card-header { flex-wrap: wrap; gap: var(--space-2); }
+    #minigame-root .room-teams { gap: var(--space-1); }
+    #minigame-root .room-team { font-size: var(--font-size-xs); padding: var(--space-1) var(--space-2); }
+    #minigame-root .btn-create { width: 100%; align-self: stretch; }
+    #minigame-root .room-actions { flex-direction: column; }
+    #minigame-root .btn-leave { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+    #minigame-root .lobby-container { padding: var(--space-3) 0 var(--space-6); gap: var(--space-3); }
+    #minigame-root .panel { padding: var(--space-4) var(--space-3); border-radius: var(--radius-xl); }
+    #minigame-root .rooms-header h2 { font-size: var(--font-size-md); }
+    #minigame-root .btn-refresh { width: 36px; height: 36px; font-size: 1rem; }
+    #minigame-root .team-card { padding: var(--space-4); }
 }

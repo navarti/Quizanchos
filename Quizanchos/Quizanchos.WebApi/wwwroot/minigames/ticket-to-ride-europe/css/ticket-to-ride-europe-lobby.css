@@ -1,7 +1,7 @@
 .ttr-lobby {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 24px;
+    padding: clamp(12px, 3vw, 24px);
     color: #f7f1e8;
     font-family: 'Segoe UI', system-ui, sans-serif;
     display: grid;
@@ -9,7 +9,7 @@
     grid-template-areas:
         "create rooms"
         "detail detail";
-    gap: 24px;
+    gap: clamp(12px, 2vw, 24px);
 }
 
 .ttr-lobby .panel {
@@ -184,4 +184,30 @@
     color: #d6c4a4;
     margin: 0 0 16px;
     font-size: 13px;
+}
+
+@media (max-width: 860px) {
+    .ttr-lobby {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "create"
+            "rooms"
+            "detail";
+    }
+    .ttr-lobby .panel { padding: 18px; }
+    .ttr-lobby h1 { font-size: 22px; }
+    .ttr-lobby h2 { font-size: 18px; }
+    .ttr-lobby .teams-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+}
+
+@media (max-width: 480px) {
+    .ttr-lobby { padding: 12px; gap: 12px; }
+    .ttr-lobby .panel { padding: 14px; border-radius: 10px; }
+    .ttr-lobby .form-row { flex-direction: column; gap: 10px; }
+    .ttr-lobby .room-card-header { flex-wrap: wrap; gap: 6px; }
+    .ttr-lobby .teams-grid { grid-template-columns: 1fr; }
+    .ttr-lobby .btn-create { padding: 12px; font-size: 14px; }
+    .ttr-lobby .btn-refresh,
+    .ttr-lobby .btn-join,
+    .ttr-lobby .btn-leave { padding: 8px 14px; font-size: 13px; }
 }

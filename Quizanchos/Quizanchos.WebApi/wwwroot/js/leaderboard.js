@@ -1,108 +1,130 @@
 document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const leaderboardItems = document.querySelectorAll('.leaderboard-item');
-    const currentUserItem = document.querySelector('.leaderboard-item.current-user');
     const leaderboardContainer = document.querySelector('.leaderboard');
+    const currentUserName = leaderboardContainer?.getAttribute('data-current-user') || '';
+
+    function renderRows(users) {
+        if (!leaderboardContainer) return;
+        if (!users || users.length === 0) {
+            leaderboardContainer.innerHTML = `
+                <div class="leaderboard-empty" role="status">
+                    <p>No players to show yet for this minigame.</p>
+                    <p>Be the first — <a href="/Minigames">play a game</a> to claim the top spot.</p>
+                </div>`;
+            return;
+        }
+        leaderboardContainer.innerHTML = users.map(u => {
+            const position = u.position ?? u.Position;
+            const userName = u.userName ?? u.UserName;
+            const avatarUrl = u.avatarUrl ?? u.AvatarUrl ?? '';
+            const score = u.score ?? u.Score;
+            const numericPosition = Number(position);
+            const isCurrent = userName === currentUserName;
+            const trophyHtml = numericPosition === 1 ? '<span class="trophy" aria-hidden="true">🏆</span>' : '';
+            return `
+                <div class="leaderboard-item${isCurrent ? ' current-user' : ''}" aria-label="Rank ${escapeHtml(String(position))}, ${escapeHtml(userName)}, score ${escapeHtml(String(score))}">
+                    <div class="rank">${escapeHtml(String(position))}</div>
+                    <div class="player-info">
+                        <img src="${escapeHtml(avatarUrl)}" alt="" class="player-avatar" data-fallback="1">
+                        <span class="player-name">${escapeHtml(userName)}${isCurrent ? ' <span class="leaderboard-you">(you)</span>' : ''}</span>
+                    </div>
+                    <div class="score">
+                        ${trophyHtml}
+                        <span>${escapeHtml(String(score))}</span>
+                    </div>
+                </div>`;
+        }).join('');
+
+        leaderboardContainer.querySelectorAll('img[data-fallback="1"]').forEach(applyDefaultAvatarFallback);
+    }
+
+    function showSkeleton(count = 6) {
+        if (!leaderboardContainer) return;
+        leaderboardContainer.innerHTML = Array.from({ length: count }).map(() =>
+            `<div class="leaderboard-item leaderboard-item--skeleton" aria-hidden="true">
+                <div class="skeleton skeleton--rank"></div>
+                <div class="player-info">
+                    <div class="skeleton skeleton--avatar"></div>
+                    <div class="skeleton skeleton--name"></div>
+                </div>
+                <div class="skeleton skeleton--score"></div>
+            </div>`).join('');
+    }
+
+    async function loadLeaderboard(minigameType) {
+        showSkeleton();
+        const take = 100;
+        const skip = 0;
+        const url = `/LeaderBoard/GetLeaderBoard?take=${take}&skip=${skip}${minigameType ? `&minigameType=${encodeURIComponent(minigameType)}` : ''}`;
+        try {
+            const resp = await fetch(url);
+            if (!resp.ok) {
+                renderRows([]);
+                return;
+            }
+            const users = await resp.json();
+            renderRows(users);
+        } catch {
+            renderRows([]);
+        }
+    }
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Remove active class from all buttons
-            filterBtns.forEach(b => b.classList.remove('active'));
-            // Add active class to clicked button
+            filterBtns.forEach(b => {
+                b.classList.remove('active');
+                b.setAttribute('aria-pressed', 'false');
+            });
             btn.classList.add('active');
-
-            const minigame = btn.dataset.minigame;
-
-            // fetch leaderboard for selected minigame
-            (async () => {
-                const take = 100; // adjust as needed
-                const skip = 0;
-                const url = `/LeaderBoard/GetLeaderBoard?take=${take}&skip=${skip}${minigame ? `&minigameType=${minigame}` : ''}`;
-                const resp = await fetch(url);
-                if (!resp.ok) {
-                    return;
-                }
-                const users = await resp.json();
-
-                // Update leaderboard DOM
-                const leaderboard = leaderboardContainer;
-                leaderboard.innerHTML = '';
-                users.forEach(u => {
-                    const position = u.position ?? u.Position;
-                    const numericPosition = Number(position);
-                    const userName = u.userName ?? u.UserName;
-                    const avatarUrl = u.avatarUrl ?? u.AvatarUrl ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-                    const score = u.score ?? u.Score;
-                    const div = document.createElement('div');
-                    div.className = 'leaderboard-item' + (userName === leaderboard.getAttribute('data-current-user') ? ' current-user' : '');
-                    div.innerHTML = `
-                        <div class="rank">${position}</div>
-                        <div class="player-info">
-                            <img src="${avatarUrl}" alt="${userName}" class="player-avatar">
-                            <span class="player-name">${userName}</span>
-                        </div>
-                        <div class="score">
-                            ${numericPosition === 1 ? '<span class="trophy">&#x1F3C6;</span>' : ''}
-                            ${score}
-                        </div>`;
-                    leaderboard.appendChild(div);
-                });
-            })();
+            btn.setAttribute('aria-pressed', 'true');
+            loadLeaderboard(btn.dataset.minigame);
         });
     });
 
-    // Prize modal functionality
+    // Prize modal
     const prizeBtn = document.querySelector('.prize-btn');
-    const modal = document.querySelector('.modal');
+    const modal = document.getElementById('prizeModal');
     const closeModal = document.querySelector('.close-modal');
 
-    prizeBtn.addEventListener('click', () => {
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-
-    closeModal.addEventListener('click', () => {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
+    if (prizeBtn && modal) {
+        prizeBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            modal.setAttribute('aria-hidden', 'false');
+        });
+        const close = () => {
             modal.classList.remove('active');
             document.body.style.overflow = '';
-        }
-    });
+            modal.setAttribute('aria-hidden', 'true');
+        };
+        closeModal?.addEventListener('click', close);
+        modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('active')) close(); });
+    }
+
+    // Apply fallback to server-rendered rows on first paint
+    document.querySelectorAll('.leaderboard-item img.player-avatar').forEach(applyDefaultAvatarFallback);
 
     document.querySelectorAll('.page-btn').forEach(button => {
         button.addEventListener('click', async () => {
             const page = button.dataset.page;
-            const response = await fetch(`/Home/GetPage?page=${page}`);
-            const data = await response.json();
-
-            // Update pagination
-            document.querySelectorAll('.page-btn').forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            // Update leaderboard
-            const leaderboard = document.querySelector('.leaderboard');
-            leaderboard.innerHTML = ''; // Clear current leaderboard
-            data.Users.forEach(user => {
-                const position = user.position ?? user.Position;
-                const userName = user.userName ?? user.UserName;
-                const avatarUrl = user.avatarUrl ?? user.AvatarUrl ?? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-                const score = user.score ?? user.Score;
-                const userItem = document.createElement('div');
-                userItem.className = 'leaderboard-item';
-                userItem.innerHTML = `
-                <div class="rank">${position}</div>
-                <div class="player-info">
-                    <img src="${avatarUrl}" alt="${userName}" class="player-avatar">
-                    <span class="player-name">${userName}</span>
-                </div>
-                <div class="score">${score}</div>`;
-                leaderboard.appendChild(userItem);
-            });
+            try {
+                const response = await fetch(`/Home/GetPage?page=${encodeURIComponent(page)}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                document.querySelectorAll('.page-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                renderRows(data.Users || data.users || []);
+            } catch { /* ignore */ }
         });
     });
 });
 
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}

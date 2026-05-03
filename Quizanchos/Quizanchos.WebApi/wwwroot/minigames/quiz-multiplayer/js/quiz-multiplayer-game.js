@@ -1,4 +1,4 @@
-// Quiz Multiplayer Game Page — real-time via SignalR
+// Quiz Multiplayer Game Page ï¿½ real-time via SignalR
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('[QM] Page loaded, initializing...');
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // state to every member of the game group.  We re-fetch state and
     // re-render the UI so everyone stays in sync.
     connection.on('MoveMade', async (_payload) => {
-        console.log('[QM] MoveMade received — refreshing state');
+        console.log('[QM] MoveMade received ï¿½ refreshing state');
         await refreshGameState(gameId, userId);
     });
 
@@ -50,14 +50,13 @@ function ensureQuizMultiplayerGameLayout() {
     <div class="quiz-options" id="qm-options"></div>
 </div>
 <div id="loading-container" style="display: flex; justify-content: center; align-items: center; height: 100vh;"><div id="loader"></div></div>
-<div id="errorModal" class="modal" style="display: none;"><div class="modal-content"><span class="close-btn" id="closeModal">&times;</span><h2 id="modalHeader">Error</h2><p id="modalErrorText"></p><div id="modalButtons" class="modal-buttons"><button id="returnToMenu">Return to Menu</button></div></div></div>
 <div id="roundResultModal" class="modal" style="display: none;"><div class="modal-content"><h2>Round Results</h2><div id="roundResultBody"></div></div></div>
 <div id="finalStatsModal" class="modal" style="display: none;"><div class="modal-content"><h2 id="finalTitle">Game Over!</h2><div id="finalScoreboard"></div><p id="winnerText"></p><button id="goToResults">Return to Main Menu</button></div></div>
 <div id="preloader"><div id="loader"></div></div>`;
 }
 
     connection.on('GameStateChanged', async (_payload) => {
-        console.log('[QM] GameStateChanged received — refreshing state');
+        console.log('[QM] GameStateChanged received ï¿½ refreshing state');
         await refreshGameState(gameId, userId);
     });
 
@@ -129,7 +128,7 @@ function ensureQuizMultiplayerGameLayout() {
         const selectedIndex = parseInt(optionEl.dataset.index);
         console.log('[QM] Option clicked:', selectedIndex);
 
-        // Visual feedback — highlight selected option
+        // Visual feedback ï¿½ highlight selected option
         optionEl.classList.add('selected-option');
 
         try {
@@ -377,9 +376,13 @@ function showFinalStats(gs) {
 }
 
 function showErrorModal(message) {
-    const modal = document.getElementById('errorModal');
-    document.getElementById('modalErrorText').textContent = message;
-    modal.style.display = 'flex';
+    showModal('Error', message, false, [
+        {
+            text: 'Return to Menu',
+            class: 'btn-primary',
+            onClick: () => { window.location.href = window.minigameConfig.lobbyUrl; },
+        },
+    ]);
 }
 
 // ?? Timeline ????????????????????????????????????????????????????????????

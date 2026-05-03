@@ -348,7 +348,11 @@ function renderChatLayout() {
     const widget = document.createElement('aside');
     widget.id = 'multiplayer-chat-widget';
     widget.className = 'multiplayer-chat-widget';
+    widget.setAttribute('aria-label', 'Game chat');
     widget.innerHTML = `
+<button id="multiplayer-chat-minimize" type="button" class="multiplayer-chat-minimize-btn" aria-label="Minimize chat" aria-expanded="true">
+    <span aria-hidden="true">−</span>
+</button>
 <div class="multiplayer-chat-header">
     <span>Game chat</span>
     <div class="multiplayer-chat-header-actions">
@@ -363,6 +367,21 @@ function renderChatLayout() {
 </div>`;
 
     document.body.appendChild(widget);
+
+    // Auto-collapse chat on small screens by default
+    const isCompact = window.matchMedia('(max-width: 640px)').matches;
+    if (isCompact) {
+        widget.classList.add('is-collapsed');
+    }
+
+    const minimizeBtn = widget.querySelector('#multiplayer-chat-minimize');
+    minimizeBtn?.addEventListener('click', () => {
+        const willCollapse = !widget.classList.contains('is-collapsed');
+        widget.classList.toggle('is-collapsed', willCollapse);
+        minimizeBtn.setAttribute('aria-expanded', String(!willCollapse));
+        minimizeBtn.setAttribute('aria-label', willCollapse ? 'Open chat' : 'Minimize chat');
+        minimizeBtn.querySelector('span').textContent = willCollapse ? '💬' : '−';
+    });
 }
 
 // SECURITY: messages arrive unescaped from the server (see GameHub.SendChatMessage).

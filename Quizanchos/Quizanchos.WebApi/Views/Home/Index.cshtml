@@ -8,23 +8,35 @@
 }
 
 <section class="home-hero" aria-labelledby="home-hero-title">
+    <span class="eyebrow">Play · Compete · Win</span>
     <h1 id="home-hero-title">Welcome to Quizanchos</h1>
     <p class="subtitle">Pick a minigame, climb the leaderboard, and play with friends.</p>
+    @if (User.Identity?.IsAuthenticated != true)
+    {
+        <div class="home-hero__cta">
+            <a href="/Signup" class="btn btn-primary btn-lg">Get started</a>
+            <a href="/Minigames" class="btn btn-secondary btn-lg">Browse minigames</a>
+        </div>
+    }
 </section>
 
 @if (User.Identity?.IsAuthenticated == true)
 {
     if (Model.ActiveSession != null)
     {
-        <article class="sessions-card" aria-labelledby="active-session-title">
-            <h2 id="active-session-title">Your Active Session</h2>
+        <article class="sessions-card sessions-card--active" aria-labelledby="active-session-title">
+            <div class="sessions-card__heading">
+                <span class="sessions-card__pulse" aria-hidden="true"></span>
+                <h2 id="active-session-title">Pick up where you left off</h2>
+            </div>
             <div class="session-item">
                 <div class="session-info">
-                    <p><strong>Minigame:</strong> @(Model.ActiveSessionMinigameName ?? Model.ActiveSession.MinigameType.ToString())</p>
+                    <p class="session-info__label">Active minigame</p>
+                    <p class="session-info__value">@(Model.ActiveSessionMinigameName ?? Model.ActiveSession.MinigameType.ToString())</p>
                 </div>
                 @if (!string.IsNullOrWhiteSpace(Model.ActiveSessionUrl))
                 {
-                    <a href="@Model.ActiveSessionUrl" class="join-btn">Continue →</a>
+                    <a href="@Model.ActiveSessionUrl" class="join-btn">Continue <span aria-hidden="true">→</span></a>
                 }
             </div>
         </article>
@@ -32,27 +44,36 @@
     else
     {
         <article class="sessions-card" aria-labelledby="active-session-title">
-            <h2 id="active-session-title">Active Sessions</h2>
-            <p>You don't have any active sessions right now. <a href="/Minigames">Browse minigames</a> to start a new game.</p>
+            <h2 id="active-session-title">Ready to play?</h2>
+            <p>You don't have an active session right now. <a href="/Minigames">Browse minigames</a> to start a new game.</p>
         </article>
     }
 }
 else
 {
-    <article class="sessions-card">
-        <h2>Get Started</h2>
-        <p>Please <a href="/Signin">sign in</a> to see your active sessions and stats. New here? <a href="/Signup">Create an account</a>.</p>
+    <article class="sessions-card sessions-card--guest">
+        <h2>Get started in seconds</h2>
+        <p>Create a free account to track your progress, save sessions, and compete on the monthly leaderboard.</p>
+        <div class="sessions-card__actions">
+            <a href="/Signup" class="btn btn-primary">Create account</a>
+            <a href="/Signin" class="btn btn-secondary">Sign in</a>
+        </div>
     </article>
 }
 
 <section class="stats-grid" aria-label="Platform stats">
     <div class="stat-card">
-        <h3>Total Minigames</h3>
+        <h3>Minigames</h3>
         <p class="stat-number">@Model.Minigames.Count</p>
     </div>
     <div class="stat-card">
-        <h3>Active Users</h3>
+        <h3>Active players</h3>
         <p class="stat-number">@Model.ActiveUsersCount</p>
+    </div>
+    <div class="stat-card">
+        <h3>Monthly prizes</h3>
+        <p class="stat-number">3</p>
+        <p class="stat-card__hint">Top 3 win Amazon gift cards</p>
     </div>
 </section>
 

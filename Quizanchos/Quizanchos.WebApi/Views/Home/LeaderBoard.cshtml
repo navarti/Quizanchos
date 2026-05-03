@@ -9,6 +9,7 @@
 
 <section class="leaderboard-page">
     <header class="hero">
+        <span class="eyebrow">Top players this month</span>
         <h1>Leaderboard</h1>
         <button class="prize-btn" type="button" aria-haspopup="dialog" aria-controls="prizeModal">
             <span class="trophy" aria-hidden="true">🏆</span>
@@ -18,30 +19,47 @@
 
     <div class="leaderboard-container">
         <div class="filters" role="tablist" aria-label="Filter by minigame">
-            <button class="filter-btn active" type="button" data-minigame="">All</button>
+            <button class="filter-btn active" type="button" data-minigame="" aria-pressed="true">All</button>
             @foreach (var minigame in Model.Minigames.OrderBy(x => x.Order))
             {
-                <button class="filter-btn" type="button" data-minigame="@minigame.MinigameTypeId">@minigame.DisplayName</button>
+                <button class="filter-btn" type="button" data-minigame="@minigame.MinigameTypeId" aria-pressed="false">@minigame.DisplayName</button>
             }
         </div>
 
         <div class="leaderboard" data-current-user="@Model.CurrentUserName" aria-live="polite">
-            @foreach (var user in Model.Users.Select(u => new { User = u, Rank = u.Position }))
+            @if (Model.Users == null || Model.Users.Count == 0)
             {
-                <div class="leaderboard-item @(Model.CurrentUserName == user.User.UserName ? "current-user" : "")">
-                    <div class="rank" aria-label="Rank @user.Rank">@user.Rank</div>
-                    <div class="player-info">
-                        <img src="@user.User.AvatarUrl" alt="" class="player-avatar" aria-hidden="true">
-                        <span class="player-name">@user.User.UserName</span>
-                    </div>
-                    <div class="score">
-                        @if (user.Rank == 1)
-                        {
-                            <span class="trophy" aria-hidden="true">🏆</span>
-                        }
-                        <span>@user.User.Score</span>
-                    </div>
+                <div class="leaderboard-empty">
+                    <p>No players have scored yet.</p>
+                    <p>Be the first — <a href="/Minigames">play a minigame</a> to claim the top spot.</p>
                 </div>
+            }
+            else
+            {
+                @foreach (var user in Model.Users.Select(u => new { User = u, Rank = u.Position }))
+                {
+                    var isCurrent = Model.CurrentUserName == user.User.UserName;
+                    <div class="leaderboard-item @(isCurrent ? "current-user" : "")" aria-label="Rank @user.Rank, @user.User.UserName, score @user.User.Score">
+                        <div class="rank">@user.Rank</div>
+                        <div class="player-info">
+                            <img src="@user.User.AvatarUrl" alt="" class="player-avatar">
+                            <span class="player-name">
+                                @user.User.UserName
+                                @if (isCurrent)
+                                {
+                                    <span class="leaderboard-you">you</span>
+                                }
+                            </span>
+                        </div>
+                        <div class="score">
+                            @if (user.Rank == 1)
+                            {
+                                <span class="trophy" aria-hidden="true">🏆</span>
+                            }
+                            <span>@user.User.Score</span>
+                        </div>
+                    </div>
+                }
             }
         </div>
 

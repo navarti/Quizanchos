@@ -5,11 +5,16 @@
 
 @section Styles {
     <link rel="stylesheet" href="/css/profile.css" asp-append-version="true">
+    <link rel="stylesheet" href="/css/balance.css" asp-append-version="true">
     <link rel="stylesheet" href="/css/market.css" asp-append-version="true">
 }
 
 <section class="profile-container">
-    <h1 class="profile-header">Market</h1>
+    <header class="balance-hero" style="margin-bottom: var(--space-6);">
+        <span class="eyebrow">Spend your coins</span>
+        <h1>Market</h1>
+        <p class="balance-subtitle">Unlock premium minigames and chat emojis.</p>
+    </header>
 
     <div class="profile-card market-card">
         <div class="market-balance-row">
@@ -20,7 +25,7 @@
             <a href="/Account/Balance" class="btn btn-primary market-balance-link">Top up</a>
         </div>
 
-        <div id="market-status" class="market-status" style="display:none;" role="status" aria-live="polite"></div>
+        <div id="market-status" hidden></div>
 
         <h2 class="market-section-title">Premium Subscriptions</h2>
         <div id="market-grid-premium" class="market-grid"></div>

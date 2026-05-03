@@ -1,5 +1,5 @@
 /* =========================================================================
-   Balance / Top-up page — uses design tokens from site.css.
+   Balance / Top-up page — uses design tokens from site.css ("Refined Arcade").
    ======================================================================== */
 
 .balance-page {
@@ -13,15 +13,21 @@
     margin-bottom: var(--space-8);
 }
 .balance-hero h1 {
-    font-size: clamp(2rem, 4vw + 1rem, 2.5rem);
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 4vw + 1rem, 3rem);
+    font-weight: 800;
     margin-bottom: var(--space-2);
-    background: linear-gradient(90deg, var(--color-primary-700), var(--color-accent-500));
+    background: var(--gradient-aurora);
+    background-size: 180% 180%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    letter-spacing: -0.035em;
+    line-height: var(--line-height-tight);
+    animation: heroShimmer 14s ease-in-out infinite;
 }
 .balance-subtitle {
-    color: var(--color-gray-600);
+    color: var(--color-text-muted);
     font-size: var(--font-size-md);
 }
 
@@ -30,45 +36,69 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-5) var(--space-6);
+    background:
+        radial-gradient(600px 200px at 0% 0%, rgba(124, 58, 237, 0.10), transparent 60%),
+        radial-gradient(500px 200px at 100% 100%, rgba(236, 72, 153, 0.08), transparent 60%),
+        var(--color-surface);
+    border: 1px solid var(--color-primary-200);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6) var(--space-7, var(--space-6));
     margin-bottom: var(--space-6);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
     flex-wrap: wrap;
     gap: var(--space-4);
+    position: relative;
+    overflow: hidden;
+}
+.balance-wallet-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--gradient-aurora);
 }
 
 .balance-wallet-label {
     display: block;
-    font-size: var(--font-size-sm);
-    color: var(--color-gray-500);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
     margin-bottom: var(--space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
 }
 
 .balance-wallet-amount {
-    font-size: var(--font-size-2xl);
+    font-family: var(--font-display);
+    font-size: var(--font-size-3xl);
     font-weight: 800;
-    color: var(--color-primary-700);
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.025em;
+    line-height: 1;
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
 }
 
 .balance-action-btn {
     display: inline-flex;
     align-items: center;
     padding: var(--space-3) var(--space-5);
-    background: var(--color-primary-600);
+    background: var(--gradient-aurora);
     color: var(--color-text-inverse);
     border-radius: var(--radius-md);
     text-decoration: none;
     font-weight: 600;
     font-size: var(--font-size-sm);
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
 }
 .balance-action-btn:hover {
-    background: var(--color-primary-700);
     color: var(--color-text-inverse);
     transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Status banner */
@@ -94,18 +124,30 @@
 
 /* Section title */
 .balance-section-title {
-    color: var(--color-gray-800);
+    font-family: var(--font-display);
+    color: var(--color-text);
     font-size: var(--font-size-lg);
     font-weight: 700;
     margin-bottom: var(--space-4);
     border-bottom: 1px solid var(--color-border);
-    padding-bottom: var(--space-2);
+    padding-bottom: var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    letter-spacing: -0.015em;
+}
+.balance-section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--gradient-aurora);
+    border-radius: 2px;
 }
 
 /* Packages grid */
 .balance-packages-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
     gap: var(--space-4);
     margin-bottom: var(--space-8);
 }
@@ -113,38 +155,59 @@
 .balance-pkg-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
     padding: var(--space-6) var(--space-4);
     text-align: center;
     transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
-    box-shadow: var(--shadow-xs);
+    box-shadow: var(--shadow-xs), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    position: relative;
+    overflow: hidden;
+}
+.balance-pkg-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: var(--gradient-aurora);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition-base);
 }
 .balance-pkg-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
     border-color: var(--color-primary-300);
 }
+.balance-pkg-card:hover::before { transform: scaleX(1); }
 
 .balance-pkg-coins {
-    font-size: var(--font-size-2xl);
+    font-family: var(--font-display);
+    font-size: var(--font-size-3xl);
     font-weight: 800;
-    color: var(--color-primary-700);
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     margin-bottom: var(--space-1);
+    letter-spacing: -0.025em;
+    line-height: 1;
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
 }
 
 .balance-pkg-name {
     font-size: var(--font-size-xs);
-    color: var(--color-gray-500);
-    font-weight: 600;
+    color: var(--color-text-muted);
+    font-weight: 700;
     margin-bottom: var(--space-3);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.14em;
 }
 
 .balance-pkg-price {
     font-size: var(--font-size-md);
     font-weight: 700;
-    color: var(--color-gray-900);
+    color: var(--color-text);
     margin-bottom: var(--space-4);
 }
 
@@ -152,16 +215,21 @@
     display: inline-block;
     width: 100%;
     padding: var(--space-3);
-    background: var(--color-primary-600);
+    background: var(--gradient-aurora);
     color: var(--color-text-inverse);
     border: none;
     border-radius: var(--radius-md);
+    font-family: inherit;
     font-weight: 600;
     font-size: var(--font-size-sm);
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-sm), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
 }
-.balance-pkg-buy:hover { background: var(--color-primary-700); }
+.balance-pkg-buy:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
 
 /* Pending orders */
 .balance-pending-row {
@@ -170,8 +238,8 @@
     align-items: center;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
     margin-bottom: var(--space-2);
     font-size: var(--font-size-sm);
     box-shadow: var(--shadow-xs);
@@ -179,10 +247,27 @@
     gap: var(--space-2);
 }
 .balance-pending-row.is-expired { opacity: 0.5; }
-.balance-pending-coins   { font-weight: 700; color: var(--color-primary-700); }
-.balance-pending-amount  { font-weight: 600; color: var(--color-gray-900); }
-.balance-pending-network { color: var(--color-gray-500); font-size: var(--font-size-xs); }
-.balance-pending-badge   { font-weight: 600; color: var(--color-warning-600); font-size: var(--font-size-xs); }
+.balance-pending-coins {
+    font-family: var(--font-display);
+    font-weight: 800;
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.01em;
+}
+.balance-pending-amount  { font-weight: 600; color: var(--color-text); }
+.balance-pending-network { color: var(--color-text-muted); font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+.balance-pending-badge {
+    font-weight: 700;
+    color: var(--color-warning-600);
+    font-size: var(--font-size-xs);
+    background: var(--color-warning-100);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
 
 /* ===== Payment Modal ===== */
 
@@ -191,8 +276,9 @@
     position: fixed;
     inset: 0;
     z-index: 2000;
-    background: rgba(17, 24, 39, 0.55);
-    backdrop-filter: blur(4px);
+    background: rgba(26, 20, 48, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     justify-content: center;
     align-items: center;
     padding: var(--space-4);
@@ -202,17 +288,25 @@
 .balance-modal {
     position: relative;
     background: var(--color-surface);
-    border-radius: var(--radius-xl);
-    padding: var(--space-8) var(--space-6);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-10) var(--space-6) var(--space-6);
     width: 100%;
     max-width: 480px;
-    box-shadow: var(--shadow-xl);
-    animation: balanceModalIn 200ms ease-out;
+    box-shadow: var(--shadow-xl), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    animation: balanceModalIn 240ms var(--easing-bouncy);
     border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+.balance-modal::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--gradient-aurora);
 }
 
 @keyframes balanceModalIn {
-    from { opacity: 0; transform: scale(0.97) translateY(8px); }
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
@@ -223,31 +317,35 @@
     background: var(--color-gray-100);
     border: none;
     font-size: 1.2rem;
-    color: var(--color-gray-500);
+    color: var(--color-text-muted);
     cursor: pointer;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    transition: background-color var(--transition-fast), color var(--transition-fast);
+    transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+    z-index: 1;
 }
 .balance-modal-close:hover {
-    background: var(--color-gray-200);
-    color: var(--color-gray-900);
+    background: var(--color-primary-50);
+    color: var(--color-primary-800);
+    transform: rotate(90deg);
 }
 
 .balance-modal-heading {
+    font-family: var(--font-display);
     font-size: var(--font-size-xl);
     font-weight: 700;
-    color: var(--color-gray-900);
+    color: var(--color-text);
     margin-bottom: var(--space-1);
+    letter-spacing: -0.02em;
 }
 
 .balance-modal-sub {
     font-size: var(--font-size-sm);
-    color: var(--color-gray-500);
+    color: var(--color-text-muted);
     margin-bottom: var(--space-5);
 }
 
@@ -264,12 +362,13 @@
     align-items: flex-start;
     width: 100%;
     padding: var(--space-4) var(--space-5);
-    background: var(--color-gray-50);
+    background: var(--color-surface-alt);
     border: 2px solid var(--color-border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-fast);
     text-align: left;
+    font-family: inherit;
 }
 .balance-network-opt:hover {
     border-color: var(--color-primary-500);
@@ -280,12 +379,12 @@
 .balance-network-label {
     font-weight: 700;
     font-size: var(--font-size-base);
-    color: var(--color-gray-900);
+    color: var(--color-text);
 }
 
 .balance-network-desc {
     font-size: var(--font-size-xs);
-    color: var(--color-gray-500);
+    color: var(--color-text-muted);
     margin-top: 2px;
 }
 
@@ -297,10 +396,10 @@
 .balance-field-label {
     display: block;
     font-size: var(--font-size-xs);
-    color: var(--color-gray-500);
+    color: var(--color-text-muted);
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.14em;
     margin-bottom: var(--space-1);
 }
 
@@ -308,7 +407,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    background: var(--color-gray-50);
+    background: var(--color-surface-alt);
     padding: var(--space-3) var(--space-4);
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
@@ -317,50 +416,60 @@
 .balance-field-val {
     flex: 1;
     word-break: break-all;
-    color: var(--color-gray-700);
+    color: var(--color-text-soft);
     font-weight: 500;
     font-size: var(--font-size-sm);
 }
 
 .balance-field-amount {
+    font-family: var(--font-display);
     font-size: var(--font-size-md);
-    font-weight: 700;
-    color: var(--color-primary-700);
+    font-weight: 800;
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .balance-field-addr {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: var(--font-mono);
     font-size: var(--font-size-xs);
     letter-spacing: 0.02em;
 }
 
 .balance-copy-btn {
     padding: var(--space-2) var(--space-3);
-    background: var(--color-primary-600);
+    background: var(--gradient-aurora);
     color: var(--color-text-inverse);
     border: none;
     border-radius: var(--radius-sm);
+    font-family: inherit;
     font-size: var(--font-size-xs);
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
-    transition: background-color var(--transition-fast);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-sm);
 }
-.balance-copy-btn:hover { background: var(--color-primary-700); }
+.balance-copy-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
 /* Timer */
 .balance-timer-row {
     text-align: center;
     padding: var(--space-3) 0;
     font-size: var(--font-size-sm);
-    color: var(--color-gray-500);
+    color: var(--color-text-muted);
 }
 
 .balance-timer-countdown {
+    font-family: var(--font-display);
     font-size: var(--font-size-xl);
-    font-weight: 700;
+    font-weight: 800;
     color: var(--color-danger-600);
     margin-left: var(--space-2);
+    letter-spacing: -0.02em;
+    font-feature-settings: 'tnum';
+    font-variant-numeric: tabular-nums;
 }
 
 /* Notice */
@@ -381,18 +490,20 @@
     display: block;
     width: 100%;
     padding: var(--space-3) var(--space-4);
-    background: var(--color-primary-600);
+    background: var(--gradient-aurora);
     color: var(--color-text-inverse);
     border: none;
     border-radius: var(--radius-md);
+    font-family: inherit;
     font-size: var(--font-size-base);
     font-weight: 600;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
     margin-bottom: var(--space-2);
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
 }
-.balance-primary-btn:hover { background: var(--color-primary-700); }
-.balance-primary-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.balance-primary-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+.balance-primary-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
 
 .balance-secondary-btn {
     display: block;
@@ -400,20 +511,43 @@
     padding: var(--space-3) var(--space-4);
     background: transparent;
     border: 1px solid var(--color-primary-300);
-    color: var(--color-primary-700);
+    color: var(--color-primary-800);
     border-radius: var(--radius-md);
+    font-family: inherit;
     font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
-.balance-secondary-btn:hover { background: var(--color-primary-50); }
+.balance-secondary-btn:hover {
+    background: var(--color-primary-50);
+    border-color: var(--color-primary-500);
+}
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .balance-wallet-card {
         flex-direction: column;
         text-align: center;
+        padding: var(--space-5) var(--space-4);
     }
+    .balance-action-btn { width: 100%; justify-content: center; }
+    .balance-packages-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+    .balance-pkg-card { padding: var(--space-5) var(--space-3); }
+    .balance-pkg-coins { font-size: var(--font-size-2xl); }
+    .balance-pending-row { flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+    .balance-modal { padding: var(--space-8) var(--space-4) var(--space-5); border-radius: var(--radius-xl); }
+    .balance-section-title { font-size: var(--font-size-md); }
+}
+
+@media (max-width: 480px) {
+    .balance-page { padding: var(--space-5) var(--space-3); }
     .balance-packages-grid { grid-template-columns: 1fr; }
-    .balance-pending-row { flex-direction: column; align-items: flex-start; }
+    .balance-pkg-card { padding: var(--space-5) var(--space-4); }
+    .balance-pkg-coins { font-size: var(--font-size-3xl); }
+    .balance-network-opt { padding: var(--space-3) var(--space-4); }
+    .balance-field-row { flex-wrap: wrap; padding: var(--space-2) var(--space-3); }
+    .balance-field-val { flex: 1 1 100%; min-width: 0; }
+    .balance-copy-btn { width: 100%; padding: var(--space-2) var(--space-3); }
+    .balance-modal { padding: var(--space-7) var(--space-3) var(--space-4); }
+    .balance-modal-heading { font-size: var(--font-size-lg); }
 }
