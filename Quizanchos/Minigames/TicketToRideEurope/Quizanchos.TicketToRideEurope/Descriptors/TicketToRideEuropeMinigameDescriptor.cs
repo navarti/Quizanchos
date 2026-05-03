@@ -4,6 +4,7 @@ using Quizanchos.TicketToRideEurope.Extensions;
 using Quizanchos.TicketToRideEurope.GameLogic;
 using Quizanchos.TicketToRideEurope.Services;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.TicketToRideEurope.Descriptors;
 
@@ -27,10 +28,29 @@ public class TicketToRideEuropeMinigameDescriptor : IMinigameDescriptor
         TicketToRideEuropeEngineFactory factory =
             serviceProvider.GetRequiredService<TicketToRideEuropeEngineFactory>();
 
+        Dictionary<string, string> nicknames = ReadNicknames(parameters);
+
         GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove> engine =
-            await factory.CreateEngineAsync(gameId, playerIds);
+            await factory.CreateEngineAsync(gameId, playerIds, nicknames);
 
         return new GameEngineWrapper<TicketToRideEuropeState, TicketToRideEuropeMove>(engine);
+    }
+
+    private static Dictionary<string, string> ReadNicknames(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("playerNicknames", out object? value) || value is null)
+            return new Dictionary<string, string>();
+
+        return value switch
+        {
+            Dictionary<string, string> direct => new Dictionary<string, string>(direct),
+            IReadOnlyDictionary<string, string> readOnly => new Dictionary<string, string>(readOnly),
+            string json when !string.IsNullOrWhiteSpace(json) =>
+                JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new(),
+            JsonElement { ValueKind: JsonValueKind.Object } element =>
+                element.Deserialize<Dictionary<string, string>>() ?? new(),
+            _ => new Dictionary<string, string>()
+        };
     }
 
     public async Task<IGameEngine?> LoadGameEngineAsync(Guid gameId, IServiceProvider serviceProvider)

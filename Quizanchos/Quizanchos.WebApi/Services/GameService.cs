@@ -80,7 +80,8 @@ public class GameService
         int minigameType,
         IReadOnlyList<string> playerIds,
         Dictionary<string, object>? parameters,
-        IReadOnlyList<TeamInfo> teams)
+        IReadOnlyList<TeamInfo> teams,
+        IReadOnlyDictionary<string, string>? playerNicknames = null)
     {
         await _premiumAccessService
             .EnsureUsersCanAccessMinigameAsync(playerIds, minigameType)
@@ -116,6 +117,11 @@ public class GameService
                 playerIds = t.PlayerIds
             }).ToList();
             gameParams["teams"] = System.Text.Json.JsonSerializer.Serialize(teamsData);
+        }
+
+        if (playerNicknames is { Count: > 0 })
+        {
+            gameParams["playerNicknames"] = System.Text.Json.JsonSerializer.Serialize(playerNicknames);
         }
 
         IGameEngine engine = await _gameLogicFactory.CreateGameEngine(

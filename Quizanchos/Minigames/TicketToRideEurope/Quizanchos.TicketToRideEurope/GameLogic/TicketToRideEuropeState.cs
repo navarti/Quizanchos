@@ -9,6 +9,7 @@ public class TicketToRideEuropeState : IGameState
     public int MinigameType => MinigameTypeId;
     public Guid GameId { get; set; }
     public IReadOnlyList<string> Players { get; set; } = Array.Empty<string>();
+    public Dictionary<string, string> PlayerNicknames { get; set; } = new();
     public bool IsFinished { get; set; }
     public string? Winner { get; set; }
 

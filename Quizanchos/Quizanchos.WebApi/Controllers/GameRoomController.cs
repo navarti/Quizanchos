@@ -42,9 +42,9 @@ public class GameRoomController : ControllerBase
     /// </summary>
     [HttpGet]
     [Authorize(AppRole.User)]
-    public IActionResult GetAvailableRooms([FromQuery] int? minigameType)
+    public async Task<IActionResult> GetAvailableRooms([FromQuery] int? minigameType)
     {
-        var rooms = _roomService.GetAvailableRooms(minigameType);
+        var rooms = await _roomService.GetAvailableRoomsAsync(minigameType);
         return Ok(rooms);
     }
 
@@ -53,9 +53,9 @@ public class GameRoomController : ControllerBase
     /// </summary>
     [HttpGet("{roomId}")]
     [Authorize(AppRole.User)]
-    public IActionResult GetRoom(Guid roomId)
+    public async Task<IActionResult> GetRoom(Guid roomId)
     {
-        RoomActionResult result = _roomService.GetRoom(roomId);
+        RoomActionResult result = await _roomService.GetRoomAsync(roomId);
 
         if (!result.IsSuccess)
             return NotFound(new { Message = result.ErrorMessage });

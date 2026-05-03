@@ -222,6 +222,7 @@ window.RoomLobbyBase = (function () {
             const current = room.currentPlayerCount ?? room.CurrentPlayerCount ?? 0;
             const max = room.maxPlayers ?? room.MaxPlayers ?? 0;
             const teams = room.teams || room.Teams || [];
+            const nicknames = room.playerNicknames || room.PlayerNicknames || {};
             const expiresAt = room.expiresAtUtc ?? room.ExpiresAtUtc;
             const statusLabels = ['Waiting for players', 'Launching', 'Game started', 'Closed'];
 
@@ -245,7 +246,10 @@ window.RoomLobbyBase = (function () {
                 const players = team.players || team.Players || [];
                 const maxSize = team.maxSize ?? team.MaxSize ?? 0;
 
-                const playersHtml = players.map(p => `<div class="player-slot filled">${p.substring(0, 8)}...</div>`).join('');
+                const playersHtml = players.map(p => {
+                    const display = nicknames[p] || `${p.substring(0, 8)}...`;
+                    return `<div class="player-slot filled">${escapeText(display)}</div>`;
+                }).join('');
                 const emptyHtml = Array(Math.max(0, maxSize - players.length)).fill('<div class="player-slot empty">...</div>').join('');
 
                 return `<div class="team-card team-${teamIndex}">
@@ -254,6 +258,10 @@ window.RoomLobbyBase = (function () {
                         </div>`;
             }).join('');
         }
+    }
+
+    function escapeText(s) {
+        return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
     function getRoomId(room) {
