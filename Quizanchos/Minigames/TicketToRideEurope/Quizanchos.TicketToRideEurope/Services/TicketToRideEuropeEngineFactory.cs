@@ -25,7 +25,8 @@ public class TicketToRideEuropeEngineFactory
 
     public async Task<GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>> CreateEngineAsync(
         Guid gameId,
-        ImmutableArray<string> playerIds)
+        ImmutableArray<string> playerIds,
+        IReadOnlyDictionary<string, string>? playerNicknames = null)
     {
         _logger.LogInformation(
             "Creating TicketToRideEurope engine: GameId={GameId}, Players={PlayerCount}",
@@ -56,6 +57,11 @@ public class TicketToRideEuropeEngineFactory
         TicketToRideEuropeLogic logic = new TicketToRideEuropeLogic();
         GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove> engine =
             new GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>(logic, gameId, playerIds);
+
+        if (playerNicknames is { Count: > 0 })
+        {
+            engine.State.PlayerNicknames = new Dictionary<string, string>(playerNicknames);
+        }
 
         await _stateService.CreateInitialStateAsync(gameId, engine.State);
 

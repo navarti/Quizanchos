@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Quizanchos.Core;
+using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Models.Rooms;
 using Quizanchos.WebApi.Services.Users;
 
@@ -15,19 +17,22 @@ public class GameRoomService
     private readonly GameService _gameService;
     private readonly ILogger<GameRoomService> _logger;
     private readonly PremiumAccessService _premiumAccessService;
+    private readonly UserManager<ApplicationUser> _userManager;
 
     public GameRoomService(
         IGameRoomManager roomManager,
         IRoomNotifier roomNotifier,
         GameService gameService,
         ILogger<GameRoomService> logger,
-        PremiumAccessService premiumAccessService)
+        PremiumAccessService premiumAccessService,
+        UserManager<ApplicationUser> userManager)
     {
         _roomManager = roomManager;
         _roomNotifier = roomNotifier;
         _gameService = gameService;
         _logger = logger;
         _premiumAccessService = premiumAccessService;
+        _userManager = userManager;
     }
 
     public async Task<RoomActionResult> CreateRoomAsync(CreateRoomRequest request, string hostPlayerId)
@@ -72,7 +77,7 @@ public class GameRoomService
             "Room created: RoomId={RoomId}, Host={HostId}, Type={Type}, MaxPlayers={Max}, Teams={Teams}",
             roomId, hostPlayerId, request.MinigameType, request.MaxPlayers, request.TeamCount);
 
-        return RoomActionResult.Success(MapToDto(room));
+        return RoomActionResult.Success(await MapToDtoAsync(room));
     }
 
     public async Task<RoomActionResult> JoinRoomAsync(Guid roomId, int teamIndex, string playerId)
@@ -118,14 +123,14 @@ public class GameRoomService
             playerId, roomId, teamIndex);
 
         await _roomNotifier.NotifyPlayerJoinedRoom(roomId, playerId, teamIndex);
-        await _roomNotifier.NotifyRoomUpdated(roomId, MapToDto(room));
+        await _roomNotifier.NotifyRoomUpdated(roomId, await MapToDtoAsync(room));
 
         if (shouldLaunch)
         {
             await LaunchGameFromRoomAsync(room);
         }
 
-        return RoomActionResult.Success(MapToDto(room));
+        return RoomActionResult.Success(await MapToDtoAsync(room));
     }
 
     public async Task<RoomActionResult> LeaveRoomAsync(Guid roomId, string playerId)
@@ -156,11 +161,11 @@ public class GameRoomService
         if (hostLeft)
         {
             await CloseRoomAsync(roomId, "Host left the room");
-            return RoomActionResult.Success(MapToDto(room));
+            return RoomActionResult.Success(await MapToDtoAsync(room));
         }
 
-        await _roomNotifier.NotifyRoomUpdated(roomId, MapToDto(room));
-        return RoomActionResult.Success(MapToDto(room));
+        await _roomNotifier.NotifyRoomUpdated(roomId, await MapToDtoAsync(room));
+        return RoomActionResult.Success(await MapToDtoAsync(room));
     }
 
     public async Task<RoomActionResult> SwitchTeamAsync(Guid roomId, int newTeamIndex, string playerId)
@@ -193,24 +198,28 @@ public class GameRoomService
         _logger.LogInformation("Player {PlayerId} switched to team {TeamIndex} in room {RoomId}",
             playerId, newTeamIndex, roomId);
 
-        await _roomNotifier.NotifyRoomUpdated(roomId, MapToDto(room));
-        return RoomActionResult.Success(MapToDto(room));
+        await _roomNotifier.NotifyRoomUpdated(roomId, await MapToDtoAsync(room));
+        return RoomActionResult.Success(await MapToDtoAsync(room));
     }
 
-    public RoomActionResult GetRoom(Guid roomId)
+    public async Task<RoomActionResult> GetRoomAsync(Guid roomId)
     {
         var room = _roomManager.GetRoom(roomId);
         if (room == null)
             return RoomActionResult.Error("Room not found");
 
-        return RoomActionResult.Success(MapToDto(room));
+        return RoomActionResult.Success(await MapToDtoAsync(room));
     }
 
-    public IReadOnlyList<GameRoomDto> GetAvailableRooms(int? minigameType = null)
+    public async Task<IReadOnlyList<GameRoomDto>> GetAvailableRoomsAsync(int? minigameType = null)
     {
-        return _roomManager.GetAvailableRooms(minigameType)
-            .Select(MapToDto)
-            .ToList();
+        var rooms = _roomManager.GetAvailableRooms(minigameType);
+        var dtos = new List<GameRoomDto>(rooms.Count);
+        foreach (var room in rooms)
+        {
+            dtos.Add(await MapToDtoAsync(room));
+        }
+        return dtos;
     }
 
     private async Task LaunchGameFromRoomAsync(GameRoom room)
@@ -229,11 +238,15 @@ public class GameRoomService
                 .Select(t => new TeamInfo(t.TeamIndex, t.Name, t.Players.ToList()))
                 .ToList();
 
+            IReadOnlyDictionary<string, string> nicknames =
+                await ResolveNicknamesAsync(playerIds);
+
             var response = await _gameService.CreateMultiPlayerGameAsync(
                 room.MinigameType,
                 playerIds,
                 room.GameParameters,
-                teams);
+                teams,
+                nicknames);
 
             lock (room.SyncRoot)
             {
@@ -255,7 +268,7 @@ public class GameRoomService
                 room.Status = GameRoomStatus.WaitingForPlayers;
             }
 
-            await _roomNotifier.NotifyRoomUpdated(room.RoomId, MapToDto(room));
+            await _roomNotifier.NotifyRoomUpdated(room.RoomId, await MapToDtoAsync(room));
         }
     }
 
@@ -276,8 +289,11 @@ public class GameRoomService
         _logger.LogInformation("Room {RoomId} closed: {Reason}", roomId, reason);
     }
 
-    internal static GameRoomDto MapToDto(GameRoom room)
+    internal async Task<GameRoomDto> MapToDtoAsync(GameRoom room)
     {
+        IReadOnlyDictionary<string, string> nicknames =
+            await ResolveNicknamesAsync(room.AllPlayerIds);
+
         return new GameRoomDto
         {
             RoomId = room.RoomId,
@@ -294,9 +310,22 @@ public class GameRoomService
                 Players = t.Players,
                 IsFull = t.IsFull
             }).ToList(),
+            PlayerNicknames = nicknames,
             CreatedAt = room.CreatedAt,
             ExpiresAtUtc = room.ExpiresAtUtc,
             LaunchedGameId = room.LaunchedGameId
         };
+    }
+
+    private async Task<IReadOnlyDictionary<string, string>> ResolveNicknamesAsync(
+        IReadOnlyCollection<string> playerIds)
+    {
+        Dictionary<string, string> result = new(playerIds.Count);
+        foreach (string playerId in playerIds.Distinct())
+        {
+            ApplicationUser? user = await _userManager.FindByIdAsync(playerId);
+            result[playerId] = user?.UserName ?? playerId;
+        }
+        return result;
     }
 }

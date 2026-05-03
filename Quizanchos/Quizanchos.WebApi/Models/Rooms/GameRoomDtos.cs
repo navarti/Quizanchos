@@ -36,6 +36,8 @@ public record GameRoomDto
     public int CurrentPlayerCount { get; init; }
     public GameRoomStatus Status { get; init; }
     public IReadOnlyList<GameRoomTeamDto> Teams { get; init; } = Array.Empty<GameRoomTeamDto>();
+    public IReadOnlyDictionary<string, string> PlayerNicknames { get; init; } =
+        new Dictionary<string, string>();
     public DateTime CreatedAt { get; init; }
     public DateTime ExpiresAtUtc { get; init; }
     public Guid? LaunchedGameId { get; init; }

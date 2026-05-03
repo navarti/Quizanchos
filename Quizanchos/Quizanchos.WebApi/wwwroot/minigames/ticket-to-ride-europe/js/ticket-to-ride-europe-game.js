@@ -377,7 +377,7 @@ function renderTopBar() {
     const colorTag = turnPlayer ? `<span class="player-chip" style="background:${PLAYER_HEX[turnPlayer.color || turnPlayer.Color]}"></span>` : '';
     const lastRound = currentState.lastRoundTriggered || currentState.LastRoundTriggered;
     const lastTag = lastRound ? ' <span class="last-round-tag">final round</span>' : '';
-    turnInfo.innerHTML = `${colorTag} Turn ${currentState.turnNumber || currentState.TurnNumber || 1}: ${shortId(turnPlayerId)}${youTag}${lastTag}`;
+    turnInfo.innerHTML = `${colorTag} Turn ${currentState.turnNumber || currentState.TurnNumber || 1}: ${playerName(turnPlayerId)}${youTag}${lastTag}`;
 }
 
 function renderMap() {
@@ -578,7 +578,7 @@ function renderPlayers() {
         const tagSuffix = tags.length ? ` (${tags.join(', ')})` : '';
         html += `<div class="player-row ${isTurn ? 'turn' : ''} ${resigned ? 'resigned' : ''}">
             <span class="player-chip" style="background:${PLAYER_HEX[color]}"></span>
-            <span class="player-name">${shortId(id)}${tagSuffix}</span>
+            <span class="player-name">${playerName(id)}${tagSuffix}</span>
             <div class="player-stats">
                 <span title="Trains">🚂 ${p.trainsRemaining ?? p.TrainsRemaining}</span>
                 <span title="Stations used">🏛 ${p.stationsBuilt ?? p.StationsBuilt}/3</span>
@@ -613,7 +613,7 @@ function renderActions() {
     } else if (phase !== 'play') {
         body = '<p class="muted">Waiting...</p>';
     } else if (!myTurn) {
-        body = `<p class="muted">Waiting for ${shortId(getCurrentTurnPlayerId(currentState))}...</p>`;
+        body = `<p class="muted">Waiting for ${playerName(getCurrentTurnPlayerId(currentState))}...</p>`;
     } else if (pending === 'tunnelDecision') {
         body = '<p class="muted">Resolve the tunnel attempt</p>';
     } else if (pending === 'keepDrawnTickets') {
@@ -772,7 +772,7 @@ function renderLog() {
     root.innerHTML = '<h4>Activity</h4>' + log.slice(-10).map(e => {
         const who = e.playerId || e.PlayerId;
         const msg = e.message || e.Message;
-        return `<div class="log-line"><strong>${who === 'system' ? 'System' : shortId(who)}:</strong> ${msg}</div>`;
+        return `<div class="log-line"><strong>${who === 'system' ? 'System' : playerName(who)}:</strong> ${msg}</div>`;
     }).reverse().join('');
 }
 
@@ -983,7 +983,7 @@ function showFinalModal() {
     ranked.forEach((p, i) => {
         html += `<tr>
             <td>${i + 1}</td>
-            <td><span class="player-chip" style="background:${PLAYER_HEX[p.color || p.Color]}"></span> ${shortId(p.playerId || p.PlayerId)}${(p.playerId || p.PlayerId) === currentUserId ? ' (you)' : ''}</td>
+            <td><span class="player-chip" style="background:${PLAYER_HEX[p.color || p.Color]}"></span> ${playerName(p.playerId || p.PlayerId)}${(p.playerId || p.PlayerId) === currentUserId ? ' (you)' : ''}</td>
             <td><strong>${p.score ?? p.Score}</strong></td>
             <td>${(p.tickets || p.Tickets || []).length}</td>
             <td>${p.stationsBuilt ?? p.StationsBuilt}</td>
@@ -1033,9 +1033,10 @@ function showError(message) {
     root.querySelector('[data-action="err-ok"]').onclick = () => closeModal();
 }
 
-function shortId(id) {
+function playerName(id) {
     if (!id) return '?';
-    return id.substring(0, 8);
+    const nicknames = (currentState && (currentState.playerNicknames || currentState.PlayerNicknames)) || {};
+    return escapeHtml(nicknames[id] || id.substring(0, 8));
 }
 function cityName(id) {
     return CITIES_BY_ID[id] ? CITIES_BY_ID[id].name : id;
