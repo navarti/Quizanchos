@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Quizanchos.Domain.Entities;
+using Quizanchos.WebApi.Constants;
 using Quizanchos.WebApi.Dto;
 using Quizanchos.Quiz.Util;
 using System.Security.Claims;
@@ -63,8 +64,12 @@ public class LeaderBoardService
     {
         SkipTakeValidator.Validate(skip, take);
 
+        HashSet<string> excludedUserIds = await GetExcludedUserIdsAsync().ConfigureAwait(false);
+
         // Load users and scores into memory, then order in-memory to support per-minigame ranking
-        var users = await _dbContext.Users.ToListAsync().ConfigureAwait(false);
+        var users = (await _dbContext.Users.ToListAsync().ConfigureAwait(false))
+            .Where(u => !excludedUserIds.Contains(u.Id))
+            .ToList();
         var scores = await _dbContext.UserMinigameScores
             .Where(s => !minigameType.HasValue || s.MinigameType == minigameType.Value)
             .ToListAsync()
@@ -77,6 +82,12 @@ public class LeaderBoardService
         return ordered.Skip(skip).Take(take).ToList();
     }
 
+    public async Task<HashSet<string>> GetExcludedUserIdsAsync()
+    {
+        IList<ApplicationUser> owners = await _userManager.GetUsersInRoleAsync(AppRole.Owner).ConfigureAwait(false);
+        return owners.Select(o => o.Id).ToHashSet(StringComparer.Ordinal);
+    }
+
     public async Task<ApplicationUserInLeaderBoardDto> GetUserPositionAsync(ClaimsPrincipal claimsPrincipal)
     {
         return await GetUserPositionAsync(claimsPrincipal, null).ConfigureAwait(false);
@@ -85,14 +96,18 @@ public class LeaderBoardService
     public async Task<ApplicationUserInLeaderBoardDto> GetUserPositionAsync(ClaimsPrincipal claimsPrincipal, int? minigameType)
     {
         ApplicationUser user = await _userRetrieverService.GetUserByClaims(claimsPrincipal).ConfigureAwait(false);
+        HashSet<string> excludedUserIds = await GetExcludedUserIdsAsync().ConfigureAwait(false);
+
         // Use DB scores to order
-        var usersWithScores = await _dbContext.Users
+        var usersWithScores = (await _dbContext.Users
             .Select(u => new
             {
                 User = u,
                 Scores = _dbContext.UserMinigameScores.Where(s => s.ApplicationUserId == u.Id)
             })
-            .ToListAsync();
+            .ToListAsync())
+            .Where(x => !excludedUserIds.Contains(x.User.Id))
+            .ToList();
 
         var ordered = minigameType.HasValue
             ? usersWithScores.OrderByDescending(x => x.Scores.FirstOrDefault(s => s.MinigameType == minigameType.Value)?.Score ?? 0).Select(x => x.User).ToList()
