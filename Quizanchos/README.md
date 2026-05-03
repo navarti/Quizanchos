@@ -8,7 +8,8 @@ For architecture, the plugin system, SignalR hubs, and how minigames are wired u
 
 - **.NET 10 SDK**
 - **SQL Server** (LocalDB or SQLEXPRESS). Default connection string in `appsettings.json` points at `localhost\SQLEXPRESS` with `Trusted_Connection=True`.
-- *(Optional, for full functionality)* Mailgun (password reset / email confirmation), Cloudinary (avatar uploads), Google OAuth (social login), Binance API (top-ups).
+- **SMTP credentials** (required) — sign-up email confirmation and password reset. e.g. Gmail with an [App Password](https://myaccount.google.com/apppasswords).
+- *(Optional, for full functionality)* Cloudinary (avatar uploads), Google OAuth (social login), Binance API (top-ups).
 
 ## First-time setup
 
@@ -21,11 +22,11 @@ cd Quizanchos.WebApi
 dotnet user-secrets set "Owner:Email" "you@example.com"
 dotnet user-secrets set "Owner:Password" "<a-real-password>"
 
-# Email (required for password-reset and SignUp confirmation when ShouldUse=1)
-dotnet user-secrets set "EmailConfirmation:MailGun:Domain" "..."
-dotnet user-secrets set "EmailConfirmation:MailGun:ApiKey"  "..."
-dotnet user-secrets set "EmailConfirmation:MailGun:FromEmail" "noreply@yourdomain"
-dotnet user-secrets set "EmailConfirmation:MailGun:FromName"  "Quizanchos"
+# Email (SMTP — required for sign-up confirmation and password reset).
+# Host/Port/FromName have defaults in appsettings.json (Gmail on 587).
+dotnet user-secrets set "EmailConfirmation:Smtp:User"      "you@gmail.com"
+dotnet user-secrets set "EmailConfirmation:Smtp:Password"  "<gmail-app-password>"
+dotnet user-secrets set "EmailConfirmation:Smtp:FromEmail" "you@gmail.com"
 
 # Cloudinary (avatar uploads)
 dotnet user-secrets set "Cloudinary:CloudName" "..."
@@ -42,8 +43,6 @@ dotnet user-secrets set "BinanceApi:ApiSecret"       "..."
 dotnet user-secrets set "BinanceApi:UsdtAddressBep20" "..."
 dotnet user-secrets set "BinanceApi:UsdtAddressTrc20" "..."
 ```
-
-To disable email confirmation locally (sign-up succeeds immediately, password reset is unavailable), set `EmailConfirmation:ShouldUse` to `"0"` in `appsettings.Development.json`.
 
 ## Run
 
@@ -78,5 +77,5 @@ The platform discovers minigames at runtime via assembly scanning. To scaffold a
 ## Security notes
 
 - Default seed Owner credentials are placeholders — override via user-secrets before any deploy.
-- Password reset requires a valid email channel (Mailgun). When email is disabled, the reset endpoints reject requests instead of resetting silently.
+- Password reset uses an emailed confirmation code; SMTP credentials are required at startup.
 - Account deletion is blocked when the user has top-up history (`TopUpOrder` rows are preserved for financial records).

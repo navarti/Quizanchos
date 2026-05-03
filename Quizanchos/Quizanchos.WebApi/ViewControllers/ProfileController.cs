@@ -1,5 +1,6 @@
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Quizanchos.WebApi.Constants;
@@ -11,11 +12,16 @@ namespace Quizanchos.WebApi.ViewControllers;
 public class ProfileController : Controller
 {
     private readonly UserProfileService _userProfileService;
+    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly ILogger<ProfileController> _logger;
 
-    public ProfileController(UserProfileService userProfileService, ILogger<ProfileController> logger)
+    public ProfileController(
+        UserProfileService userProfileService,
+        SignInManager<ApplicationUser> signInManager,
+        ILogger<ProfileController> logger)
     {
         _userProfileService = userProfileService;
+        _signInManager = signInManager;
         _logger = logger;
     }
     
@@ -37,12 +43,9 @@ public class ProfileController : Controller
 
     [HttpPost("Logout")]
     [Authorize]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        Response.Cookies.Delete("Identity.External");
-        Response.Cookies.Delete("QAuth");
-        await HttpContext.SignOutAsync("Cookies");
-        return Ok();
+        await _signInManager.SignOutAsync();
+        return LocalRedirect("/");
     }
 }

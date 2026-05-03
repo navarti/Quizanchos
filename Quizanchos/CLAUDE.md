@@ -78,7 +78,7 @@ Groups are named `game-{guid}` and `room-{guid}`. Server pushes via `SignalRGame
 
 - ASP.NET Identity with cookie auth (`QAuth` cookie) + optional Google OAuth
 - Three roles: `User`, `Admin`, `Owner` (hierarchical policies in `Startup.AddAuthorizaiton()`)
-- Optional email confirmation flow toggled by `EmailConfirmation:ShouldUse` config
+- Email confirmation required for registration; password reset uses an emailed code (SMTP)
 - Premium access: `PremiumUntilUtc` on `ApplicationUser`, checked by `PremiumAccessService` for minigames with `IsPremium = true`
 
 ### Frontend
