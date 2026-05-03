@@ -20,6 +20,7 @@ public class QuizanchosDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<MarketItem> MarketItems { get; set; }
     public DbSet<UserOwnedItem> UserOwnedItems { get; set; }
     public DbSet<TopUpOrder> TopUpOrders { get; set; }
+    public DbSet<ContactMessage> ContactMessages { get; set; }
 
     #region Quiz Domain Entities
     public DbSet<QuizEntity> QuizEntities { get; set; }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Quizanchos.Domain;
@@ -11,9 +12,11 @@ using Quizanchos.Domain;
 namespace Quizanchos.Domain.Migrations
 {
     [DbContext(typeof(QuizanchosDbContext))]
-    partial class QuizanchosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260503201035_AddContactMessages")]
+    partial class AddContactMessages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
