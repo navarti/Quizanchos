@@ -11,7 +11,6 @@ using Quizanchos.Domain.Repositories.Implementations;
 using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.Util;
 using Quizanchos.WebApi.Constants;
-using Quizanchos.WebApi.Controllers.Auth;
 using Quizanchos.WebApi.Extensions;
 using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Services.Auth;
@@ -378,20 +377,20 @@ public static class Startup
         IServiceCollection services = builder.Services;
         ConfigurationManager configuration = builder.Configuration;
 
-        if (configuration.GetOption("EmailConfirmation:ShouldUse") == "0")
+        string smtpHost = configuration.GetOption("EmailConfirmation:Smtp:Host");
+        if (!int.TryParse(configuration.GetOption("EmailConfirmation:Smtp:Port"), out int smtpPort))
         {
-            services.AddTransient<IUserPasswordUpdaterService, DefaultPasswordUpdaterService>();
-            services.AddTransient<IUserRegistrationService, DefaultUserRegistrationService>();
-            services.AddControllersWithViews(options =>
-            {
-                options.Conventions.Add(new SkipControllerConvention(typeof(EmailConfirmationController)));
-            })
-            .AddJsonOptions(options => ConfigureJsonOptions(options, minigameDescriptors));
-            return;
+            throw Util.CriticalExceptionFactory.CreateConfigException("EmailConfirmation:Smtp:Port");
         }
+        string smtpUser = configuration.GetOption("EmailConfirmation:Smtp:User");
+        string smtpPassword = configuration.GetOption("EmailConfirmation:Smtp:Password");
 
-        services.AddFluentEmail(configuration.GetOption("EmailConfirmation:MailGun:FromEmail"), configuration.GetOption("EmailConfirmation:MailGun:FromName"))
-            .AddMailGunSender(configuration.GetOption("EmailConfirmation:MailGun:Domain"), configuration.GetOption("EmailConfirmation:MailGun:ApiKey"));
+        services.AddFluentEmail(configuration.GetOption("EmailConfirmation:Smtp:FromEmail"), configuration.GetOption("EmailConfirmation:Smtp:FromName"))
+            .AddSmtpSender(() => new System.Net.Mail.SmtpClient(smtpHost, smtpPort)
+            {
+                EnableSsl = true,
+                Credentials = new System.Net.NetworkCredential(smtpUser, smtpPassword)
+            });
 
         services.AddTransient<EmailSenderService>();
         services.AddTransient<DefaultUserRegistrationService>();

@@ -58,7 +58,9 @@
 
             <div class="auth-buttons">
                 <a href="/" class="btn btn-secondary" title="Switch to user view">User view</a>
-                <a href="/Account/Logout" class="btn-logout">Logout</a>
+                <form method="post" action="/Account/Logout" class="logout-form">
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
             </div>
         }
     </div>
