@@ -29,7 +29,7 @@ services:
       - ./logs:/app/logs
       - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
     ports:
-      - "127.0.0.1:8080:8080"
+      - "8080:8080"
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
       interval: 30s
