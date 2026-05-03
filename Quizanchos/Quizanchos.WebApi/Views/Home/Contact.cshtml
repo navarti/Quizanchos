@@ -12,22 +12,22 @@
         <form id="contactForm" novalidate>
             <div class="form-group">
                 <label class="form-label" for="contact-name">Name</label>
-                <input id="contact-name" type="text" class="form-input" required autocomplete="name">
+                <input id="contact-name" type="text" class="form-input" required autocomplete="name" maxlength="100">
                 <small class="error-message" id="contact-nameError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contact-email">Email</label>
-                <input id="contact-email" type="email" class="form-input" required autocomplete="email">
+                <input id="contact-email" type="email" class="form-input" required autocomplete="email" maxlength="256">
                 <small class="error-message" id="contact-emailError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contact-subject">Subject</label>
-                <input id="contact-subject" type="text" class="form-input" required>
+                <input id="contact-subject" type="text" class="form-input" required maxlength="200">
                 <small class="error-message" id="contact-subjectError" role="alert"></small>
             </div>
             <div class="form-group">
                 <label class="form-label" for="contact-message">Message</label>
-                <textarea id="contact-message" class="form-input form-textarea" required></textarea>
+                <textarea id="contact-message" class="form-input form-textarea" required maxlength="5000"></textarea>
                 <small class="error-message" id="contact-messageError" role="alert"></small>
             </div>
             <button type="submit" class="form-submit btn btn-primary" id="contact-submit">Send Message</button>
@@ -46,7 +46,7 @@
             const submitBtn = document.getElementById('contact-submit');
             if (!form || !submitBtn) return;
 
-            form.addEventListener('submit', (e) => {
+            form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 clearErrors();
                 const name = document.getElementById('contact-name');
@@ -62,14 +62,38 @@
                 if (!valid) return;
 
                 setButtonBusy(submitBtn, true, 'Sending…');
-                // No backend endpoint yet — fall back to mailto so the user's message isn't lost.
-                setTimeout(() => {
+                try {
+                    const response = await fetch('/Contact/Submit', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: name.value.trim(),
+                            email: email.value.trim(),
+                            subject: subject.value.trim(),
+                            message: message.value.trim(),
+                        }),
+                    });
+
+                    if (response.ok) {
+                        showToast("Thanks! Your message has been sent.", 'success');
+                        form.reset();
+                        return;
+                    }
+
+                    if (response.status === 429) {
+                        showToast('Too many requests. Please try again in a few minutes.', 'warning');
+                        return;
+                    }
+
+                    let errorMsg = 'Could not send your message. Please try again.';
+                    try { const data = await response.json(); errorMsg = data?.Message || data?.message || errorMsg; } catch {}
+                    showToast(errorMsg, 'error');
+                } catch (err) {
+                    console.error(err);
+                    showToast('Network error. Please try again.', 'error');
+                } finally {
                     setButtonBusy(submitBtn, false);
-                    showToast("Thanks! Opening your mail app to deliver the message.", 'success');
-                    const body = encodeURIComponent(`From: ${name.value.trim()} <${email.value.trim()}>\n\n${message.value.trim()}`);
-                    window.location.href = `mailto:quizanchos@outlook.com?subject=${encodeURIComponent(subject.value.trim())}&body=${body}`;
-                    form.reset();
-                }, 350);
+                }
             });
         });
     </script>

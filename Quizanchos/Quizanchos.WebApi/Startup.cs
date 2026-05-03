@@ -141,6 +141,15 @@ public static class Startup
                         Window = TimeSpan.FromMinutes(1),
                         QueueLimit = 0
                     }));
+            options.AddPolicy("contact", httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "anon",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 3,
+                        Window = TimeSpan.FromMinutes(5),
+                        QueueLimit = 0
+                    }));
         });
 
         // ========== MINIGAME REGISTRATION SYSTEM ==========
@@ -196,6 +205,9 @@ public static class Startup
         services.AddTransient<AuthorizationService>(); 
         services.AddScoped<UserProfileService>();
         services.AddTransient<LeaderBoardService>();
+
+        services.Configure<ContactOptions>(configuration.GetSection("Contact"));
+        services.AddScoped<ContactService>();
 
         services.Configure<BinanceApiOptions>(configuration.GetSection("BinanceApi"));
         services.Configure<List<CoinPackageOption>>(configuration.GetSection("CoinPackages"));
