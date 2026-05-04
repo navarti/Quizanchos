@@ -28,7 +28,6 @@ public static class QuizServiceExtensions
         services.AddScoped<FeatureIntService>();
         services.AddScoped<FeatureFloatService>();
         services.AddScoped<QuizCardGeneratorService>();
-        services.AddScoped<QuizGameStateService>();
         services.AddScoped<QuizEngineFactory>();
 
         return services;

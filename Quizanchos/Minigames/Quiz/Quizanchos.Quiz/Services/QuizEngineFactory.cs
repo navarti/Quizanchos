@@ -1,35 +1,32 @@
 using Microsoft.Extensions.Logging;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.GameLogic;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.Quiz.Services;
 
 public class QuizEngineFactory
 {
-    private const int QuizMinigameTypeId = 1;
+    private const int MinigameTypeId = 1;
+
     private readonly ILogger<QuizEngineFactory> _logger;
+    private readonly IGameStatePersistence _persistence;
     private readonly QuizCardGeneratorService? _cardGenerator;
-    private readonly QuizGameStateService _stateService;
-    private readonly IGameSessionRepository _gameSessionRepository;
 
     public QuizEngineFactory(
         ILogger<QuizEngineFactory> logger,
-        QuizGameStateService stateService,
-        IGameSessionRepository gameSessionRepository,
+        IGameStatePersistence persistence,
         QuizCardGeneratorService? cardGenerator = null)
     {
         _logger = logger;
-        _stateService = stateService;
-        _gameSessionRepository = gameSessionRepository;
+        _persistence = persistence;
         _cardGenerator = cardGenerator;
     }
 
     public async Task<GameEngine<QuizGameState, QuizMove>> CreateQuizEngineAsync(
-        Guid gameId, 
+        Guid gameId,
         ImmutableArray<string> playerIds,
         int totalCards,
         Guid? categoryId,
@@ -37,49 +34,29 @@ public class QuizEngineFactory
         int secondsPerCard,
         int optionCount)
     {
-        _logger.LogInformation("Creating Quiz engine with: TotalCards={TotalCards}, CategoryId={CategoryId}, GameLevel={GameLevel}, SecondsPerCard={SecondsPerCard}, OptionCount={OptionCount}",
+        _logger.LogInformation(
+            "Creating Quiz engine with: TotalCards={TotalCards}, CategoryId={CategoryId}, GameLevel={GameLevel}, SecondsPerCard={SecondsPerCard}, OptionCount={OptionCount}",
             totalCards, categoryId, gameLevel, secondsPerCard, optionCount);
 
-        // Create GameSession first
-        GameSession gameSession = new GameSession
-        {
-            Id = gameId,
-            MinigameType = QuizMinigameTypeId,
-            IsActive = true,
-            IsFinished = false,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        foreach (string playerId in playerIds)
-        {
-            gameSession.Players.Add(new GameSessionPlayer
-            {
-                Id = Guid.NewGuid(),
-                GameSessionId = gameId,
-                ApplicationUserId = playerId,
-                JoinedAt = DateTime.UtcNow
-            });
-        }
-
-        await _gameSessionRepository.CreateAsync(gameSession);
-
-        // Create the engine
-        QuizGameLogic logic = new QuizGameLogic(
+        var logic = new QuizGameLogic(
             totalCards,
             categoryId,
             gameLevel,
             secondsPerCard,
             optionCount,
-            _cardGenerator
-        );
-        
-        GameEngine<QuizGameState, QuizMove> engine = new GameEngine<QuizGameState, QuizMove>(logic, gameId, playerIds);
-        
-        QuizGameState state = engine.State;
+            _cardGenerator);
 
-        await _stateService.CreateInitialStateAsync(gameSession, state);
+        var engine = new GameEngine<QuizGameState, QuizMove>(logic, gameId, playerIds);
+        var state = engine.State;
 
-        _logger.LogInformation("Quiz engine created. Initial state: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
+        await _persistence.CreateAsync(
+            gameId,
+            MinigameTypeId,
+            playerIds,
+            JsonSerializer.Serialize(state));
+
+        _logger.LogInformation(
+            "Quiz engine created. Initial state: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
             state.CurrentCardIndex, state.TotalCards, state.Cards.Count);
 
         // Generate only the first card if categoryId is provided.
@@ -87,14 +64,13 @@ public class QuizEngineFactory
         if (categoryId.HasValue && categoryId.Value != Guid.Empty && _cardGenerator != null)
         {
             _logger.LogInformation("Delegating first-card generation to QuizCardGeneratorService");
-            
+
             try
             {
                 await _cardGenerator.GenerateSingleCard(state, categoryId.Value, optionCount, gameLevel);
                 state.CurrentCardIndex = 0;
 
-                // Save generated card to DB
-                await _stateService.SaveStateAsync(gameId, state);
+                await SaveQuizStateAsync(gameId, state);
             }
             catch (Exception ex)
             {
@@ -105,7 +81,7 @@ public class QuizEngineFactory
         {
             _logger.LogWarning("No category ID provided or card generator unavailable, cards will not be generated");
         }
-        
+
         return engine;
     }
 
@@ -113,27 +89,37 @@ public class QuizEngineFactory
     {
         _logger.LogInformation("Loading Quiz engine for GameId={GameId}", gameId);
 
-        QuizGameState? state = await _stateService.LoadStateAsync(gameId);
-        if (state == null)
+        var loaded = await _persistence.LoadAsync(gameId);
+        if (loaded is null)
         {
             _logger.LogWarning("Quiz state not found for GameId={GameId}", gameId);
             return null;
         }
 
-        QuizGameLogic logic = new QuizGameLogic(
+        var state = JsonSerializer.Deserialize<QuizGameState>(loaded.StateJson);
+        if (state is null)
+        {
+            _logger.LogWarning("Quiz state failed to deserialize for GameId={GameId}", gameId);
+            return null;
+        }
+
+        state.GameId = gameId;
+        state.Players = loaded.PlayerIds;
+        state.IsFinished = loaded.IsFinished;
+        state.Winner = loaded.Winner;
+
+        var logic = new QuizGameLogic(
             state.TotalCards,
             state.QuizCategoryId,
             state.GameLevel,
             state.SecondsPerCard,
             state.OptionCount,
-            _cardGenerator
-        );
+            _cardGenerator);
 
-        GameEngine<QuizGameState, QuizMove> engine = new GameEngine<QuizGameState, QuizMove>(
-            logic, 
-            state);
+        var engine = new GameEngine<QuizGameState, QuizMove>(logic, state);
 
-        _logger.LogInformation("Quiz engine loaded. State: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
+        _logger.LogInformation(
+            "Quiz engine loaded. State: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards.Count={CardsCount}",
             state.CurrentCardIndex, state.TotalCards, state.Cards.Count);
 
         return engine;
@@ -141,6 +127,6 @@ public class QuizEngineFactory
 
     public async Task SaveQuizStateAsync(Guid gameId, QuizGameState state)
     {
-        await _stateService.SaveStateAsync(gameId, state);
+        await _persistence.UpdateAsync(gameId, JsonSerializer.Serialize(state));
     }
 }

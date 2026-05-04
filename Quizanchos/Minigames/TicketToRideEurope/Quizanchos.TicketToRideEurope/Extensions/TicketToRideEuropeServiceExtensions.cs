@@ -7,7 +7,6 @@ public static class TicketToRideEuropeServiceExtensions
 {
     public static IServiceCollection AddTicketToRideEuropeServices(this IServiceCollection services)
     {
-        services.AddScoped<TicketToRideEuropeStateService>();
         services.AddScoped<TicketToRideEuropeEngineFactory>();
         return services;
     }

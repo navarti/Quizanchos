@@ -1,6 +1,6 @@
 ﻿using Quizanchos.Domain.Entities.Quiz;
 using Quizanchos.Domain.Repositories.Quiz.Interfaces;
-using Quizanchos.Common.Quiz.FeatureTypes;
+using Quizanchos.Domain.Quiz.FeatureTypes;
 
 namespace Quizanchos.DbUpdater.Updater.FeatureUpdaters;
 

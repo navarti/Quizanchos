@@ -1,4 +1,4 @@
-﻿using Quizanchos.Common.Quiz.FeatureTypes;
+﻿using Quizanchos.Domain.Quiz.FeatureTypes;
 
 namespace Quizanchos.DbUpdater.Updater;
 

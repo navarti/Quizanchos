@@ -1,4 +1,3 @@
-using Quizanchos.Common.Enums;
 namespace Quizanchos.ViewModels
 {
     public class SingleGameSessionViewModel
