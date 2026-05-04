@@ -311,6 +311,11 @@ public class GameService
         {
             gameSession.IsFinished = true;
             gameSession.IsActive = false;
+            if (!string.IsNullOrEmpty(engine.Winner))
+            {
+                gameSession.WinnerId = engine.Winner;
+            }
+            gameSession.FinishedAt = DateTime.UtcNow;
             await _gameSessionRepository.UpdateAsync(gameSession);
         }
 
