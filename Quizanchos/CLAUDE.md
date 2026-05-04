@@ -47,6 +47,8 @@ Minigames are **plugins discovered at runtime** via assembly scanning. There are
 - **First-party (build-time):** projects listed as `<MinigamePluginProject>` in `Quizanchos.WebApi.csproj` are built and their DLLs copied into the host output directory.
 - **Third-party (runtime drop-in):** each plugin lives in its own folder under the configured plugin root (`Plugins:Root` in appsettings, defaults to `{contentRoot}/plugins`). The host's `PluginLoader` scans this root at startup, loads each folder via an isolated `PluginLoadContext` (`AssemblyLoadContext` subclass) with `AssemblyDependencyResolver`, and mounts the plugin's `wwwroot/` at `/minigames/{gamekey-lowercase}/` via a per-plugin `PhysicalFileProvider`. Third-party `MinigameTypeId` must be ≥ 1000. See `samples/Quizanchos.Plugin.ClickCounter/` for a reference.
 
+**SDK packaging:** `Quizanchos.Core` and `Quizanchos.Common` are NuGet-packable. Run `dotnet pack Quizanchos.Core/Quizanchos.Core.csproj -c Release` (and same for Common) to produce `nupkgs/Quizanchos.{Core,Common}.0.1.0.nupkg`. Third-party authors install `Quizanchos.Core` (Common is transitive) and use it as their plugin SDK without needing this monorepo.
+
 **To add a new first-party minigame:**
 
 1. Create a project implementing `IMinigameDescriptor` and `IMinigameFrontendDescriptor` (in a `/Descriptors` folder)

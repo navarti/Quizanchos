@@ -452,12 +452,40 @@ Before marking complete, verify:
 
 For an externally-developed plugin that drops into the `plugins/` folder at runtime (rather than being bundled at build time), the same plugin code applies — but the surrounding packaging differs:
 
-- **Project lives outside this repo.** The dev develops against the `Quizanchos.Core` SDK (project ref or NuGet, when published).
+- **Project lives outside this repo.** The dev installs the SDK NuGet package:
+  ```bash
+  dotnet add package Quizanchos.Core --version 0.1.0
+  ```
+  `Quizanchos.Common` is pulled in transitively. Local feed: `Quizanchos/nupkgs/` after running `dotnet pack` on the Core+Common projects (see "Packaging the SDK" below).
 - **MinigameTypeId must be ≥ 1000** (the loader rejects lower values for third-party plugins).
-- **`.csproj` SDK refs use `Private="false" ExcludeAssets="runtime"`** so the host's copy of `Quizanchos.Core`/`Common` is used at runtime (avoids type identity issues and reduces plugin size).
+- **PackageReference uses `PrivateAssets="all" ExcludeAssets="runtime"`** so the host's copy of `Quizanchos.Core`/`Common` is used at runtime (avoids type identity issues and reduces plugin size):
+  ```xml
+  <PackageReference Include="Quizanchos.Core" Version="0.1.0"
+                    PrivateAssets="all" ExcludeAssets="runtime" />
+  ```
 - **A `plugin.json` manifest** at the plugin root declares the entry assembly + wwwroot path.
 - **`wwwroot/` lives in the plugin project** (not in `WebApi/wwwroot/`); the host's loader mounts it under `/minigames/{gamekey-lowercase}/` via a per-plugin `PhysicalFileProvider`.
 - **Publish via `dotnet publish -c Release -o {pluginsRoot}/{GameKey}`** — drops the DLL, deps.json, manifest, and wwwroot into a single folder ready to be loaded.
 - **No edit to `WebApi.csproj` or the solution** — the host discovers the plugin at startup by scanning the configured plugin root (`Plugins:Root` in appsettings).
 
-A complete working example lives at `samples/Quizanchos.Plugin.ClickCounter/` — refer to it as the canonical reference for third-party authoring.
+A complete working example lives at `samples/Quizanchos.Plugin.ClickCounter/` — refer to it as the canonical reference for third-party authoring. (The sample uses `ProjectReference` for in-repo development convenience; the csproj has a comment explaining the PackageReference swap for true third-party use.)
+
+### Packaging the SDK
+
+Run from the `Quizanchos/` directory:
+
+```bash
+dotnet pack Quizanchos.Common/Quizanchos.Common.csproj -c Release
+dotnet pack Quizanchos.Core/Quizanchos.Core.csproj -c Release
+```
+
+Output: `Quizanchos/nupkgs/Quizanchos.Core.0.1.0.nupkg` (and `.snupkg` symbol package), `Quizanchos.Common.0.1.0.nupkg`. To consume from a third-party project, add the local folder as a NuGet feed:
+
+```xml
+<!-- nuget.config in the third-party project -->
+<configuration>
+  <packageSources>
+    <add key="quizanchos-local" value="C:\path\to\Quizanchos\nupkgs" />
+  </packageSources>
+</configuration>
+```
