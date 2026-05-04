@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Quizanchos.Common.Quiz.FeatureTypes;
+using Quizanchos.Domain.Quiz.FeatureTypes;
 using Quizanchos.Domain.Entities.Quiz;
 
 namespace Quizanchos.Domain.Configurations.Quiz;

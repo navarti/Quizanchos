@@ -1,4 +1,4 @@
-using Quizanchos.Common.Quiz.Enums;
+using Quizanchos.Domain.Quiz.Enums;
 using Quizanchos.Domain.Entities.Interfaces;
 
 namespace Quizanchos.Domain.Entities.Quiz;

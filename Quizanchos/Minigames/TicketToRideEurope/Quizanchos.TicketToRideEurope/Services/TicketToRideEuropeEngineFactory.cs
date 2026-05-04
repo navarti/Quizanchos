@@ -1,26 +1,22 @@
 using Microsoft.Extensions.Logging;
 using Quizanchos.Core;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.TicketToRideEurope.GameLogic;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.TicketToRideEurope.Services;
 
 public class TicketToRideEuropeEngineFactory
 {
     private readonly ILogger<TicketToRideEuropeEngineFactory> _logger;
-    private readonly TicketToRideEuropeStateService _stateService;
-    private readonly IGameSessionRepository _gameSessionRepository;
+    private readonly IGameStatePersistence _persistence;
 
     public TicketToRideEuropeEngineFactory(
         ILogger<TicketToRideEuropeEngineFactory> logger,
-        TicketToRideEuropeStateService stateService,
-        IGameSessionRepository gameSessionRepository)
+        IGameStatePersistence persistence)
     {
         _logger = logger;
-        _stateService = stateService;
-        _gameSessionRepository = gameSessionRepository;
+        _persistence = persistence;
     }
 
     public async Task<GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>> CreateEngineAsync(
@@ -32,38 +28,19 @@ public class TicketToRideEuropeEngineFactory
             "Creating TicketToRideEurope engine: GameId={GameId}, Players={PlayerCount}",
             gameId, playerIds.Length);
 
-        GameSession gameSession = new GameSession
-        {
-            Id = gameId,
-            MinigameType = TicketToRideEuropeState.MinigameTypeId,
-            IsActive = true,
-            IsFinished = false,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        foreach (string playerId in playerIds)
-        {
-            gameSession.Players.Add(new GameSessionPlayer
-            {
-                Id = Guid.NewGuid(),
-                GameSessionId = gameId,
-                ApplicationUserId = playerId,
-                JoinedAt = DateTime.UtcNow
-            });
-        }
-
-        await _gameSessionRepository.CreateAsync(gameSession);
-
-        TicketToRideEuropeLogic logic = new TicketToRideEuropeLogic();
-        GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove> engine =
-            new GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>(logic, gameId, playerIds);
+        var logic = new TicketToRideEuropeLogic();
+        var engine = new GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>(logic, gameId, playerIds);
 
         if (playerNicknames is { Count: > 0 })
         {
             engine.State.PlayerNicknames = new Dictionary<string, string>(playerNicknames);
         }
 
-        await _stateService.CreateInitialStateAsync(gameId, engine.State);
+        await _persistence.CreateAsync(
+            gameId,
+            TicketToRideEuropeState.MinigameTypeId,
+            playerIds,
+            JsonSerializer.Serialize(engine.State));
 
         _logger.LogInformation("TicketToRideEurope engine created for GameId={GameId}", gameId);
         return engine;
@@ -73,22 +50,34 @@ public class TicketToRideEuropeEngineFactory
     {
         _logger.LogInformation("Loading TicketToRideEurope engine for GameId={GameId}", gameId);
 
-        TicketToRideEuropeState? state = await _stateService.LoadStateAsync(gameId);
-        if (state == null)
+        var loaded = await _persistence.LoadAsync(gameId);
+        if (loaded is null)
         {
             _logger.LogWarning("TicketToRideEurope state not found for GameId={GameId}", gameId);
             return null;
         }
 
-        TicketToRideEuropeLogic logic = new TicketToRideEuropeLogic();
-        GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove> engine =
-            new GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>(logic, state);
+        var state = JsonSerializer.Deserialize<TicketToRideEuropeState>(loaded.StateJson);
+        if (state is null)
+        {
+            _logger.LogWarning("TicketToRideEurope state failed to deserialize for GameId={GameId}", gameId);
+            return null;
+        }
 
-        return engine;
+        state.GameId = gameId;
+        // Derive Players from PlayerStates (preserved in JSON in original turn order).
+        // loaded.PlayerIds comes from EF's GameSession.Players nav collection which has no
+        // guaranteed ordering — using it would scramble the turn rotation after a reload.
+        state.Players = state.PlayerStates.Select(p => p.PlayerId).ToList();
+        state.IsFinished = loaded.IsFinished;
+        // state.Winner intentionally preserved from JSON (set during gameplay, not host-tracked).
+
+        var logic = new TicketToRideEuropeLogic();
+        return new GameEngine<TicketToRideEuropeState, TicketToRideEuropeMove>(logic, state);
     }
 
     public async Task SaveStateAsync(Guid gameId, TicketToRideEuropeState state)
     {
-        await _stateService.SaveStateAsync(gameId, state);
+        await _persistence.UpdateAsync(gameId, JsonSerializer.Serialize(state));
     }
 }
