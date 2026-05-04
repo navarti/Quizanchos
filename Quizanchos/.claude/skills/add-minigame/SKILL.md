@@ -5,11 +5,13 @@ description: Scaffold a new minigame plugin for the Quizanchos platform. Use whe
 
 # Add New Minigame Plugin
 
-You are adding a new minigame plugin to the Quizanchos platform. Ask the user for the following details (if not already provided):
+You are adding a new **first-party** minigame plugin to the Quizanchos platform — i.e. one that lives inside this repo and is bundled at build time via the `<MinigamePluginProject>` MSBuild target. For the third-party (drop-in DLL) workflow, see the sidebar at the bottom of this file.
+
+Ask the user for the following details (if not already provided):
 
 1. **Game name** (e.g., "Minesweeper") — used for class prefixes and display
 2. **Game key** (e.g., "Minesweeper") — unique identifier, used in URLs and registry
-3. **MinigameTypeId** — next available integer (check existing descriptors to find the highest current ID and increment by 1)
+3. **MinigameTypeId** — next available integer in the first-party range (1–999). Check existing descriptors and use the next free integer.
 4. **Is premium?** (default: false)
 5. **Is multiplayer?** (default: false)
 6. **Brief description** of the game rules/mechanics — needed to implement the game logic
@@ -20,7 +22,7 @@ You are adding a new minigame plugin to the Quizanchos platform. Ask the user fo
 
 ### 1. Determine the next MinigameTypeId
 
-Search existing descriptors for the highest `MinigameTypeId` and use the next integer.
+Search existing descriptors for the highest first-party `MinigameTypeId` (in the 1–999 range; 1000+ is reserved for third-party) and use the next integer.
 
 ```bash
 # Find all MinigameTypeId values
@@ -40,11 +42,12 @@ Quizanchos.{GameKey}/
     {GameKey}Logic.cs
   Services/
     {GameKey}EngineFactory.cs
-    {GameKey}StateService.cs
   Extensions/
     {GameKey}ServiceExtensions.cs
   Quizanchos.{GameKey}.csproj
 ```
+
+> **Important:** Plugins reference `Quizanchos.Core` + `Quizanchos.Common` only — never `Quizanchos.Domain` or `Quizanchos.WebApi`. State persistence goes through `IGameStatePersistence` (in `Quizanchos.Core`), implemented by the host. There is no separate `{GameKey}StateService` — its responsibilities are absorbed into the engine factory.
 
 ### 3. Create files using these templates
 
@@ -66,7 +69,6 @@ Quizanchos.{GameKey}/
   <ItemGroup>
     <ProjectReference Include="..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\Quizanchos.Core\Quizanchos.Core.csproj" />
-    <ProjectReference Include="..\Quizanchos.Domain\Quizanchos.Domain.csproj" />
   </ItemGroup>
 </Project>
 ```
@@ -179,150 +181,49 @@ public class {GameKey}Logic : IGameLogic<{GameKey}State, {GameKey}Move>
 }
 ```
 
-#### 3.5 — `{GameKey}StateService.cs`
+#### 3.5 — `{GameKey}EngineFactory.cs`
 
-```csharp
-using System.Text.Json;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
-using Quizanchos.{GameKey}.GameLogic;
-
-namespace Quizanchos.{GameKey}.Services;
-
-public class {GameKey}StateService
-{
-    private readonly IGameSessionStateRepository _repository;
-
-    public {GameKey}StateService(IGameSessionStateRepository repository)
-    {
-        _repository = repository;
-    }
-
-    public async Task<{GameKey}State?> LoadStateAsync(Guid gameSessionId)
-    {
-        GameSessionState? sessionState = await _repository.GetByGameSessionIdAsync(gameSessionId);
-        if (sessionState == null)
-            return null;
-
-        {GameKey}State? state = JsonSerializer.Deserialize<{GameKey}State>(sessionState.StateJson);
-        if (state == null)
-            return null;
-
-        state.GameId = sessionState.GameSessionId;
-        state.Players = sessionState.GameSession.Players.Select(p => p.ApplicationUserId).ToList();
-        state.IsFinished = sessionState.GameSession.IsFinished;
-        state.Winner = sessionState.GameSession.WinnerId;
-
-        return state;
-    }
-
-    public async Task SaveStateAsync(Guid gameSessionId, {GameKey}State state)
-    {
-        GameSessionState? existingState = await _repository.GetByGameSessionIdAsync(gameSessionId);
-        if (existingState == null)
-        {
-            throw new InvalidOperationException($"GameSessionState not found for GameSessionId: {gameSessionId}");
-        }
-
-        existingState.StateJson = JsonSerializer.Serialize(state);
-        existingState.UpdatedAt = DateTime.UtcNow;
-
-        existingState.GameSession.IsFinished = state.IsFinished;
-        if (!string.IsNullOrEmpty(state.Winner))
-        {
-            existingState.GameSession.WinnerId = state.Winner;
-            existingState.GameSession.FinishedAt = DateTime.UtcNow;
-        }
-        if (state.IsFinished)
-        {
-            existingState.GameSession.IsActive = false;
-        }
-
-        await _repository.UpdateAsync(existingState);
-    }
-
-    public async Task<GameSessionState> CreateInitialStateAsync(
-        GameSession gameSession,
-        {GameKey}State state)
-    {
-        var sessionState = new GameSessionState
-        {
-            Id = Guid.NewGuid(),
-            GameSessionId = gameSession.Id,
-            MinigameType = gameSession.MinigameType,
-            StateJson = JsonSerializer.Serialize(state),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        await _repository.CreateAsync(sessionState);
-        return sessionState;
-    }
-}
-```
-
-#### 3.6 — `{GameKey}EngineFactory.cs`
+The factory uses `IGameStatePersistence` (host-provided abstraction in `Quizanchos.Core`) to create/load/save state. No `IGameSessionRepository`, no Domain entities — the host handles `GameSession` row creation when `CreateAsync` is called.
 
 ```csharp
 using Microsoft.Extensions.Logging;
 using Quizanchos.Core;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.{GameKey}.GameLogic;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.{GameKey}.Services;
 
 public class {GameKey}EngineFactory
 {
-    private const int {GameKey}MinigameTypeId = {MinigameTypeId};
+    private const int MinigameTypeId = {MinigameTypeId};
+
     private readonly ILogger<{GameKey}EngineFactory> _logger;
-    private readonly {GameKey}StateService _stateService;
-    private readonly IGameSessionRepository _gameSessionRepository;
+    private readonly IGameStatePersistence _persistence;
 
     public {GameKey}EngineFactory(
         ILogger<{GameKey}EngineFactory> logger,
-        {GameKey}StateService stateService,
-        IGameSessionRepository gameSessionRepository)
+        IGameStatePersistence persistence)
     {
         _logger = logger;
-        _stateService = stateService;
-        _gameSessionRepository = gameSessionRepository;
+        _persistence = persistence;
     }
 
     public async Task<GameEngine<{GameKey}State, {GameKey}Move>> CreateEngineAsync(
         Guid gameId,
         ImmutableArray<string> playerIds)
     {
-        _logger.LogInformation("Creating {GameKey} engine");
-
-        GameSession gameSession = new GameSession
-        {
-            Id = gameId,
-            MinigameType = {GameKey}MinigameTypeId,
-            IsActive = true,
-            IsFinished = false,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        foreach (string playerId in playerIds)
-        {
-            gameSession.Players.Add(new GameSessionPlayer
-            {
-                Id = Guid.NewGuid(),
-                GameSessionId = gameId,
-                ApplicationUserId = playerId,
-                JoinedAt = DateTime.UtcNow
-            });
-        }
-
-        await _gameSessionRepository.CreateAsync(gameSession);
+        _logger.LogInformation("Creating {GameKey} engine for GameId={GameId}", gameId);
 
         // TODO: Pass any game-specific parameters to the logic constructor
-        {GameKey}Logic logic = new {GameKey}Logic();
-        GameEngine<{GameKey}State, {GameKey}Move> engine = new(logic, gameId, playerIds);
+        var logic = new {GameKey}Logic();
+        var engine = new GameEngine<{GameKey}State, {GameKey}Move>(logic, gameId, playerIds);
 
-        await _stateService.CreateInitialStateAsync(gameSession, engine.State);
+        await _persistence.CreateAsync(
+            gameId,
+            MinigameTypeId,
+            playerIds,
+            JsonSerializer.Serialize(engine.State));
 
         return engine;
     }
@@ -331,29 +232,43 @@ public class {GameKey}EngineFactory
     {
         _logger.LogInformation("Loading {GameKey} engine for GameId={GameId}", gameId);
 
-        {GameKey}State? state = await _stateService.LoadStateAsync(gameId);
-        if (state == null)
+        var loaded = await _persistence.LoadAsync(gameId);
+        if (loaded is null)
         {
             _logger.LogWarning("{GameKey} state not found for GameId={GameId}", gameId);
             return null;
         }
 
-        // TODO: Reconstruct logic with the same parameters used at creation
-        {GameKey}Logic logic = new {GameKey}Logic();
+        var state = JsonSerializer.Deserialize<{GameKey}State>(loaded.StateJson);
+        if (state is null)
+        {
+            _logger.LogWarning("{GameKey} state failed to deserialize for GameId={GameId}", gameId);
+            return null;
+        }
+
+        // Patch host-tracked metadata onto the deserialized state.
+        state.GameId = gameId;
+        state.Players = loaded.PlayerIds;
+        state.IsFinished = loaded.IsFinished;
+        state.Winner = loaded.Winner;
+
+        // TODO: Reconstruct logic with the same parameters used at creation.
+        var logic = new {GameKey}Logic();
         return new GameEngine<{GameKey}State, {GameKey}Move>(logic, state);
     }
 
     public async Task SaveStateAsync(Guid gameId, {GameKey}State state)
     {
-        await _stateService.SaveStateAsync(gameId, state);
+        await _persistence.UpdateAsync(gameId, JsonSerializer.Serialize(state));
     }
 }
 ```
 
-#### 3.7 — `{GameKey}ServiceExtensions.cs`
+#### 3.6 — `{GameKey}ServiceExtensions.cs`
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
+using Quizanchos.{GameKey}.Services;
 
 namespace Quizanchos.{GameKey}.Extensions;
 
@@ -361,14 +276,13 @@ public static class {GameKey}ServiceExtensions
 {
     public static IServiceCollection Add{GameKey}Services(this IServiceCollection services)
     {
-        services.AddScoped<Services.{GameKey}StateService>();
-        services.AddScoped<Services.{GameKey}EngineFactory>();
+        services.AddScoped<{GameKey}EngineFactory>();
         return services;
     }
 }
 ```
 
-#### 3.8 — `{GameKey}MinigameDescriptor.cs` (implements `IMinigameDescriptor`)
+#### 3.7 — `{GameKey}MinigameDescriptor.cs` (implements `IMinigameDescriptor`)
 
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
@@ -428,7 +342,7 @@ public class {GameKey}MinigameDescriptor : IMinigameDescriptor
 }
 ```
 
-#### 3.9 — `{GameKey}FrontendDescriptor.cs` (implements `IMinigameFrontendDescriptor`)
+#### 3.8 — `{GameKey}FrontendDescriptor.cs` (implements `IMinigameFrontendDescriptor`)
 
 ```csharp
 using Quizanchos.Core;
@@ -525,8 +439,25 @@ Before marking complete, verify:
 - [ ] `IMinigameDescriptor` and `IMinigameFrontendDescriptor` are both implemented
 - [ ] `IGameLogic<TState, TMove>` is implemented with real game rules
 - [ ] Move type has `[JsonDerivedType]` attribute with unique discriminator
-- [ ] `MinigameTypeId` is unique across all minigames
+- [ ] `MinigameTypeId` is unique and in the first-party range (1–999); third-party uses 1000+
+- [ ] Engine factory uses `IGameStatePersistence` — NOT `IGameSessionRepository` or `IGameSessionStateRepository`
 - [ ] Plugin is registered in `WebApi.csproj` as `<MinigamePluginProject>`
 - [ ] Project is added to `Quizanchos.slnx`
 - [ ] Frontend asset stubs exist in `wwwroot/minigames/{gameKeyLower}/`
-- [ ] Plugin only references `Core`, `Common`, and `Domain` — NOT `WebApi`
+- [ ] Plugin only references `Core` and `Common` — NOT `WebApi` or `Domain`
+
+---
+
+## Sidebar: Third-party plugin scaffolding
+
+For an externally-developed plugin that drops into the `plugins/` folder at runtime (rather than being bundled at build time), the same plugin code applies — but the surrounding packaging differs:
+
+- **Project lives outside this repo.** The dev develops against the `Quizanchos.Core` SDK (project ref or NuGet, when published).
+- **MinigameTypeId must be ≥ 1000** (the loader rejects lower values for third-party plugins).
+- **`.csproj` SDK refs use `Private="false" ExcludeAssets="runtime"`** so the host's copy of `Quizanchos.Core`/`Common` is used at runtime (avoids type identity issues and reduces plugin size).
+- **A `plugin.json` manifest** at the plugin root declares the entry assembly + wwwroot path.
+- **`wwwroot/` lives in the plugin project** (not in `WebApi/wwwroot/`); the host's loader mounts it under `/minigames/{gamekey-lowercase}/` via a per-plugin `PhysicalFileProvider`.
+- **Publish via `dotnet publish -c Release -o {pluginsRoot}/{GameKey}`** — drops the DLL, deps.json, manifest, and wwwroot into a single folder ready to be loaded.
+- **No edit to `WebApi.csproj` or the solution** — the host discovers the plugin at startup by scanning the configured plugin root (`Plugins:Root` in appsettings).
+
+A complete working example lives at `samples/Quizanchos.Plugin.ClickCounter/` — refer to it as the canonical reference for third-party authoring.

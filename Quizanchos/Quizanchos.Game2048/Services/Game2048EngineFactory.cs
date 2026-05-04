@@ -1,27 +1,24 @@
 using Microsoft.Extensions.Logging;
 using Quizanchos.Core;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Game2048.GameLogic;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.Game2048.Services;
 
 public class Game2048EngineFactory
 {
-    private const int Game2048MinigameTypeId = 2;
+    private const int MinigameTypeId = 2;
+
     private readonly ILogger<Game2048EngineFactory> _logger;
-    private readonly Game2048StateService _stateService;
-    private readonly IGameSessionRepository _gameSessionRepository;
+    private readonly IGameStatePersistence _persistence;
 
     public Game2048EngineFactory(
         ILogger<Game2048EngineFactory> logger,
-        Game2048StateService stateService,
-        IGameSessionRepository gameSessionRepository)
+        IGameStatePersistence persistence)
     {
         _logger = logger;
-        _stateService = stateService;
-        _gameSessionRepository = gameSessionRepository;
+        _persistence = persistence;
     }
 
     public async Task<GameEngine<Game2048State, Game2048Move>> CreateGame2048EngineAsync(
@@ -31,36 +28,19 @@ public class Game2048EngineFactory
     {
         _logger.LogInformation("Creating 2048 engine with Size={Size}", size);
 
-        GameSession gameSession = new GameSession
-        {
-            Id = gameId,
-            MinigameType = Game2048MinigameTypeId,
-            IsActive = true,
-            IsFinished = false,
-            CreatedAt = DateTime.UtcNow
-        };
+        var logic = new Game2048Logic(size);
+        var engine = new GameEngine<Game2048State, Game2048Move>(logic, gameId, playerIds);
 
-        foreach (string playerId in playerIds)
-        {
-            gameSession.Players.Add(new GameSessionPlayer
-            {
-                Id = Guid.NewGuid(),
-                GameSessionId = gameId,
-                ApplicationUserId = playerId,
-                JoinedAt = DateTime.UtcNow
-            });
-        }
+        await _persistence.CreateAsync(
+            gameId,
+            MinigameTypeId,
+            playerIds,
+            JsonSerializer.Serialize(engine.State));
 
-        await _gameSessionRepository.CreateAsync(gameSession);
-
-        Game2048Logic logic = new Game2048Logic(size);
-        GameEngine<Game2048State, Game2048Move> engine = new GameEngine<Game2048State, Game2048Move>(logic, gameId, playerIds);
-
-        Game2048State state = engine.State;
-
-        await _stateService.CreateInitialStateAsync(gameSession, state);
-
-        _logger.LogInformation("2048 engine created. Score={Score}, BestTile={BestTile}", state.Score, state.BestTile);
+        _logger.LogInformation(
+            "2048 engine created. Score={Score}, BestTile={BestTile}",
+            engine.State.Score,
+            engine.State.BestTile);
 
         return engine;
     }
@@ -69,24 +49,39 @@ public class Game2048EngineFactory
     {
         _logger.LogInformation("Loading 2048 engine for GameId={GameId}", gameId);
 
-        Game2048State? state = await _stateService.LoadStateAsync(gameId);
-        if (state == null)
+        var loaded = await _persistence.LoadAsync(gameId);
+        if (loaded is null)
         {
             _logger.LogWarning("2048 state not found for GameId={GameId}", gameId);
             return null;
         }
 
-        Game2048Logic logic = new Game2048Logic(state.Size);
-        GameEngine<Game2048State, Game2048Move> engine = new GameEngine<Game2048State, Game2048Move>(logic, state);
+        var state = JsonSerializer.Deserialize<Game2048State>(loaded.StateJson);
+        if (state is null)
+        {
+            _logger.LogWarning("2048 state could not be deserialized for GameId={GameId}", gameId);
+            return null;
+        }
 
-        _logger.LogInformation("2048 engine loaded. Score={Score}, BestTile={BestTile}, MoveCount={MoveCount}",
-            state.Score, state.BestTile, state.MoveCount);
+        state.GameId = gameId;
+        state.Players = loaded.PlayerIds;
+        state.IsFinished = loaded.IsFinished;
+        state.Winner = loaded.Winner;
+
+        var logic = new Game2048Logic(state.Size);
+        var engine = new GameEngine<Game2048State, Game2048Move>(logic, state);
+
+        _logger.LogInformation(
+            "2048 engine loaded. Score={Score}, BestTile={BestTile}, MoveCount={MoveCount}",
+            state.Score,
+            state.BestTile,
+            state.MoveCount);
 
         return engine;
     }
 
     public async Task SaveGame2048StateAsync(Guid gameId, Game2048State state)
     {
-        await _stateService.SaveStateAsync(gameId, state);
+        await _persistence.UpdateAsync(gameId, JsonSerializer.Serialize(state));
     }
 }
