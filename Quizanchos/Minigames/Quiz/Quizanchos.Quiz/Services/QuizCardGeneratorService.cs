@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Quizanchos.Common.Enums;
-using Quizanchos.Common.Quiz.Enums;
+using Quizanchos.Domain.Quiz.Enums;
 using Quizanchos.Domain.Entities.Quiz;
 using Quizanchos.Domain.Repositories.Quiz.Interfaces;
 using Quizanchos.Quiz.GameLogic;

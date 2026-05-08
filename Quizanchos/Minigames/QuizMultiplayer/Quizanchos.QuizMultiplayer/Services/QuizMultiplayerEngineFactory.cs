@@ -1,32 +1,29 @@
 using Microsoft.Extensions.Logging;
 using Quizanchos.Common.Enums;
 using Quizanchos.Core;
-using Quizanchos.Domain.Entities;
-using Quizanchos.Domain.Repositories.Interfaces;
 using Quizanchos.Quiz.GameLogic;
 using Quizanchos.Quiz.Services;
 using Quizanchos.QuizMultiplayer.GameLogic;
 using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace Quizanchos.QuizMultiplayer.Services;
 
 public class QuizMultiplayerEngineFactory
 {
-    private const int QuizMultiplayerMinigameTypeId = 3;
+    private const int MinigameTypeId = 3;
+
     private readonly ILogger<QuizMultiplayerEngineFactory> _logger;
-    private readonly QuizMultiplayerStateService _stateService;
-    private readonly IGameSessionRepository _gameSessionRepository;
+    private readonly IGameStatePersistence _persistence;
     private readonly QuizCardGeneratorService? _cardGenerator;
 
     public QuizMultiplayerEngineFactory(
         ILogger<QuizMultiplayerEngineFactory> logger,
-        QuizMultiplayerStateService stateService,
-        IGameSessionRepository gameSessionRepository,
+        IGameStatePersistence persistence,
         QuizCardGeneratorService? cardGenerator = null)
     {
         _logger = logger;
-        _stateService = stateService;
-        _gameSessionRepository = gameSessionRepository;
+        _persistence = persistence;
         _cardGenerator = cardGenerator;
     }
 
@@ -44,37 +41,11 @@ public class QuizMultiplayerEngineFactory
             "Creating QuizMultiplayer engine: TotalCards={TotalCards}, CategoryId={CategoryId}, Teams={TeamCount}, Players={PlayerCount}",
             totalCards, categoryId, teams.Count, playerIds.Length);
 
-        // Create GameSession
-        GameSession gameSession = new GameSession
-        {
-            Id = gameId,
-            MinigameType = QuizMultiplayerMinigameTypeId,
-            IsActive = true,
-            IsFinished = false,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        foreach (string playerId in playerIds)
-        {
-            gameSession.Players.Add(new GameSessionPlayer
-            {
-                Id = Guid.NewGuid(),
-                GameSessionId = gameId,
-                ApplicationUserId = playerId,
-                JoinedAt = DateTime.UtcNow
-            });
-        }
-
-        await _gameSessionRepository.CreateAsync(gameSession);
-
-        // Create the engine
-        QuizMultiplayerGameLogic logic = new QuizMultiplayerGameLogic(
+        var logic = new QuizMultiplayerGameLogic(
             totalCards, categoryId, gameLevel, secondsPerCard, optionCount, teams, _cardGenerator);
 
-        GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove> engine =
-            new GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove>(logic, gameId, playerIds);
-
-        QuizMultiplayerGameState state = engine.State;
+        var engine = new GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove>(logic, gameId, playerIds);
+        var state = engine.State;
 
         // Generate only the first card. Next cards are generated lazily after each round.
         if (categoryId.HasValue && categoryId.Value != Guid.Empty && _cardGenerator != null)
@@ -82,7 +53,7 @@ public class QuizMultiplayerEngineFactory
             _logger.LogInformation("Generating first card via QuizCardGeneratorService");
             try
             {
-                QuizGameState tempState = new QuizGameState
+                var tempState = new QuizGameState
                 {
                     GameId = gameId,
                     Players = playerIds.ToList(),
@@ -94,7 +65,6 @@ public class QuizMultiplayerEngineFactory
 
                 await _cardGenerator.GenerateSingleCard(tempState, categoryId.Value, optionCount, gameLevel);
 
-                // Copy generated first card into multiplayer state
                 var quizCard = tempState.Cards.FirstOrDefault();
                 if (quizCard != null)
                 {
@@ -124,8 +94,11 @@ public class QuizMultiplayerEngineFactory
             _logger.LogWarning("No category ID provided or card generator unavailable, cards will not be generated");
         }
 
-        // Persist initial state
-        await _stateService.CreateInitialStateAsync(gameId, state);
+        await _persistence.CreateAsync(
+            gameId,
+            MinigameTypeId,
+            playerIds,
+            JsonSerializer.Serialize(state));
 
         _logger.LogInformation(
             "QuizMultiplayer engine created: GameId={GameId}, Cards={CardsCount}, CurrentCardIndex={CurrentCardIndex}",
@@ -138,14 +111,27 @@ public class QuizMultiplayerEngineFactory
     {
         _logger.LogInformation("Loading QuizMultiplayer engine for GameId={GameId}", gameId);
 
-        QuizMultiplayerGameState? state = await _stateService.LoadStateAsync(gameId);
-        if (state == null)
+        var loaded = await _persistence.LoadAsync(gameId);
+        if (loaded is null)
         {
             _logger.LogWarning("QuizMultiplayer state not found for GameId={GameId}", gameId);
             return null;
         }
 
-        QuizMultiplayerGameLogic logic = new QuizMultiplayerGameLogic(
+        var state = JsonSerializer.Deserialize<QuizMultiplayerGameState>(loaded.StateJson);
+        if (state is null)
+        {
+            _logger.LogWarning("QuizMultiplayer state failed to deserialize for GameId={GameId}", gameId);
+            return null;
+        }
+
+        state.GameId = gameId;
+        state.Players = loaded.PlayerIds;
+        state.IsFinished = loaded.IsFinished;
+        // state.Winner is the winning team name, preserved from JSON; do not overwrite with
+        // loaded.Winner (which would be GameSession.WinnerId — left null for team-based games).
+
+        var logic = new QuizMultiplayerGameLogic(
             state.TotalCards,
             state.QuizCategoryId,
             state.GameLevel,
@@ -154,8 +140,7 @@ public class QuizMultiplayerEngineFactory
             state.Teams,
             _cardGenerator);
 
-        GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove> engine =
-            new GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove>(logic, state);
+        var engine = new GameEngine<QuizMultiplayerGameState, QuizMultiplayerMove>(logic, state);
 
         _logger.LogInformation(
             "QuizMultiplayer engine loaded: CurrentCardIndex={CurrentCardIndex}, TotalCards={TotalCards}, Cards={CardsCount}",
@@ -166,6 +151,6 @@ public class QuizMultiplayerEngineFactory
 
     public async Task SaveStateAsync(Guid gameId, QuizMultiplayerGameState state)
     {
-        await _stateService.SaveStateAsync(gameId, state);
+        await _persistence.UpdateAsync(gameId, JsonSerializer.Serialize(state));
     }
 }

@@ -42,14 +42,20 @@ Minigame plugins → Core, Common (no reference to WebApi or Domain)
 
 ### Minigame Plugin System (most important pattern)
 
-Minigames are **plugins discovered at runtime** via assembly scanning. No hardcoded references in WebApi to any minigame project — they are built separately and their DLLs are copied to the output directory (see `MinigamePluginProject` items in WebApi.csproj).
+Minigames are **plugins discovered at runtime** via assembly scanning. There are two loading paths:
 
-**To add a new minigame:**
+- **First-party (build-time):** projects listed as `<MinigamePluginProject>` in `Quizanchos.WebApi.csproj` are built and their DLLs copied into the host output directory.
+- **Third-party (runtime drop-in):** each plugin lives in its own folder under the configured plugin root (`Plugins:Root` in appsettings, defaults to `{contentRoot}/plugins`). The host's `PluginLoader` scans this root at startup, loads each folder via an isolated `PluginLoadContext` (`AssemblyLoadContext` subclass) with `AssemblyDependencyResolver`, and mounts the plugin's `wwwroot/` at `/minigames/{gamekey-lowercase}/` via a per-plugin `PhysicalFileProvider`. Third-party `MinigameTypeId` must be ≥ 1000. See `samples/Quizanchos.Plugin.ClickCounter/` for a reference.
+
+**SDK packaging:** `Quizanchos.Core` and `Quizanchos.Common` are NuGet-packable. Run `dotnet pack Quizanchos.Core/Quizanchos.Core.csproj -c Release` (and same for Common) to produce `nupkgs/Quizanchos.{Core,Common}.0.1.0.nupkg`. Third-party authors install `Quizanchos.Core` (Common is transitive) and use it as their plugin SDK without needing this monorepo.
+
+**To add a new first-party minigame:**
 
 1. Create a project implementing `IMinigameDescriptor` and `IMinigameFrontendDescriptor` (in a `/Descriptors` folder)
 2. Implement `IGameLogic<TState, TMove>` (combines `IGameStateFactory`, `IGameValidator`, `IGameRules`)
-3. Add the project as a `<MinigamePluginProject>` in `Quizanchos.WebApi.csproj`
-4. Add static assets to `wwwroot/minigames/{gameKey}/`
+3. Persist state via the host's `IGameStatePersistence` (in `Quizanchos.Core`) — never reach into Domain repositories directly
+4. Add the project as a `<MinigamePluginProject>` in `Quizanchos.WebApi.csproj`
+5. Add static assets to `wwwroot/minigames/{gameKey}/`
 
 Each descriptor self-registers its DI services via `RegisterServices(IServiceCollection)`.
 
@@ -58,10 +64,11 @@ Each descriptor self-registers its DI services via `RegisterServices(IServiceCol
 - `IMinigameFrontendDescriptor` — frontend: CSS/JS URLs, display metadata, lobby/game view configuration
 - `IGameEngine` — runtime game instance: `MakeMove()`, `GetState()`, `NeedToFinish()`
 - `IGameLogic<TState, TMove>` — pure game rules (state factory + validator + rules)
+- `IGameStatePersistence` — host-provided persistence for plugin state JSON; plugins call `CreateAsync` / `LoadAsync` / `UpdateAsync` instead of touching `IGameSessionRepository` / `IGameSessionStateRepository` from Domain
 
 **Runtime flow:** `GameService` → `GameLogicFactory` → `IMinigameRegistry` (lookup by gameKey) → `IMinigameDescriptor.CreateGameEngineAsync()` → `GameEngineWrapper<TState, TMove>` wrapping `GameEngine<TState, TMove>`.
 
-Game state is persisted as JSON in `GameSessionState.StateJson` (one blob per game session).
+Game state is persisted as JSON in `GameSessionState.StateJson` (one blob per game session). Plugins go through `IGameStatePersistence`; the host implementation also creates/updates the parent `GameSession` row.
 
 ### Polymorphic Move Deserialization
 

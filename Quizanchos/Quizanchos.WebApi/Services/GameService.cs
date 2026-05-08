@@ -311,6 +311,14 @@ public class GameService
         {
             gameSession.IsFinished = true;
             gameSession.IsActive = false;
+            // Only persist Winner if it's an actual player ID. Some minigames (e.g. team-based
+            // QuizMultiplayer) put a non-player value (team name) in engine.Winner; assigning
+            // that to GameSession.WinnerId would violate the user FK relationship.
+            if (!string.IsNullOrEmpty(engine.Winner) && engine.Players.Contains(engine.Winner))
+            {
+                gameSession.WinnerId = engine.Winner;
+            }
+            gameSession.FinishedAt = DateTime.UtcNow;
             await _gameSessionRepository.UpdateAsync(gameSession);
         }
 
