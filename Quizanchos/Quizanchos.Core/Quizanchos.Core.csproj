@@ -15,7 +15,9 @@
     <Authors>Danchos and Vanchos</Authors>
     <Description>SDK for building Quizanchos minigame plugins. Implement IMinigameDescriptor, IMinigameFrontendDescriptor, and IGameLogic&lt;TState, TMove&gt; to ship a third-party minigame loadable at runtime by the Quizanchos host.</Description>
     <PackageTags>quizanchos;minigame;sdk;plugin;game</PackageTags>
+    <RepositoryUrl>https://github.com/navarti/Quizanchos</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/navarti/Quizanchos</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageOutputPath>$(MSBuildThisFileDirectory)..\nupkgs</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
