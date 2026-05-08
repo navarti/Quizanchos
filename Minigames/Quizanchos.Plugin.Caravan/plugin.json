@@ -1,0 +1,5 @@
+{
+  "entryAssembly": "Quizanchos.Plugin.Caravan.dll",
+  "wwwRoot": "wwwroot",
+  "version": "0.1.0"
+}
