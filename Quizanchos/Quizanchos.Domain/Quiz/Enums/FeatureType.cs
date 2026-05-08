@@ -1,4 +1,4 @@
-﻿namespace Quizanchos.Common.Quiz.Enums;
+namespace Quizanchos.Domain.Quiz.Enums;
 
 public enum FeatureType
 {

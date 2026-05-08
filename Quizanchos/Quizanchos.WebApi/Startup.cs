@@ -16,12 +16,16 @@ using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Services.Auth;
 using Quizanchos.WebApi.Services.GameLogic;
 using Quizanchos.WebApi.Services.Market;
+using Quizanchos.WebApi.Services.PluginSystem;
 using Quizanchos.WebApi.Services.Rooms;
 using Quizanchos.WebApi.Services.Users;
 using Quizanchos.WebApi.Util;
 using Quizanchos.WebApi.Hubs;
 using Quizanchos.WebApi.Options;
 using Quizanchos.WebApi.Services.Payment;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.StaticFiles;
+using Serilog.Extensions.Logging;
 using System.Runtime.Loader;
 using System.Reflection;
 
@@ -44,6 +48,8 @@ public static class Startup
         }
 
         app.UseStaticFiles();
+
+        MountPluginStaticFiles(app);
 
         app.UseRouting();
 
@@ -153,14 +159,41 @@ public static class Startup
         });
 
         // ========== MINIGAME REGISTRATION SYSTEM ==========
+        // First-party minigames are loaded from assemblies in the host's output directory
+        // (built via the MinigamePluginProject MSBuild target in the .csproj).
         var pluginAssemblies = LoadPluginAssemblies();
         var minigameDescriptors = CreateDescriptors<IMinigameDescriptor>(pluginAssemblies).ToList();
+        var frontendDescriptors = CreateDescriptors<IMinigameFrontendDescriptor>(pluginAssemblies).ToList();
+
+        // Third-party minigames are loaded from a configurable plugin root, each in its
+        // own folder with an isolated AssemblyLoadContext (see PluginLoadContext).
+        var pluginRoot = configuration.GetSection("Plugins")["Root"];
+        if (string.IsNullOrWhiteSpace(pluginRoot))
+        {
+            pluginRoot = Path.Combine(builder.Environment.ContentRootPath, "plugins");
+        }
+        else if (!Path.IsPathRooted(pluginRoot))
+        {
+            pluginRoot = Path.Combine(builder.Environment.ContentRootPath, pluginRoot);
+        }
+
+        using var pluginLoaderFactory = new SerilogLoggerFactory(Serilog.Log.Logger, dispose: false);
+        var pluginLoaderLogger = pluginLoaderFactory.CreateLogger("PluginLoader");
+        var thirdPartyPlugins = PluginLoader.LoadFromDirectory(pluginRoot, pluginLoaderLogger);
+
+        foreach (var plugin in thirdPartyPlugins)
+        {
+            minigameDescriptors.AddRange(plugin.Descriptors);
+            frontendDescriptors.AddRange(plugin.FrontendDescriptors);
+        }
+
+        services.AddSingleton<IPluginCatalog>(new PluginCatalog(thirdPartyPlugins));
 
         var registry = BuildMinigameRegistry(services, minigameDescriptors);
         services.AddSingleton<IMinigameRegistry>(registry);
 
         // ========== FRONTEND MINIGAME REGISTRATION SYSTEM ==========
-        var frontendRegistry = BuildFrontendRegistry(pluginAssemblies);
+        var frontendRegistry = BuildFrontendRegistry(frontendDescriptors);
         services.AddSingleton<IMinigameFrontendRegistry>(frontendRegistry);
         // ===================================================
 
@@ -186,6 +219,7 @@ public static class Startup
 
         services.AddScoped<IGameSessionRepository, GameSessionRepository>();
         services.AddScoped<IGameSessionStateRepository, GameSessionStateRepository>();
+        services.AddScoped<IGameStatePersistence, GameStatePersistence>();
         services.AddScoped<IMarketItemRepository, MarketItemRepository>();
         services.AddScoped<IUserOwnedItemRepository, UserOwnedItemRepository>();
         services.AddScoped<IGameLogicFactory, GameLogicFactory>();
@@ -341,16 +375,50 @@ public static class Startup
         return registry;
     }
 
-    private static IMinigameFrontendRegistry BuildFrontendRegistry(IReadOnlyList<Assembly> pluginAssemblies)
+    private static IMinigameFrontendRegistry BuildFrontendRegistry(IEnumerable<IMinigameFrontendDescriptor> descriptors)
     {
         var registry = new MinigameFrontendRegistry();
 
-        foreach (var descriptor in CreateDescriptors<IMinigameFrontendDescriptor>(pluginAssemblies))
+        foreach (var descriptor in descriptors)
         {
             registry.Register(descriptor);
         }
 
         return registry;
+    }
+
+    private static void MountPluginStaticFiles(WebApplication app)
+    {
+        var catalog = app.Services.GetService<IPluginCatalog>();
+        if (catalog is null)
+        {
+            return;
+        }
+
+        var seenRequestPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var plugin in catalog.Plugins)
+        {
+            if (plugin.StaticFiles is null)
+            {
+                continue;
+            }
+
+            foreach (var frontend in plugin.FrontendDescriptors)
+            {
+                // Match existing URL convention: /minigames/<gamekey-lowercase>/...
+                var requestPath = $"/minigames/{frontend.GameKey.ToLowerInvariant()}";
+                if (!seenRequestPaths.Add(requestPath))
+                {
+                    continue;
+                }
+
+                app.UseStaticFiles(new StaticFileOptions
+                {
+                    FileProvider = plugin.StaticFiles,
+                    RequestPath = requestPath,
+                });
+            }
+        }
     }
 
     private static IEnumerable<TDescriptor> CreateDescriptors<TDescriptor>(IReadOnlyList<Assembly> assemblies)

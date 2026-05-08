@@ -14,7 +14,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Quizanchos.Common\Quizanchos.Common.csproj" />
     <ProjectReference Include="..\..\..\Quizanchos.Core\Quizanchos.Core.csproj" />
-    <ProjectReference Include="..\..\..\Quizanchos.Domain\Quizanchos.Domain.csproj" />
+    <!--
+      Domain is NOT directly referenced — the plugin's source no longer touches Domain types.
+      It still arrives transitively via Quizanchos.Quiz (which retains its Domain reference
+      for Quiz-specific repositories). That's a separate cleanup tracked at the Quiz level.
+    -->
     <ProjectReference Include="..\..\Quiz\Quizanchos.Quiz\Quizanchos.Quiz.csproj" />
   </ItemGroup>
 
