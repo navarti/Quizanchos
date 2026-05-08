@@ -14,7 +14,9 @@
     <Authors>Danchos and Vanchos</Authors>
     <Description>Common utilities shared across the Quizanchos minigame platform host and plugins. Pulled in transitively by Quizanchos.Core; you typically don't reference it directly.</Description>
     <PackageTags>quizanchos;minigame;sdk;plugin</PackageTags>
+    <RepositoryUrl>https://github.com/navarti/Quizanchos</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/navarti/Quizanchos</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageOutputPath>$(MSBuildThisFileDirectory)..\nupkgs</PackageOutputPath>
     <IncludeSymbols>true</IncludeSymbols>
