@@ -13,11 +13,13 @@ public class GoogleAuthorizationService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly DefaultNicknameGenerator _nicknameGenerator;
 
-    public GoogleAuthorizationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public GoogleAuthorizationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, DefaultNicknameGenerator nicknameGenerator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _nicknameGenerator = nicknameGenerator;
     }
 
     public async Task SignIn(AuthenticateResult authenticateResult)
@@ -28,18 +30,17 @@ public class GoogleAuthorizationService
         ApplicationUser? user = await _userManager.FindByEmailAsync(email);
         if (user is null)
         {
-            string userName = authenticateResult?.Principal?.FindFirstValue(ClaimTypes.Name) ?? email;
-            user = await CreateNewUser(email, userName);
+            user = await CreateNewUser(email);
         }
 
         await _signInManager.SignInAsync(user, isPersistent: true);
     }
 
-    private async Task<ApplicationUser> CreateNewUser(string email, string userName)
+    private async Task<ApplicationUser> CreateNewUser(string email)
     {
         ApplicationUser user = new ApplicationUser
         {
-            UserName = email,
+            UserName = await _nicknameGenerator.GenerateAsync(),
             Email = email,
             AvatarUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFAMn65QIVqFZGQBV1otby9cY8r27W-ZGm_Q&s",
             Coins = 0,

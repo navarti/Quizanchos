@@ -57,6 +57,10 @@ public class AdminController : Controller
     [Authorize(AppRole.Admin)]
     public IActionResult TopUp() => View();
 
+    [HttpGet("/Admin/Statistics")]
+    [Authorize(AppRole.Admin)]
+    public IActionResult Statistics() => View();
+
     /// <summary>
     /// Aggregates dashboard counts. Each metric is loaded independently so a
     /// partial failure (e.g. payments service down) still yields a usable
@@ -132,6 +136,15 @@ public class AdminController : Controller
 
         var tools = new List<AdminToolCardViewModel>
         {
+            new()
+            {
+                Key = "statistics",
+                Title = "Statistics",
+                Description = "Sessions over time, online players, per-game breakdown.",
+                IconKey = "stats",
+                ActionLabel = "View Statistics",
+                ActionUrl = "/Admin/Statistics",
+            },
             new()
             {
                 Key = "users",

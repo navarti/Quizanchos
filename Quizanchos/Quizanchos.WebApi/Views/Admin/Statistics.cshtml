@@ -1,0 +1,127 @@
+@{
+    ViewData["Title"] = "Statistics";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="/css/admindash.css" asp-append-version="true">
+    <link rel="stylesheet" href="/css/admin-statistics.css" asp-append-version="true">
+}
+
+@await Html.PartialAsync("Partials/_AdminPageHeader", new AdminPageHeaderViewModel
+{
+    Title = "Platform Statistics",
+    Subtitle = "Sessions, online players, completion and per-game activity.",
+    BackUrl = "/Admin",
+})
+
+<section class="stats-controls" aria-label="Statistics filters">
+    <div class="stats-controls__row">
+        <div class="stats-control">
+            <label for="statsRangePreset">Range</label>
+            <select id="statsRangePreset" class="stats-input">
+                <option value="24h">Last 24 hours</option>
+                <option value="7d" selected>Last 7 days</option>
+                <option value="30d">Last 30 days</option>
+                <option value="90d">Last 90 days</option>
+                <option value="365d">Last 365 days</option>
+                <option value="custom">Custom…</option>
+            </select>
+        </div>
+
+        <div class="stats-control" id="statsCustomRange" hidden>
+            <label for="statsFromDate">From</label>
+            <input type="date" id="statsFromDate" class="stats-input">
+            <label for="statsToDate">To</label>
+            <input type="date" id="statsToDate" class="stats-input">
+        </div>
+
+        <div class="stats-control">
+            <label for="statsBucket">Granularity</label>
+            <select id="statsBucket" class="stats-input">
+                <option value="auto" selected>Auto</option>
+                <option value="hour">Hourly</option>
+                <option value="day">Daily</option>
+                <option value="week">Weekly</option>
+                <option value="month">Monthly</option>
+            </select>
+        </div>
+
+        <div class="stats-control">
+            <label for="statsGameFilter">Game</label>
+            <select id="statsGameFilter" class="stats-input">
+                <option value="">All games</option>
+            </select>
+        </div>
+
+        <button id="statsRefresh" type="button" class="stats-refresh-btn">Refresh</button>
+    </div>
+
+    <div id="statsLoadError" class="admin-alert admin-alert--error" hidden role="alert"></div>
+    <div id="statsRangeSummary" class="stats-range-summary" aria-live="polite"></div>
+</section>
+
+<h2 class="admin-section-heading">Overview</h2>
+<section class="admin-stats-grid" id="statsOverviewGrid" aria-label="Headline statistics">
+    <!-- populated by JS -->
+</section>
+
+<h2 class="admin-section-heading">Sessions over time</h2>
+<section class="stats-chart-card" aria-label="Sessions over time">
+    <div class="stats-chart-card__header">
+        <p class="stats-chart-card__hint" id="statsChartHint">Sessions created per bucket, stacked by minigame.</p>
+        <div class="stats-chart-legend" id="statsChartLegend" aria-hidden="true"></div>
+    </div>
+    <div class="stats-chart-wrap">
+        <canvas id="statsChart" role="img" aria-label="Sessions over time chart"></canvas>
+        <div id="statsChartEmpty" class="admin-empty" hidden>
+            <p class="admin-empty__message">No sessions in this range.</p>
+            <p class="admin-empty__hint">Try widening the date range or removing the game filter.</p>
+        </div>
+    </div>
+</section>
+
+<h2 class="admin-section-heading">Per-game breakdown</h2>
+<section class="stats-table-card" aria-label="Per-game breakdown">
+    <div id="statsByGameLoading" class="admin-loading" hidden>Loading…</div>
+    <div id="statsByGameEmpty" class="admin-empty" hidden>
+        <p class="admin-empty__message">No game data in this range.</p>
+    </div>
+    <table id="statsByGameTable" class="user-table stats-table">
+        <thead>
+            <tr>
+                <th scope="col">Game</th>
+                <th scope="col">Sessions</th>
+                <th scope="col">Share</th>
+                <th scope="col">Finished</th>
+                <th scope="col">Distinct players</th>
+                <th scope="col">Live now</th>
+                <th scope="col">Avg duration</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</section>
+
+<h2 class="admin-section-heading">Top players</h2>
+<section class="stats-table-card" aria-label="Top players in range">
+    <div id="statsTopPlayersEmpty" class="admin-empty" hidden>
+        <p class="admin-empty__message">No player activity in this range.</p>
+    </div>
+    <table id="statsTopPlayersTable" class="user-table stats-table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Player</th>
+                <th scope="col">Sessions</th>
+                <th scope="col">Wins</th>
+                <th scope="col">Total score</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="/js/admin-statistics.js" asp-append-version="true"></script>
+}

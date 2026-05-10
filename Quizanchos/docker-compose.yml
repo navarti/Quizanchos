@@ -17,8 +17,13 @@ services:
       start_period: 30s
 
   app:
-    build: .
-    image: quizanchos:local
+    # Context is the repo root so the Dockerfile can see both Quizanchos/ (host)
+    # and Minigames/ (third-party plugin solution). The image bakes plugins into
+    # /app/plugins; mount the `plugins` named volume below to add more at runtime.
+    build:
+      context: ..
+      dockerfile: Quizanchos/Dockerfile
+    image: ${IMAGE:-ghcr.io/navarti/quizanchos:local}
     container_name: quizanchos
     restart: unless-stopped
     env_file: .env
@@ -28,10 +33,12 @@ services:
     volumes:
       - ./logs:/app/logs
       - dataprotection-keys:/home/app/.aspnet/DataProtection-Keys
+      # Optional: mount a host folder over /app/plugins to drop in extra plugins
+      # without rebuilding the image. Activate it via docker-compose.plugins.yml.
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/"]
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
       interval: 30s
       timeout: 5s
       retries: 3

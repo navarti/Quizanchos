@@ -1,0 +1,5 @@
+{
+  "entryAssembly": "Quizanchos.Plugin.Game2048.dll",
+  "wwwRoot": "wwwroot",
+  "version": "0.1.0"
+}

@@ -12,6 +12,7 @@ public interface IMinigameFrontendDescriptor
     string GameKey { get; }
     string DisplayName { get; }
     bool IsPremium { get; }
+    bool IsMultiplayer => false;
     string Description { get; }
     string CardStyle { get; }
     string LobbyUrl { get; }

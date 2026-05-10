@@ -10,6 +10,8 @@ Standalone solution containing third-party Quizanchos minigame plugins, built ag
 | `Quizanchos.Plugin.Caravan` | Caravan (Fallout) | Single-player vs AI | 1100 |
 | `Quizanchos.Plugin.CountryGuesser` | Country Guesser (map) | Single-player | 1200 |
 | `Quizanchos.Plugin.CountryGuesserMultiplayer` | Country Guesser (map) | Multiplayer | 1201 |
+| `Quizanchos.Plugin.Game2048` | 2048 | Single-player | 1300 |
+| `Quizanchos.Plugin.TicketToRideEurope` | Ticket to Ride: Europe | Premium, multiplayer | 1400 |
 
 ## Build
 
@@ -36,6 +38,8 @@ mkdir -p "$HOST_PLUGINS"
 cp -r Quizanchos.Plugin.Caravan/bin/Release/net10.0/publish                     "$HOST_PLUGINS/Caravan"
 cp -r Quizanchos.Plugin.CountryGuesser/bin/Release/net10.0/publish              "$HOST_PLUGINS/CountryGuesser"
 cp -r Quizanchos.Plugin.CountryGuesserMultiplayer/bin/Release/net10.0/publish   "$HOST_PLUGINS/CountryGuesserMultiplayer"
+cp -r Quizanchos.Plugin.Game2048/bin/Release/net10.0/publish                    "$HOST_PLUGINS/Game2048"
+cp -r Quizanchos.Plugin.TicketToRideEurope/bin/Release/net10.0/publish          "$HOST_PLUGINS/TicketToRideEurope"
 
 # Run the host
 dotnet run --project ../Quizanchos/Quizanchos.WebApi
@@ -108,9 +112,20 @@ Once loaded, each plugin is available at:
 | Caravan | `/Minigame/Caravan` | `/minigames/caravan/...` |
 | CountryGuesser | `/Minigame/CountryGuesser` | `/minigames/countryguesser/...` |
 | CountryGuesserMultiplayer | `/Minigame/CountryGuesserMultiplayer` | `/minigames/countryguessermultiplayer/...` |
+| Game2048 | `/Minigame/Game2048` | `/minigames/game2048/...` |
+| TicketToRideEurope | `/Minigame/TicketToRideEurope` | `/minigames/tickettorideeurope/...` |
 
 The static-asset mount point is always `/minigames/{GameKey-lowercased}/` — that's what the
 descriptor's `*Styles` / `*Scripts` URLs reference.
+
+## UI design system
+
+The host serves a shared CSS shell at `/css/minigame-shell.css` (auto-loaded before
+your plugin's styles). Use `.minigame-card`, `.minigame-btn`, `.minigame-option`,
+`.minigame-score`, `.minigame-finished`, etc. for chrome — only ship your own CSS
+for game-specific visuals (boards, cards, maps).
+
+See [MINIGAME-SHELL.md](MINIGAME-SHELL.md) for the full class contract and tokens.
 
 ## Architecture
 

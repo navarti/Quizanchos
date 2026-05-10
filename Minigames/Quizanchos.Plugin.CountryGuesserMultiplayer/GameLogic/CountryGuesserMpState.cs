@@ -13,8 +13,13 @@ public sealed class CountryGuesserMpState : IGameState
 
     public int CurrentCardIndex { get; set; } = -1;
     public int TotalCards { get; set; } = 5;
-    public int OptionCount { get; set; } = 4;
     public int SecondsPerCard { get; set; } = 20;
+
+    /// <summary>
+    /// Maximum great-circle distance (km) between a click and the country
+    /// centroid that still counts as a correct answer.
+    /// </summary>
+    public double MaxDistanceKm { get; set; } = 600;
 
     public List<MpCard> Cards { get; set; } = new();
     public Dictionary<string, int> Scores { get; set; } = new();
@@ -26,10 +31,15 @@ public sealed class CountryGuesserMpState : IGameState
         public string TargetName { get; set; } = string.Empty;
         public double TargetLat { get; set; }
         public double TargetLon { get; set; }
-        public List<string> OptionCodes { get; set; } = new();
-        public List<string> OptionNames { get; set; } = new();
-        public int CorrectOption { get; set; }
-        public Dictionary<string, int?> PlayerAnswers { get; set; } = new();
+        public Dictionary<string, ClickAnswer> PlayerAnswers { get; set; } = new();
         public DateTime CreationTime { get; set; }
+    }
+
+    public sealed class ClickAnswer
+    {
+        public double Lat { get; set; }
+        public double Lon { get; set; }
+        public double DistanceKm { get; set; }
+        public bool Correct { get; set; }
     }
 }

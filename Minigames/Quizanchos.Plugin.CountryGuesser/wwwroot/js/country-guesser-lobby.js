@@ -7,17 +7,27 @@
     const gameUrlTemplate = cfg.gameUrlTemplate;
 
     root.innerHTML = `
-        <div class="country-guesser country-guesser__lobby">
-            <h2>Country Guesser</h2>
-            <p>
-                A country is highlighted on the world map each round. Pick the matching name from
-                the options before the timer runs out.
+        <div class="minigame-card minigame-card--lobby minigame-card--narrow">
+            <h2 class="minigame-title">Country Guesser</h2>
+            <p class="minigame-prose">
+                You'll see a country name each round — click on the world map where you
+                think it is. Land within range of the centroid to score.
             </p>
-            <div>
-                <label>Rounds: <input type="number" min="3" max="20" value="5" id="cg-rounds" /></label>
-                <label>Seconds per round: <input type="number" min="5" max="60" value="20" id="cg-secs" /></label>
+            <div class="minigame-form">
+                <div class="minigame-field">
+                    <label for="cg-rounds">Rounds</label>
+                    <input type="number" min="3" max="20" value="5" id="cg-rounds" />
+                </div>
+                <div class="minigame-field">
+                    <label for="cg-secs">Seconds per round</label>
+                    <input type="number" min="5" max="60" value="20" id="cg-secs" />
+                </div>
+                <div class="minigame-field">
+                    <label for="cg-radius">Allowed radius (km)</label>
+                    <input type="number" min="100" max="2000" step="50" value="600" id="cg-radius" />
+                </div>
             </div>
-            <button class="country-guesser__btn" data-start>Start a new game</button>
+            <button class="minigame-btn" data-start>Start a new game</button>
         </div>
     `;
 
@@ -29,6 +39,7 @@
         }
         const totalCards = parseInt(document.getElementById('cg-rounds').value, 10) || 5;
         const secondsPerCard = parseInt(document.getElementById('cg-secs').value, 10) || 20;
+        const maxDistanceKm = parseInt(document.getElementById('cg-radius').value, 10) || 600;
         try {
             const resp = await fetch('/api/Game/create', {
                 method: 'POST',
@@ -37,7 +48,7 @@
                 body: JSON.stringify({
                     minigameType: minigameTypeId,
                     playerIds: [userId],
-                    parameters: { totalCards, secondsPerCard, optionCount: 4 },
+                    parameters: { totalCards, secondsPerCard, maxDistanceKm },
                 }),
             });
             if (!resp.ok) {

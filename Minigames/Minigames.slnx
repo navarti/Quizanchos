@@ -1,5 +1,8 @@
 <Solution>
   <Project Path="Quizanchos.Plugin.Caravan/Quizanchos.Plugin.Caravan.csproj" />
+  <Project Path="Quizanchos.Plugin.CaravanMultiplayer/Quizanchos.Plugin.CaravanMultiplayer.csproj" />
   <Project Path="Quizanchos.Plugin.CountryGuesser/Quizanchos.Plugin.CountryGuesser.csproj" />
   <Project Path="Quizanchos.Plugin.CountryGuesserMultiplayer/Quizanchos.Plugin.CountryGuesserMultiplayer.csproj" />
+  <Project Path="Quizanchos.Plugin.Game2048/Quizanchos.Plugin.Game2048.csproj" />
+  <Project Path="Quizanchos.Plugin.TicketToRideEurope/Quizanchos.Plugin.TicketToRideEurope.csproj" />
 </Solution>

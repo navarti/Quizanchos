@@ -48,6 +48,7 @@
             <nav class="nav-list" id="admin-nav" aria-label="Admin">
                 <ul>
                     <li><a href="/Admin" class="@(IsActive("/Admin") && requestPath.TrimEnd('/').EndsWith("/Admin") ? "active" : "")">Dashboard</a></li>
+                    <li><a href="/Admin/Statistics" class="@(IsActive("/Admin/Statistics") ? "active" : "")">Statistics</a></li>
                     <li><a href="/Admin/Users" class="@(IsActive("/Admin/Users") ? "active" : "")">Users</a></li>
                     <li><a href="/Admin/CreateQuiz" class="@(IsActive("/Admin/CreateQuiz") ? "active" : "")">Create Quiz</a></li>
                     <li><a href="/Admin/TopUp" class="@(IsActive("/Admin/TopUp") ? "active" : "")">Top-Ups</a></li>

@@ -9,3 +9,5 @@ public record FullApplicationUserDto(string Email, string UserName, string Avata
 
 public record ApplicationUserInLeaderBoardDto(string UserName, string AvatarUrl, int Score, int Coins, int Position, UserStatusEnum UserStatus)
     : ApplicationUserDto(UserName, AvatarUrl, Score, Coins, UserStatus);
+
+public record AdminUserDto(string Email, string UserName, string AvatarUrl, int Score, int Coins, UserStatusEnum UserStatus);

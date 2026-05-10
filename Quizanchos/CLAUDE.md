@@ -92,14 +92,19 @@ Groups are named `game-{guid}` and `room-{guid}`. Server pushes via `SignalRGame
 
 Server-rendered Razor views (`/Views`) with client-side JS. Per-minigame assets in `wwwroot/minigames/{gameKey}/`. `MinigameViewController` uses `IMinigameFrontendRegistry` to inject the right CSS/JS into lobby/game views.
 
+**Minigame UI shell:** `wwwroot/css/minigame-shell.css` is auto-loaded by `Views/Minigame/{Lobby,Game}.cshtml` before plugin styles. It owns the chrome (`.minigame-card`, `.minigame-btn`, `.minigame-option`, `.minigame-pill`, `.minigame-score`, `.minigame-finished`) so plugins only style game-specific visuals. Class names are a public API — see `Minigames/MINIGAME-SHELL.md` for the contract.
+
 ### Registered Minigames
 
 | TypeId | GameKey | Project | Notes |
 |--------|---------|---------|-------|
-| 1 | Quiz | Quizanchos.Quiz | Single-player |
-| 2 | Game2048 | Quizanchos.Game2048 | Single-player |
-| 3 | QuizMultiplayer | Quizanchos.QuizMultiplayer | Multiplayer with teams |
-| 4 | TicketToRideEurope | Quizanchos.TicketToRideEurope | Premium, multiplayer |
+| 1 | Quiz | Quizanchos.Quiz | First-party, single-player |
+| 3 | QuizMultiplayer | Quizanchos.QuizMultiplayer | First-party, multiplayer with teams |
+| 1300 | Game2048 | Quizanchos.Plugin.Game2048 (Minigames solution) | Third-party plugin, single-player |
+| 1400 | TicketToRideEurope | Quizanchos.Plugin.TicketToRideEurope (Minigames solution) | Third-party plugin, premium, multiplayer |
+
+Caravan, CountryGuesser, and CountryGuesserMultiplayer also live in the Minigames solution as
+third-party plugins (TypeIds 1100, 1200, 1201). See `Minigames/README.md` for the full list.
 
 ## Guidelines
 

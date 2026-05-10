@@ -369,6 +369,148 @@
     font-size: var(--font-size-sm);
     box-shadow: var(--shadow-xs);
 }
+
+/* Minigame filters --------------------------------------------------- */
+.minigame-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-sm), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.minigame-filters__search {
+    position: relative;
+    flex: 1 1 240px;
+    min-width: 200px;
+}
+.minigame-filters__search-icon {
+    position: absolute;
+    top: 50%;
+    left: var(--space-3);
+    transform: translateY(-50%);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    pointer-events: none;
+}
+.minigame-filters__input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4) var(--space-3) calc(var(--space-3) + 1.5rem);
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+}
+.minigame-filters__input:focus {
+    outline: none;
+    background: var(--color-white);
+    border-color: var(--color-primary-400);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+.minigame-filters__input::-webkit-search-cancel-button { cursor: pointer; }
+
+.minigame-filters__group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+}
+
+.minigame-chip {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    padding: var(--space-2) var(--space-4);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-soft);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
+    white-space: nowrap;
+}
+.minigame-chip:hover {
+    color: var(--color-text);
+    background: rgba(124, 58, 237, 0.08);
+}
+.minigame-chip:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+}
+.minigame-chip--active {
+    background: var(--gradient-aurora);
+    color: var(--color-text-inverse);
+    box-shadow: var(--shadow-sm), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+.minigame-chip--active:hover {
+    color: var(--color-text-inverse);
+    background: var(--gradient-aurora);
+}
+
+.minigame-filters__empty {
+    margin-top: var(--space-5);
+    padding: var(--space-5);
+    text-align: center;
+    color: var(--color-text-soft);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-2xl);
+    font-size: var(--font-size-sm);
+}
+.minigame-filters__reset {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 0;
+    margin-left: var(--space-1);
+    color: var(--color-primary-700);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.minigame-filters__reset:hover { color: var(--color-accent-600); }
+
+/* Mode badge on minigame cards --------------------------------------- */
+.quiz-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+.mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--color-text-inverse);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset;
+}
+.mode-badge--multi {
+    background: rgba(79, 195, 247, 0.32);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+}
+.mode-badge--multi::before { content: '👥'; font-size: 0.85em; }
+.mode-badge--single::before { content: '🎯'; font-size: 0.85em; }
 .minigames-banner--premium {
     background: linear-gradient(135deg, #fef3c7, #fde68a);
     border-color: var(--color-highlight-400);

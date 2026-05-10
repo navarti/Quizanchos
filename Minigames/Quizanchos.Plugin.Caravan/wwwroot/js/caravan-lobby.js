@@ -7,19 +7,19 @@
     const gameUrlTemplate = cfg.gameUrlTemplate;
 
     root.innerHTML = `
-        <div class="caravan caravan__lobby">
-            <h2>Caravan</h2>
-            <p>
+        <div class="caravan minigame-card minigame-card--lobby">
+            <h2 class="minigame-title">Caravan</h2>
+            <p class="minigame-prose">
                 Build three caravans, each worth 21–26, before the AI does the same. Number cards
                 2–10 must be placed in strict ascending or descending order on a column; matching
                 the suit lets you reverse direction. Aces can open a column.
             </p>
-            <p>
+            <p class="minigame-prose">
                 Face cards attach to existing slots — Jack discards a card, Queen flips direction
                 and changes the active suit, King doubles the slot's value, Joker on an Ace nukes
                 that suit, Joker on a number nukes that value across the whole table.
             </p>
-            <button class="caravan__btn" data-start>Start a new game</button>
+            <button class="minigame-btn" data-start>Start a new game</button>
         </div>
     `;
 

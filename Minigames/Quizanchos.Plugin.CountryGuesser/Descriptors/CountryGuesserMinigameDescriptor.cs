@@ -30,11 +30,11 @@ public sealed class CountryGuesserMinigameDescriptor : IMinigameDescriptor
     {
         var factory = serviceProvider.GetRequiredService<CountryGuesserEngineFactory>();
         int totalCards = GetInt(parameters, "totalCards", 5);
-        int optionCount = GetInt(parameters, "optionCount", 4);
         int secondsPerCard = GetInt(parameters, "secondsPerCard", 20);
+        double maxDistanceKm = GetDouble(parameters, "maxDistanceKm", 600);
         int seed = GetInt(parameters, "seed", 0);
 
-        var engine = await factory.CreateAsync(gameId, playerIds, totalCards, optionCount, secondsPerCard, seed);
+        var engine = await factory.CreateAsync(gameId, playerIds, totalCards, secondsPerCard, maxDistanceKm, seed);
         return new GameEngineWrapper<CountryGuesserState, CountryGuesserMove>(engine);
     }
 
@@ -62,6 +62,22 @@ public sealed class CountryGuesserMinigameDescriptor : IMinigameDescriptor
             string s when int.TryParse(s, out var p) => p,
             JsonElement { ValueKind: JsonValueKind.Number } n when n.TryGetInt32(out var p) => p,
             JsonElement { ValueKind: JsonValueKind.String } e when int.TryParse(e.GetString(), out var p) => p,
+            _ => fallback,
+        };
+    }
+
+    private static double GetDouble(Dictionary<string, object> parameters, string key, double fallback)
+    {
+        if (!parameters.TryGetValue(key, out var raw) || raw is null) return fallback;
+        return raw switch
+        {
+            double d => d,
+            float f => f,
+            int i => i,
+            long l => l,
+            string s when double.TryParse(s, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var p) => p,
+            JsonElement { ValueKind: JsonValueKind.Number } n when n.TryGetDouble(out var p) => p,
+            JsonElement { ValueKind: JsonValueKind.String } e when double.TryParse(e.GetString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var p) => p,
             _ => fallback,
         };
     }

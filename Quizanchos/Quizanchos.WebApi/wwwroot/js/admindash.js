@@ -155,11 +155,19 @@ function fetchAndRenderUsers() {
                 row.insertCell(1).textContent = user.score;
 
                 const actionCell = row.insertCell(2);
+
+                const editButton = document.createElement('button');
+                editButton.type = 'button';
+                editButton.className = 'admin-row-btn';
+                editButton.textContent = 'Edit nickname';
+                editButton.onclick = () => editUserNickname(user.email, user.userName);
+                actionCell.appendChild(editButton);
+
                 const deleteButton = document.createElement('button');
                 deleteButton.type = 'button';
                 deleteButton.className = 'admin-row-btn danger';
                 deleteButton.textContent = 'Delete';
-                deleteButton.onclick = () => deleteUser(user.userName);
+                deleteButton.onclick = () => deleteUser(user.email);
                 actionCell.appendChild(deleteButton);
             });
             setUserTableState('ready');
@@ -189,6 +197,34 @@ function deleteUser(userEmail) {
         .catch(error => {
             console.error('Error deleting user:', error);
             alert('An error occurred while deleting the user.');
+        });
+}
+
+function editUserNickname(userEmail, currentNickname) {
+    const newNickname = prompt(`Enter new nickname for ${userEmail}:`, currentNickname);
+    if (newNickname === null) return;
+
+    const trimmed = newNickname.trim();
+    if (!trimmed || trimmed === currentNickname) return;
+
+    fetch('/Admin/UpdateUserNickname', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail, newNickname: trimmed }),
+    })
+        .then(response => {
+            if (response.ok) {
+                fetchAndRenderUsers();
+            } else {
+                response.text().then(errorMessage => {
+                    console.error('Failed to update nickname:', errorMessage);
+                    alert(errorMessage || 'Failed to update nickname.');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error updating nickname:', error);
+            alert('An error occurred while updating the nickname.');
         });
 }
 

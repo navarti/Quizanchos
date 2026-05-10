@@ -21,11 +21,11 @@ public sealed class CountryGuesserMpEngineFactory
         Guid gameId,
         ImmutableArray<string> playerIds,
         int totalCards,
-        int optionCount,
         int secondsPerCard,
+        double maxDistanceKm,
         int seed)
     {
-        var logic = new CountryGuesserMpLogic(_repository, totalCards, optionCount, secondsPerCard, seed);
+        var logic = new CountryGuesserMpLogic(_repository, totalCards, secondsPerCard, maxDistanceKm, seed);
         var engine = new GameEngine<CountryGuesserMpState, CountryGuesserMpMove>(logic, gameId, playerIds);
 
         await _persistence.CreateAsync(
@@ -50,7 +50,7 @@ public sealed class CountryGuesserMpEngineFactory
         state.IsFinished = loaded.IsFinished;
         state.Winner = loaded.Winner;
 
-        var logic = new CountryGuesserMpLogic(_repository, state.TotalCards, state.OptionCount, state.SecondsPerCard);
+        var logic = new CountryGuesserMpLogic(_repository, state.TotalCards, state.SecondsPerCard, state.MaxDistanceKm);
         return new GameEngine<CountryGuesserMpState, CountryGuesserMpMove>(logic, state);
     }
 

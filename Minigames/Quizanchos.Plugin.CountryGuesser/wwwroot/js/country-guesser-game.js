@@ -10,7 +10,7 @@
 
     let state = null;
     let map = null;
-    let highlightLayer = null;
+    let answerLayer = null;
     let pickedThisRound = false;
     let lastCardIndex = -1;
 
@@ -20,75 +20,149 @@
         const mapEl = root.querySelector('[data-map]');
         if (!mapEl) return;
         map = L.map(mapEl, {
-            zoomControl: false,
+            zoomControl: true,
             worldCopyJump: true,
         }).setView([20, 0], 2);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap © CARTO',
+            subdomains: 'abcd',
             maxZoom: 7,
             minZoom: 2,
         }).addTo(map);
+        map.on('click', onMapClick);
     }
 
-    function highlightCountry(card) {
-        if (!map || !card) return;
-        if (highlightLayer) {
-            map.removeLayer(highlightLayer);
-            highlightLayer = null;
+    function onMapClick(e) {
+        if (pickedThisRound) return;
+        if (!state || state.isFinished) return;
+        if (state.currentCardIndex < 0 || state.currentCardIndex >= (state.cards?.length || 0)) return;
+        const card = state.cards[state.currentCardIndex];
+        if ((card.playerAnswers || {})[playerId]) return;
+
+        pickedThisRound = true;
+        // Wrap longitude to [-180, 180] for worldCopyJump-style clicks across copies.
+        const lat = e.latlng.lat;
+        let lon = ((e.latlng.lng + 540) % 360) - 180;
+        showPendingMarker(lat, lon);
+        submitMove(lat, lon);
+    }
+
+    function clearAnswerLayer() {
+        if (!map) return;
+        if (answerLayer) {
+            map.removeLayer(answerLayer);
+            answerLayer = null;
         }
+    }
+
+    function showPendingMarker(lat, lon) {
+        if (!map) return;
+        clearAnswerLayer();
+        answerLayer = L.layerGroup([
+            L.circleMarker([lat, lon], {
+                radius: 8,
+                color: '#fcd34d',
+                weight: 3,
+                fillColor: '#fcd34d',
+                fillOpacity: 0.9,
+            }),
+        ]).addTo(map);
+    }
+
+    function showAnswerOverlay(card, answer) {
+        if (!map || !card || !answer) return;
+        clearAnswerLayer();
+
+        const click = [answer.lat, answer.lon];
         const target = [card.targetLat, card.targetLon];
-        highlightLayer = L.circle(target, {
-            radius: 700000,
-            color: '#ffd166',
-            weight: 3,
-            fillColor: '#ffd166',
-            fillOpacity: 0.25,
-        }).addTo(map);
-        map.flyTo(target, 4, { duration: 0.6 });
+        const correct = answer.correct;
+        const clickColor = correct ? '#16a34a' : '#dc2626';
+
+        const layers = [
+            L.circleMarker(click, {
+                radius: 8,
+                color: clickColor,
+                weight: 3,
+                fillColor: clickColor,
+                fillOpacity: 0.9,
+            }).bindTooltip(`Your pick (${Math.round(answer.distanceKm)} km off)`, { permanent: false }),
+            L.circle(target, {
+                radius: (state.maxDistanceKm || 600) * 1000,
+                color: '#16a34a',
+                weight: 1,
+                fillColor: '#16a34a',
+                fillOpacity: 0.10,
+            }),
+            L.circleMarker(target, {
+                radius: 6,
+                color: '#16a34a',
+                weight: 3,
+                fillColor: '#ffffff',
+                fillOpacity: 1,
+            }).bindTooltip(card.targetName, { permanent: false }),
+            L.polyline([click, target], {
+                color: clickColor,
+                weight: 2,
+                dashArray: '6 6',
+                opacity: 0.8,
+            }),
+        ];
+        answerLayer = L.layerGroup(layers).addTo(map);
+        try {
+            map.fitBounds(L.latLngBounds(click, target).pad(0.4), { maxZoom: 5, animate: true });
+        } catch (_) { /* identical points */ }
     }
 
     function renderShell() {
         if (root.dataset.cgInitialized === '1') return;
         root.dataset.cgInitialized = '1';
         root.innerHTML = `
-            <div class="country-guesser">
-                <div class="country-guesser__head">
-                    <h2>Country Guesser</h2>
-                    <div>
-                        <span class="country-guesser__progress" data-progress></span>
-                        <span class="country-guesser__timer" data-timer>--</span>
+            <div class="minigame-card">
+                <div class="minigame-head">
+                    <h2 class="minigame-title">Country Guesser</h2>
+                    <div class="minigame-head-meta">
+                        <span class="minigame-pill" data-progress></span>
+                        <span class="minigame-pill minigame-pill--timer" data-timer>--</span>
                     </div>
                 </div>
+                <div class="country-guesser__prompt">
+                    <span class="country-guesser__prompt-label">Find this country</span>
+                    <span class="country-guesser__prompt-name" data-prompt>—</span>
+                    <span class="country-guesser__prompt-hint" data-hint>Click on the world map.</span>
+                </div>
                 <div class="country-guesser__map" data-map></div>
-                <div class="country-guesser__options" data-options></div>
-                <div class="country-guesser__scores" data-scores></div>
+                <h3 class="minigame-section-title">Score</h3>
+                <div class="minigame-scores" data-scores></div>
                 <div data-finished></div>
             </div>
         `;
     }
 
-    function paintOptions(card, currentAnswer) {
-        const opts = root.querySelector('[data-options]');
-        if (!opts) return;
-        opts.innerHTML = card.optionNames.map((name, i) => {
-            let stateAttr = '';
-            if (currentAnswer != null && i === currentAnswer) {
-                stateAttr = i === card.correctOption ? 'correct' : 'wrong';
-            } else if (currentAnswer != null && i === card.correctOption) {
-                stateAttr = 'correct';
+    function paintPrompt(card, answer) {
+        const promptEl = root.querySelector('[data-prompt]');
+        const hintEl = root.querySelector('[data-hint]');
+        if (promptEl) promptEl.textContent = card?.targetName || '—';
+        if (!hintEl) return;
+        if (!card) {
+            hintEl.textContent = '';
+            hintEl.dataset.state = '';
+            return;
+        }
+        if (answer) {
+            const km = Math.round(answer.distanceKm);
+            if (answer.correct) {
+                hintEl.textContent = `Correct! ${km} km from the centroid.`;
+                hintEl.dataset.state = 'correct';
+            } else {
+                hintEl.textContent = `Off by ${km} km — see the actual location.`;
+                hintEl.dataset.state = 'wrong';
             }
-            return `<button class="country-guesser__option" data-state="${stateAttr}" data-idx="${i}" ${pickedThisRound || currentAnswer != null ? 'disabled' : ''}>${name}</button>`;
-        }).join('');
-        if (currentAnswer == null && !pickedThisRound) {
-            opts.querySelectorAll('.country-guesser__option').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (pickedThisRound) return;
-                    const idx = parseInt(btn.dataset.idx, 10);
-                    pickedThisRound = true;
-                    btn.dataset.state = 'picked';
-                    submitMove(idx);
-                });
-            });
+        } else if (pickedThisRound) {
+            hintEl.textContent = 'Locked in — waiting for results...';
+            hintEl.dataset.state = 'picked';
+        } else {
+            hintEl.textContent = 'Click on the world map.';
+            hintEl.dataset.state = '';
         }
     }
 
@@ -103,7 +177,8 @@
         }
         el.innerHTML = ids.map(id => {
             const label = id === playerId ? 'You' : id.substring(0, 8);
-            return `<div class="country-guesser__score">${label}: ${scores[id]}</div>`;
+            const cls = id === playerId ? 'minigame-score is-me' : 'minigame-score';
+            return `<div class="${cls}"><span>${label}</span><strong>${scores[id]}</strong></div>`;
         }).join('');
     }
 
@@ -115,10 +190,14 @@
             return;
         }
         const myScore = (state.scores || {})[playerId] || 0;
-        const winnerLabel = state.winner === playerId ? 'You won!'
+        const isWin = state.winner === playerId;
+        const isDraw = !state.winner;
+        const cls = isDraw ? 'minigame-finished--draw'
+            : isWin ? 'minigame-finished--win' : 'minigame-finished--loss';
+        const winnerLabel = isWin ? 'You won!'
             : state.winner ? `Winner: ${state.winner.substring(0, 8)}`
-            : 'Draw / no clear winner';
-        el.innerHTML = `<div class="country-guesser__finished">${winnerLabel} — final score ${myScore}/${state.totalCards}</div>`;
+            : 'Draw — no clear winner';
+        el.innerHTML = `<div class="minigame-finished ${cls}">${winnerLabel} — final score ${myScore}/${state.totalCards}</div>`;
     }
 
     function paintTimerAndProgress() {
@@ -160,27 +239,30 @@
 
         if (state.currentCardIndex !== lastCardIndex) {
             pickedThisRound = false;
+            clearAnswerLayer();
             lastCardIndex = state.currentCardIndex;
         }
 
+        let card = null;
         if (state.cards && state.currentCardIndex >= 0 && state.currentCardIndex < state.cards.length) {
-            const card = state.cards[state.currentCardIndex];
-            highlightCountry(card);
-            const myAnswer = (card.playerAnswers || {})[playerId];
-            paintOptions(card, myAnswer);
-            if (myAnswer != null) pickedThisRound = true;
+            card = state.cards[state.currentCardIndex];
         } else if (state.cards && state.cards.length > 0) {
-            const last = state.cards[state.cards.length - 1];
-            highlightCountry(last);
-            paintOptions(last, (last.playerAnswers || {})[playerId]);
+            card = state.cards[state.cards.length - 1];
         }
 
+        const myAnswer = card ? (card.playerAnswers || {})[playerId] : null;
+        if (myAnswer) {
+            pickedThisRound = true;
+            showAnswerOverlay(card, myAnswer);
+        }
+
+        paintPrompt(card, myAnswer);
         paintScores();
         paintFinished();
         paintTimerAndProgress();
     }
 
-    async function submitMove(optionPicked) {
+    async function submitMove(lat, lon) {
         try {
             const resp = await fetch('/api/Game/move', {
                 method: 'POST',
@@ -189,18 +271,21 @@
                 body: JSON.stringify({
                     gameId,
                     playerId,
-                    move: { gameType: moveDiscriminator, optionPicked },
+                    move: { gameType: moveDiscriminator, lat, lon },
                 }),
             });
             if (!resp.ok) {
                 const err = await resp.json().catch(() => ({}));
                 console.error('Move rejected:', err);
                 pickedThisRound = false;
+                clearAnswerLayer();
                 return;
             }
             await loadState();
         } catch (err) {
             console.error(err);
+            pickedThisRound = false;
+            clearAnswerLayer();
         }
     }
 

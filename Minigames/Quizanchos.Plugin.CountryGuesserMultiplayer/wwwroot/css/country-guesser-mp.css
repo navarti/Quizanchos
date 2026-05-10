@@ -1,143 +1,471 @@
-.country-guesser-mp {
-    --bg: #0a2a3d;
-    --paper: #e6f4f3;
-    --accent: #71b280;
-    --highlight: #ffd166;
-    --wrong: #ef476f;
-    --right: #06d6a0;
-    color: var(--paper);
-    font-family: "Segoe UI", system-ui, sans-serif;
-    background: linear-gradient(180deg, #0a2a3d 0%, #134e5e 60%, #0a2a3d 100%);
-    border-radius: 12px;
-    padding: 1.5rem;
-    min-height: 600px;
-}
+/* =========================================================================
+   Country Guesser — Multiplayer minigame.
+   Game-page chrome (.minigame-card / btn / pill / option / score / finished)
+   comes from /css/minigame-shell.css. This file owns:
+     - the Leaflet map container
+     - lobby panels (create / rooms list / room detail) used by RoomLobbyBase
+   ======================================================================== */
 
-.country-guesser-mp h2,
-.country-guesser-mp h3 {
-    margin: 0 0 0.5rem;
-    color: var(--highlight);
-}
-
-.country-guesser-mp__lobby {
+/* --- Game page --------------------------------------------------------- */
+#minigame-root .country-guesser-mp__prompt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    margin: var(--space-4) auto var(--space-3);
+    padding: var(--space-4) var(--space-5);
     text-align: center;
-    padding: 2rem;
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xs);
+    max-width: 720px;
 }
 
-.country-guesser-mp__btn {
-    margin-top: 1rem;
-    padding: 0.75rem 1.75rem;
-    font-size: 1rem;
+#minigame-root .country-guesser-mp__prompt-label {
+    font-size: var(--font-size-xs);
     font-weight: 700;
-    color: #0a2a3d;
-    background: var(--highlight);
-    border: 2px solid var(--accent);
-    border-radius: 6px;
-    cursor: pointer;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
 }
 
-.country-guesser-mp__btn:hover {
-    transform: translateY(-1px);
+#minigame-root .country-guesser-mp__prompt-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2vw + 1rem, 2.25rem);
+    font-weight: 800;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
 }
 
-.country-guesser-mp__btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+#minigame-root .country-guesser-mp__prompt-hint {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+#minigame-root .country-guesser-mp__prompt-hint[data-state="correct"] {
+    color: var(--color-success-600);
+    font-weight: 600;
+}
+#minigame-root .country-guesser-mp__prompt-hint[data-state="wrong"] {
+    color: var(--color-danger-600);
+    font-weight: 600;
+}
+#minigame-root .country-guesser-mp__prompt-hint[data-state="picked"] {
+    color: var(--color-warning-600);
+    font-weight: 600;
 }
 
-.country-guesser-mp__head {
+#minigame-root .country-guesser-mp__map {
+    height: 400px;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border-strong);
+    box-shadow: var(--shadow-sm);
+    cursor: crosshair;
+}
+
+@media (max-width: 640px) {
+    #minigame-root .country-guesser-mp__map { height: 300px; }
+}
+
+@media (max-width: 480px) {
+    #minigame-root .country-guesser-mp__map { height: 240px; }
+}
+
+/* --- Lobby (room flow) ------------------------------------------------- */
+#minigame-root .lobby-container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: var(--space-5) 0 var(--space-10);
+    color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+#minigame-root .panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6) var(--space-7, var(--space-6));
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    position: relative;
+    overflow: hidden;
+}
+#minigame-root .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+}
+
+#minigame-root .panel h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw + 1rem, 2.25rem);
+    font-weight: 800;
+    margin-bottom: var(--space-1);
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.025em;
+    line-height: var(--line-height-tight);
+}
+
+#minigame-root .panel .subtitle {
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-5);
+    font-size: var(--font-size-sm);
+}
+
+#minigame-root .create-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+#minigame-root .form-row {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+#minigame-root .lobby-container .form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 140px;
+    margin-bottom: 0;
+}
+
+#minigame-root .lobby-container .form-group label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    margin-bottom: var(--space-1);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-text-muted);
+}
+
+#minigame-root .lobby-container .form-control {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-white);
+    color: var(--color-text);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+#minigame-root .lobby-container .form-control:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 4px var(--color-focus-ring);
+}
+
+#minigame-root .btn-create {
+    align-self: flex-start;
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+    color: var(--color-text-inverse);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+#minigame-root .btn-create:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+#minigame-root .rooms-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
+}
+
+#minigame-root .rooms-header h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-text);
+    letter-spacing: -0.015em;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+#minigame-root .rooms-header h2::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+    border-radius: 2px;
+}
+
+#minigame-root .btn-refresh {
+    background: var(--color-white);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-primary-700);
+    font-size: 1.1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-base), background var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-xs);
+}
+#minigame-root .btn-refresh:hover {
+    border-color: var(--color-primary-400);
+    color: var(--color-primary-800);
+    background: var(--color-primary-50);
+    transform: rotate(90deg);
+}
+
+#minigame-root .rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+#minigame-root .empty-msg {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: var(--space-6);
+    background: var(--color-surface-alt);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-lg);
+}
+
+#minigame-root .room-card {
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-5);
+    transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base);
+}
+#minigame-root .room-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary-200);
+    box-shadow: var(--shadow-sm);
+}
+
+#minigame-root .room-card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--space-3);
+    font-weight: 600;
+    flex-wrap: wrap;
+    gap: var(--space-2);
 }
 
-.country-guesser-mp__progress {
-    font-size: 0.875rem;
-    opacity: 0.85;
-    margin-right: 0.5rem;
+#minigame-root .room-id {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+    background: var(--color-white);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
 }
 
-.country-guesser-mp__timer {
-    background: rgba(0, 0, 0, 0.45);
-    padding: 0.4rem 0.75rem;
-    border-radius: 999px;
-    font-variant-numeric: tabular-nums;
+#minigame-root .room-expires {
+    font-size: var(--font-size-xs);
+    color: var(--color-warning-600);
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+}
+#minigame-root .room-expires.expiring-soon {
+    color: var(--color-danger-600);
 }
 
-.country-guesser-mp__map {
-    height: 320px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid var(--accent);
-}
-
-.country-guesser-mp__options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.country-guesser-mp__option {
-    padding: 0.75rem 1rem;
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--accent);
-    border-radius: 6px;
-    color: var(--paper);
-    cursor: pointer;
-    font-size: 1rem;
-    text-align: left;
-}
-
-.country-guesser-mp__option:hover {
-    background: rgba(113, 178, 128, 0.35);
-}
-
-.country-guesser-mp__option[data-state="picked"] {
-    background: rgba(255, 209, 102, 0.2);
-    border-color: var(--highlight);
-}
-
-.country-guesser-mp__option[data-state="correct"] {
-    background: rgba(6, 214, 160, 0.25);
-    border-color: var(--right);
-}
-
-.country-guesser-mp__option[data-state="wrong"] {
-    background: rgba(239, 71, 111, 0.25);
-    border-color: var(--wrong);
-}
-
-.country-guesser-mp__scores {
-    margin-top: 1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0.5rem;
-}
-
-.country-guesser-mp__score {
-    padding: 0.5rem 0.75rem;
-    background: rgba(0, 0, 0, 0.45);
-    border-left: 3px solid var(--highlight);
-    border-radius: 4px;
+#minigame-root .room-teams {
     display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+#minigame-root .room-team {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
+}
+
+#minigame-root .tag-full {
+    background: var(--color-danger-100);
+    color: var(--color-danger-600);
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+#minigame-root .btn-join {
+    padding: var(--space-1) var(--space-4);
+    border: none;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, var(--color-success-500), var(--color-success-600));
+    color: var(--color-text-inverse);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+#minigame-root .btn-join:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+#minigame-root .room-detail-panel h2 {
+    margin-bottom: var(--space-1);
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+}
+
+#minigame-root .room-status {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-5);
+}
+
+#minigame-root .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+#minigame-root .team-card {
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-base), border-color var(--transition-base);
+}
+#minigame-root .team-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary-200);
+}
+#minigame-root .team-card::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4px;
+    background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+}
+
+#minigame-root .team-card h3 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: var(--space-2);
 }
 
-.country-guesser-mp__score.me {
-    border-left-color: var(--right);
+#minigame-root .team-count {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
 }
 
-.country-guesser-mp__finished {
-    margin-top: 1rem;
-    padding: 1rem;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.55);
-    border: 2px solid var(--highlight);
-    border-radius: 6px;
-    font-size: 1.125rem;
+#minigame-root .player-slot {
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-1);
+    font-size: var(--font-size-sm);
+    transition: background var(--transition-fast);
+}
+
+#minigame-root .player-slot.filled {
+    background: var(--color-white);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+#minigame-root .player-slot.empty {
+    background: transparent;
+    border: 1px dashed var(--color-border-strong);
+    color: var(--color-text-muted);
+    font-style: italic;
+    opacity: 0.7;
+}
+
+#minigame-root .room-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+#minigame-root .btn-leave {
+    padding: var(--space-2) var(--space-6);
+    border: 1px solid var(--color-danger-100);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--color-danger-600);
+    font-family: inherit;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+#minigame-root .btn-leave:hover {
+    background: var(--color-danger-500);
+    color: var(--color-text-inverse);
+    border-color: var(--color-danger-500);
+}
+
+@media (max-width: 640px) {
+    #minigame-root .form-row { flex-direction: column; gap: var(--space-2); }
+    #minigame-root .teams-grid { grid-template-columns: 1fr; }
+    #minigame-root .panel { padding: var(--space-5) var(--space-4); }
+    #minigame-root .panel h1 { font-size: clamp(1.5rem, 6vw, 2rem); }
+    #minigame-root .room-card { padding: var(--space-3) var(--space-4); }
+    #minigame-root .btn-create { width: 100%; align-self: stretch; }
+    #minigame-root .room-actions { flex-direction: column; }
+    #minigame-root .btn-leave { width: 100%; text-align: center; }
+}
+
+@media (max-width: 480px) {
+    #minigame-root .lobby-container { padding: var(--space-3) 0 var(--space-6); gap: var(--space-3); }
+    #minigame-root .panel { padding: var(--space-4) var(--space-3); border-radius: var(--radius-xl); }
+    #minigame-root .rooms-header h2 { font-size: var(--font-size-md); }
+    #minigame-root .btn-refresh { width: 36px; height: 36px; font-size: 1rem; }
+    #minigame-root .team-card { padding: var(--space-4); }
 }

@@ -202,6 +202,7 @@ public class HomeController : Controller
                 GameKey = x.GameKey,
                 DisplayName = x.DisplayName,
                 IsPremium = x.IsPremium,
+                IsMultiplayer = x.IsMultiplayer,
                 CanAccess = !x.IsPremium || hasPremiumAccess,
                 Description = x.Description,
                 CardStyle = x.CardStyle,

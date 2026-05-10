@@ -1,0 +1,158 @@
+/* =========================================================================
+   Admin Statistics page — filters, chart card, breakdown tables.
+   Reuses tokens from site.css / admin.css and admin-stat-card chrome
+   from admindash.css.
+   ======================================================================== */
+
+.stats-controls {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-6);
+    box-shadow: var(--shadow-sm);
+}
+
+.stats-controls__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: flex-end;
+}
+
+.stats-control {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 160px;
+}
+
+.stats-control label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.stats-input {
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    background: var(--color-white);
+    color: var(--color-gray-900);
+}
+.stats-input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+#statsCustomRange {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-2);
+}
+#statsCustomRange label { align-self: flex-end; margin-bottom: var(--space-2); }
+
+.stats-refresh-btn {
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-600);
+    color: var(--color-text-inverse);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+.stats-refresh-btn:hover { background: var(--color-primary-700); }
+
+.stats-range-summary {
+    margin-top: var(--space-3);
+    color: var(--color-gray-600);
+    font-size: var(--font-size-sm);
+}
+
+/* Chart card --------------------------------------------------------- */
+.stats-chart-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-6);
+}
+
+.stats-chart-card__header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.stats-chart-card__hint {
+    color: var(--color-gray-600);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.stats-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-4);
+    font-size: var(--font-size-sm);
+    color: var(--color-gray-700);
+}
+.stats-chart-legend__item { display: inline-flex; align-items: center; gap: var(--space-2); }
+.stats-chart-legend__swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.stats-chart-wrap {
+    position: relative;
+    height: 360px;
+    width: 100%;
+}
+.stats-chart-wrap canvas { max-height: 360px; }
+
+/* Tables ------------------------------------------------------------- */
+.stats-table-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-6);
+    overflow-x: auto;
+}
+
+.stats-table { min-width: 640px; }
+.stats-table th, .stats-table td { white-space: nowrap; }
+
+.stats-player-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.stats-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+}
+
+@media (max-width: 640px) {
+    .stats-controls__row { gap: var(--space-3); }
+    .stats-control { min-width: 140px; flex: 1 1 140px; }
+    .stats-chart-wrap { height: 280px; }
+}

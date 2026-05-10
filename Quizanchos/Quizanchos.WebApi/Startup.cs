@@ -234,6 +234,7 @@ public static class Startup
         services.AddScoped<Quizanchos.Core.IRoomNotifier, SignalRRoomNotifier>();
         services.AddScoped<GameRoomService>();
         services.AddScoped<AdminService>();
+        services.AddScoped<StatisticsService>();
         services.AddTransient<UserRetrieverService>();
         services.AddTransient<GoogleAuthorizationService>();
         services.AddTransient<AuthorizationService>(); 
@@ -473,6 +474,7 @@ public static class Startup
             });
 
         services.AddTransient<EmailSenderService>();
+        services.AddTransient<DefaultNicknameGenerator>();
         services.AddTransient<DefaultUserRegistrationService>();
         services.AddTransient<EmailConfirmationUserRegistrationService>();
         services.AddTransient<IUserPasswordUpdaterService, EmailConfirmationPasswordUpdaterService>();

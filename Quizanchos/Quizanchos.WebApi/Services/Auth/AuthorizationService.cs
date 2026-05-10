@@ -81,7 +81,6 @@ public class AuthorizationService
 
         user = new ApplicationUser
         {
-            UserName = registerModelDto.Email,
             Email = registerModelDto.Email,
             AvatarUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFAMn65QIVqFZGQBV1otby9cY8r27W-ZGm_Q&s",
             Coins = 0,

@@ -6,23 +6,25 @@ namespace Quizanchos.Plugin.CountryGuesserMultiplayer.GameLogic;
 
 public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, CountryGuesserMpMove>
 {
+    private const double EarthRadiusKm = 6371.0088;
+
     private readonly CountryRepository _repository;
     private readonly int _totalCards;
-    private readonly int _optionCount;
     private readonly int _secondsPerCard;
+    private readonly double _maxDistanceKm;
     private readonly int _seed;
 
     public CountryGuesserMpLogic(
         CountryRepository repository,
         int totalCards = 5,
-        int optionCount = 4,
         int secondsPerCard = 20,
+        double maxDistanceKm = 600,
         int seed = 0)
     {
         _repository = repository;
         _totalCards = Math.Max(1, totalCards);
-        _optionCount = Math.Clamp(optionCount, 2, 6);
         _secondsPerCard = Math.Max(5, secondsPerCard);
+        _maxDistanceKm = Math.Max(50, maxDistanceKm);
         _seed = seed == 0 ? Random.Shared.Next() : seed;
     }
 
@@ -35,8 +37,8 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
             Players = players.ToList(),
             CurrentCardIndex = 0,
             TotalCards = _totalCards,
-            OptionCount = _optionCount,
             SecondsPerCard = _secondsPerCard,
+            MaxDistanceKm = _maxDistanceKm,
         };
         foreach (var p in state.Players) state.Scores[p] = 0;
 
@@ -49,14 +51,6 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
         for (int i = 0; i < picks.Count; i++)
         {
             var target = picks[i];
-            var distractors = pool
-                .Where(c => c.Code != target.Code)
-                .OrderBy(_ => rnd.Next())
-                .Take(_optionCount - 1)
-                .ToList();
-            var allOpts = distractors.Append(target).OrderBy(_ => rnd.Next()).ToList();
-            int correctIdx = allOpts.FindIndex(c => c.Code == target.Code);
-
             state.Cards.Add(new CountryGuesserMpState.MpCard
             {
                 CardIndex = i,
@@ -64,9 +58,6 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
                 TargetName = target.Name,
                 TargetLat = target.Lat,
                 TargetLon = target.Lon,
-                OptionCodes = allOpts.Select(c => c.Code).ToList(),
-                OptionNames = allOpts.Select(c => c.Name).ToList(),
-                CorrectOption = correctIdx,
                 CreationTime = DateTime.UtcNow,
             });
         }
@@ -83,17 +74,30 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
         var card = state.Cards[state.CurrentCardIndex];
         if (card.PlayerAnswers.ContainsKey(playerId))
             return MoveResult.Failure("Already answered this round");
-        if (move.OptionPicked < 0 || move.OptionPicked >= card.OptionCodes.Count)
-            return MoveResult.Failure("Invalid option");
+        if (move.Lat is null || move.Lon is null)
+            return MoveResult.Failure("Click coordinates required");
+        if (move.Lat is < -90 or > 90 || move.Lon is < -180 or > 180)
+            return MoveResult.Failure("Coordinates out of range");
         return MoveResult.Success;
     }
 
     public void ApplyMove(CountryGuesserMpState state, CountryGuesserMpMove move, string playerId)
     {
         var card = state.Cards[state.CurrentCardIndex];
-        card.PlayerAnswers[playerId] = move.OptionPicked;
+        double lat = move.Lat!.Value;
+        double lon = move.Lon!.Value;
+        double distance = HaversineKm(lat, lon, card.TargetLat, card.TargetLon);
+        bool correct = distance <= state.MaxDistanceKm;
 
-        if (move.OptionPicked == card.CorrectOption)
+        card.PlayerAnswers[playerId] = new CountryGuesserMpState.ClickAnswer
+        {
+            Lat = lat,
+            Lon = lon,
+            DistanceKm = distance,
+            Correct = correct,
+        };
+
+        if (correct)
         {
             state.Scores[playerId] = state.Scores.GetValueOrDefault(playerId, 0) + 1;
         }
@@ -156,6 +160,20 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
                 scores[p] = 0;
         }
         return scores;
+    }
+
+    private static double HaversineKm(double lat1, double lon1, double lat2, double lon2)
+    {
+        double phi1 = lat1 * Math.PI / 180.0;
+        double phi2 = lat2 * Math.PI / 180.0;
+        double dPhi = (lat2 - lat1) * Math.PI / 180.0;
+        double dLambda = (lon2 - lon1) * Math.PI / 180.0;
+
+        double a = Math.Sin(dPhi / 2) * Math.Sin(dPhi / 2)
+                 + Math.Cos(phi1) * Math.Cos(phi2)
+                 * Math.Sin(dLambda / 2) * Math.Sin(dLambda / 2);
+        double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+        return EarthRadiusKm * c;
     }
 
     private static void Shuffle<T>(IList<T> list, Random rnd)

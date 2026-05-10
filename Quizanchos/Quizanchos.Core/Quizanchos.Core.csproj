@@ -11,7 +11,7 @@
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <PackageId>Quizanchos.Core</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Danchos and Vanchos</Authors>
     <Description>SDK for building Quizanchos minigame plugins. Implement IMinigameDescriptor, IMinigameFrontendDescriptor, and IGameLogic&lt;TState, TMove&gt; to ship a third-party minigame loadable at runtime by the Quizanchos host.</Description>
     <PackageTags>quizanchos;minigame;sdk;plugin;game</PackageTags>
