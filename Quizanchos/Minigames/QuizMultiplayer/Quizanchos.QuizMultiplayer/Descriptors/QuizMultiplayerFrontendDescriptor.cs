@@ -11,6 +11,7 @@ public class QuizMultiplayerFrontendDescriptor : IMinigameFrontendDescriptor
     public string GameKey => "QuizMultiplayer";
     public string DisplayName => "Quiz Multiplayer";
     public bool IsPremium => false;
+    public bool IsMultiplayer => true;
     public string Description => "Team up and compete in real-time quizzes.";
     public string CardStyle => "background: linear-gradient(135deg, #7b61ff 0%, #4fc3f7 100%);";
     public string LobbyUrl => MinigameRoute;

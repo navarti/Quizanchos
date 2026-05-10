@@ -1,0 +1,5 @@
+{
+  "entryAssembly": "Quizanchos.Plugin.TicketToRideEurope.dll",
+  "wwwRoot": "wwwroot",
+  "version": "0.1.0"
+}

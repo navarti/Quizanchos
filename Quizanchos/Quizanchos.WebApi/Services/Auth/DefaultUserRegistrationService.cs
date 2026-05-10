@@ -9,11 +9,13 @@ public class DefaultUserRegistrationService : IUserRegistrationService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly DefaultNicknameGenerator _nicknameGenerator;
 
-    public DefaultUserRegistrationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public DefaultUserRegistrationService(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, DefaultNicknameGenerator nicknameGenerator)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _nicknameGenerator = nicknameGenerator;
     }
 
     public async Task<RegisterUserResult> RegisterUser(ApplicationUser user, string password, string roleName)
@@ -23,6 +25,8 @@ public class DefaultUserRegistrationService : IUserRegistrationService
         {
             throw HandledExceptionFactory.Create("The user with this email exists");
         }
+
+        user.UserName = await _nicknameGenerator.GenerateAsync();
 
         IdentityResult result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded)

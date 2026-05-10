@@ -4,5 +4,9 @@ namespace Quizanchos.Plugin.CountryGuesserMultiplayer.GameLogic;
 
 public sealed record CountryGuesserMpMove : GameMove
 {
-    public int OptionPicked { get; init; } = -1;
+    /// <summary>Latitude of the player's click on the world map (degrees, [-90, 90]).</summary>
+    public double? Lat { get; init; }
+
+    /// <summary>Longitude of the player's click on the world map (degrees, [-180, 180]).</summary>
+    public double? Lon { get; init; }
 }

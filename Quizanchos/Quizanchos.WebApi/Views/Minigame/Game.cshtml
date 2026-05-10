@@ -4,6 +4,7 @@
 }
 
 @section Styles {
+    <link rel="stylesheet" href="/css/minigame-shell.css" asp-append-version="true" />
     @foreach (var style in Model.Styles)
     {
         <link rel="stylesheet" href="@style" asp-append-version="@(!style.StartsWith("http", StringComparison.OrdinalIgnoreCase))" />

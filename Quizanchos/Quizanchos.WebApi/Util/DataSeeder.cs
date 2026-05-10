@@ -13,6 +13,40 @@ public static class DataSeeder
         await SeedRoles(serviceProvider);
         await SeedOwner(serviceProvider, configuration);
         await SeedMarketItems(serviceProvider);
+        await SeedTestUsers(serviceProvider);
+    }
+
+    public static async Task SeedTestUsers(IServiceProvider serviceProvider)
+    {
+        UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        var testUsers = new (string Email, string Password)[]
+        {
+            ("alice@test.com", "alice123"),
+            ("bob@test.com", "bob123"),
+        };
+
+        foreach (var (email, password) in testUsers)
+        {
+            ApplicationUser? existing = await userManager.FindByEmailAsync(email);
+            if (existing is not null)
+            {
+                continue;
+            }
+
+            ApplicationUser user = new()
+            {
+                UserName = email,
+                Email = email,
+                EmailConfirmed = true,
+            };
+            IdentityResult create = await userManager.CreateAsync(user, password);
+            if (!create.Succeeded)
+            {
+                continue;
+            }
+            await userManager.AddToRoleAsync(user, AppRole.User);
+        }
     }
 
     public static async Task SeedRoles(IServiceProvider serviceProvider)

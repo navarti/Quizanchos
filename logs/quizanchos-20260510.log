@@ -1,0 +1,87 @@
+2026-05-10 20:23:39.093 +02:00 [DBG] Quartz.Simpl.TaskSchedulingThreadPool TaskSchedulingThreadPool configured with max concurrency of 10 and TaskScheduler ThreadPoolTaskScheduler. {}
+2026-05-10 20:23:39.111 +02:00 [INF] Quartz.Core.SchedulerSignalerImpl Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl {}
+2026-05-10 20:23:39.112 +02:00 [INF] Quartz.Core.QuartzScheduler Quartz Scheduler created {}
+2026-05-10 20:23:39.112 +02:00 [INF] Quartz.Core.QuartzScheduler JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory {}
+2026-05-10 20:23:39.112 +02:00 [INF] Quartz.Simpl.RAMJobStore RAMJobStore initialized. {}
+2026-05-10 20:23:39.113 +02:00 [INF] Quartz.Impl.StdSchedulerFactory Quartz Scheduler 3.17.1.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized {}
+2026-05-10 20:23:39.113 +02:00 [INF] Quartz.Impl.StdSchedulerFactory Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10 {}
+2026-05-10 20:23:39.114 +02:00 [INF] Quartz.Impl.StdSchedulerFactory Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False {}
+2026-05-10 20:23:39.121 +02:00 [INF] Quartz.ContainerConfigurationProcessor Adding 3 jobs, 3 triggers. {}
+2026-05-10 20:23:39.123 +02:00 [INF] Quartz.ContainerConfigurationProcessor Adding job: DEFAULT.MonthlyTask {}
+2026-05-10 20:23:39.124 +02:00 [DBG] Quartz.ContainerConfigurationProcessor Scheduling job: DEFAULT.MonthlyTask with trigger: DEFAULT.MonthlyTaskTrigger {}
+2026-05-10 20:23:39.134 +02:00 [INF] Quartz.ContainerConfigurationProcessor Adding job: DEFAULT.DepositChecker {}
+2026-05-10 20:23:39.134 +02:00 [DBG] Quartz.ContainerConfigurationProcessor Scheduling job: DEFAULT.DepositChecker with trigger: DEFAULT.DepositCheckerTrigger {}
+2026-05-10 20:23:39.136 +02:00 [INF] Quartz.ContainerConfigurationProcessor Adding job: DEFAULT.OrderExpiry {}
+2026-05-10 20:23:39.136 +02:00 [DBG] Quartz.ContainerConfigurationProcessor Scheduling job: DEFAULT.OrderExpiry with trigger: DEFAULT.OrderExpiryTrigger {}
+2026-05-10 20:23:39.136 +02:00 [DBG] Quartz.ContainerConfigurationProcessor Rescheduling job: DEFAULT.MonthlyTask with updated trigger: DEFAULT.MonthlyTaskTrigger {}
+2026-05-10 20:23:39.139 +02:00 [DBG] Quartz.ContainerConfigurationProcessor Rescheduling job: DEFAULT.DepositChecker with updated trigger: DEFAULT.DepositCheckerTrigger {}
+2026-05-10 20:23:39.139 +02:00 [DBG] Quartz.ContainerConfigurationProcessor Rescheduling job: DEFAULT.OrderExpiry with updated trigger: DEFAULT.OrderExpiryTrigger {}
+2026-05-10 20:23:39.180 +02:00 [INF] Microsoft.Hosting.Lifetime Now listening on: http://localhost:5237 {"EventId":{"Id":14,"Name":"ListeningOnAddress"}}
+2026-05-10 20:23:39.181 +02:00 [INF] Microsoft.Hosting.Lifetime Application started. Press Ctrl+C to shut down. {}
+2026-05-10 20:23:39.181 +02:00 [INF] Microsoft.Hosting.Lifetime Hosting environment: Development {}
+2026-05-10 20:23:39.181 +02:00 [INF] Microsoft.Hosting.Lifetime Content root path: C:/Study/KPI/diploma/Quizanchos/Quizanchos/Quizanchos.WebApi {}
+2026-05-10 20:23:39.185 +02:00 [INF] Quartz.Core.QuartzScheduler Scheduler QuartzScheduler_$_NON_CLUSTERED started. {}
+2026-05-10 20:23:39.187 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:23:39.189 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:23:39.189 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:23:39.189 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:23:39.189 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:23:39.189 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:23:39.226 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.OrderExpiry {}
+2026-05-10 20:23:39.226 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.DepositChecker {}
+2026-05-10 20:23:39.226 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.DepositChecker {}
+2026-05-10 20:23:39.226 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.OrderExpiry {}
+2026-05-10 20:23:39.240 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}
+2026-05-10 20:23:39.283 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}
+2026-05-10 20:23:39.285 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP HEAD / responded 405 in 49.9770 ms {"RequestId":"0HNLEO50VMECI:00000001","ConnectionId":"0HNLEO50VMECI"}
+2026-05-10 20:23:39.405 +02:00 [WRN] LuckyPennySoftware.AutoMapper.License You do not have a valid license key for the Lucky Penny software AutoMapper. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license. {"ActionId":"cde6492f-f1d5-40df-872f-fc0fd5600e26","ActionName":"Quizanchos.WebApi.ViewControllers.HomeController.Index (Quizanchos.WebApi)","RequestId":"0HNLEO50VMECK:00000001","RequestPath":"/","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:23:39.515 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 238.1298 ms {"RequestId":"0HNLEO50VMECJ:00000001","ConnectionId":"0HNLEO50VMECJ"}
+2026-05-10 20:23:39.515 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET / responded 200 in 220.3838 ms {"RequestId":"0HNLEO50VMECK:00000001","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:23:39.538 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/common.js responded 200 in 7.1144 ms {"RequestId":"0HNLEO50VMECP:00000001","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:23:39.538 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/home.css responded 200 in 7.6973 ms {"RequestId":"0HNLEO50VMECN:00000001","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:23:39.538 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/home.js responded 200 in 7.4939 ms {"RequestId":"0HNLEO50VMECO:00000001","ConnectionId":"0HNLEO50VMECO"}
+2026-05-10 20:23:39.538 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/site.css responded 200 in 10.5624 ms {"RequestId":"0HNLEO50VMECL:00000001","ConnectionId":"0HNLEO50VMECL"}
+2026-05-10 20:23:39.538 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/multiplayer-game-chat.css responded 200 in 8.0721 ms {"RequestId":"0HNLEO50VMECM:00000001","ConnectionId":"0HNLEO50VMECM"}
+2026-05-10 20:23:39.538 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/bootstrap.min.css responded 200 in 10.7059 ms {"RequestId":"0HNLEO50VMECK:00000002","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:23:39.539 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/site.js responded 200 in 0.7540 ms {"RequestId":"0HNLEO50VMECN:00000002","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:23:39.539 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/profile.js responded 200 in 0.7293 ms {"RequestId":"0HNLEO50VMECL:00000002","ConnectionId":"0HNLEO50VMECL"}
+2026-05-10 20:23:39.539 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/multiplayer-game-chat.js responded 200 in 0.5990 ms {"RequestId":"0HNLEO50VMECK:00000003","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:23:39.842 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}
+2026-05-10 20:23:39.857 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}
+2026-05-10 20:24:08.732 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:24:16.263 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/Statistics responded 302 in 7.7506 ms {"RequestId":"0HNLEO50VMECN:00000003","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:24:20.624 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/Statistics responded 302 in 5.6140 ms {"RequestId":"0HNLEO50VMECN:00000004","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:24:20.709 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 83.1710 ms {"RequestId":"0HNLEO50VMECN:00000005","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:24:26.740 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/admindash.css responded 200 in 1.3054 ms {"RequestId":"0HNLEO50VMECL:00000003","ConnectionId":"0HNLEO50VMECL"}
+2026-05-10 20:24:26.740 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/admin-statistics.css responded 200 in 1.5463 ms {"RequestId":"0HNLEO50VMECN:00000006","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:24:26.740 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/admin-statistics.js responded 200 in 1.5536 ms {"RequestId":"0HNLEO50VMECK:00000004","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:24:34.797 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/GetStatisticsByGame responded 302 in 1.6855 ms {"RequestId":"0HNLEO50VMECK:00000005","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:24:34.797 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/GetStatisticsGames responded 302 in 1.6837 ms {"RequestId":"0HNLEO50VMECN:00000007","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:24:34.797 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/GetStatisticsTopPlayers responded 302 in 1.6853 ms {"RequestId":"0HNLEO50VMECP:00000002","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:24:34.797 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/GetStatisticsOverview responded 302 in 1.6911 ms {"RequestId":"0HNLEO50VMECL:00000004","ConnectionId":"0HNLEO50VMECL"}
+2026-05-10 20:24:34.797 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/GetStatisticsTimeSeries responded 302 in 1.6797 ms {"RequestId":"0HNLEO50VMECO:00000002","ConnectionId":"0HNLEO50VMECO"}
+2026-05-10 20:24:34.801 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 2.1244 ms {"RequestId":"0HNLEO50VMECO:00000003","ConnectionId":"0HNLEO50VMECO"}
+2026-05-10 20:24:34.801 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 1.5162 ms {"RequestId":"0HNLEO50VMECL:00000005","ConnectionId":"0HNLEO50VMECL"}
+2026-05-10 20:24:34.801 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 1.2260 ms {"RequestId":"0HNLEO50VMECP:00000003","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:24:34.801 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 2.3720 ms {"RequestId":"0HNLEO50VMECK:00000006","ConnectionId":"0HNLEO50VMECK"}
+2026-05-10 20:24:34.801 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 1.3165 ms {"RequestId":"0HNLEO50VMECN:00000008","ConnectionId":"0HNLEO50VMECN"}
+2026-05-10 20:24:37.073 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:24:39.141 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:24:39.144 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.DepositChecker {}
+2026-05-10 20:24:39.671 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}
+2026-05-10 20:24:42.742 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 2.0410 ms {"RequestId":"0HNLEO50VMECP:00000004","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:25:05.681 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:25:29.941 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:25:32.039 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP POST /Authorization/SignIn responded 200 in 175.4129 ms {"RequestId":"0HNLEO50VMECP:00000005","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:25:39.141 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:25:39.142 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.DepositChecker {}
+2026-05-10 20:25:39.685 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}
+2026-05-10 20:25:40.981 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Admin/Statistics responded 302 in 3.7975 ms {"RequestId":"0HNLEO50VMECP:00000006","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:25:40.984 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /Signin responded 200 in 1.6023 ms {"RequestId":"0HNLEO50VMECP:00000007","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:25:58.719 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /js/admin-statistics.js responded 304 in 0.9665 ms {"RequestId":"0HNLEO50VMECP:00000008","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:26:05.204 +02:00 [INF] Serilog.AspNetCore.RequestLoggingMiddleware HTTP GET /css/admin-statistics.css responded 304 in 0.3690 ms {"RequestId":"0HNLEO50VMECP:00000009","ConnectionId":"0HNLEO50VMECP"}
+2026-05-10 20:26:08.393 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:26:33.237 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 1 triggers {}
+2026-05-10 20:26:39.142 +02:00 [DBG] Quartz.Core.QuartzSchedulerThread Batch acquisition of 0 triggers {}
+2026-05-10 20:26:39.142 +02:00 [DBG] Quartz.Core.JobRunShell Calling Execute on job DEFAULT.DepositChecker {}
+2026-05-10 20:26:39.671 +02:00 [DBG] Quartz.Core.JobRunShell Trigger instruction : NoInstruction {}

@@ -400,10 +400,12 @@ public sealed class CaravanLogic : IGameLogic<CaravanState, CaravanMove>
         }
 
         var winnerId = state.Winner;
+        bool isDraw = string.IsNullOrEmpty(winnerId);
         foreach (var ps in state.PlayerStates)
         {
             if (ps.IsAi) continue;
-            scores[ps.PlayerId] = ps.PlayerId == winnerId ? 5 : 0;
+            int points = isDraw ? 1 : (ps.PlayerId == winnerId ? 3 : 0);
+            scores[ps.PlayerId] = points;
         }
         return scores;
     }

@@ -1,0 +1,13 @@
+# Override that mounts a host folder over /app/plugins so you can drop new
+# plugin folders in at runtime without rebuilding the image.
+#
+# Usage:
+#   PLUGINS_DIR=/srv/quizanchos/plugins \
+#       docker compose -f docker-compose.yml -f docker-compose.plugins.yml up -d
+#
+# The mounted folder must contain one subfolder per plugin (Caravan/, ...) with
+# the published DLL + plugin.json + wwwroot/. See Minigames/README.md.
+services:
+  app:
+    volumes:
+      - ${PLUGINS_DIR:-./plugins}:/app/plugins

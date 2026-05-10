@@ -12,6 +12,7 @@ public sealed class CountryGuesserMpFrontendDescriptor : IMinigameFrontendDescri
     public string GameKey => CountryGuesserMpConstants.GameKey;
     public string DisplayName => CountryGuesserMpConstants.DisplayName;
     public bool IsPremium => false;
+    public bool IsMultiplayer => true;
     public string Description => "Race other players to identify highlighted countries on the world map.";
     public string CardStyle => "background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);";
     public string LobbyUrl => Route;

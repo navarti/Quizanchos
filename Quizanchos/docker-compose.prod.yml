@@ -1,0 +1,15 @@
+# Production override: pull a pre-built image from GHCR instead of building.
+#
+# Usage:
+#   IMAGE=ghcr.io/navarti/quizanchos:1.2.3 \
+#       docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+#   IMAGE=ghcr.io/navarti/quizanchos:1.2.3 \
+#       docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Always run `pull` first — once the image is in the local cache, `up -d`
+# uses it instead of falling back to `build:` from the base compose file.
+# Combine with docker-compose.plugins.yml to also mount a host plugin dir.
+services:
+  app:
+    image: ${IMAGE:?IMAGE must be set, e.g. ghcr.io/navarti/quizanchos:1.2.3}
+    pull_policy: always

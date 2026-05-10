@@ -33,7 +33,12 @@
             state.players = wrapper.players ?? wrapper.Players ?? state.players;
             render();
         } catch (err) {
-            root.innerHTML = `<div class="caravan caravan__lobby"><p>Could not load game state.</p><p>${err.message}</p></div>`;
+            root.innerHTML = `
+                <div class="caravan minigame-card minigame-card--lobby">
+                    <h2 class="minigame-title">Caravan</h2>
+                    <p class="minigame-prose">Could not load game state.</p>
+                    <p class="minigame-prose">${err.message}</p>
+                </div>`;
         }
     }
 
@@ -108,14 +113,30 @@
                     <span>Caravan ${columnLabel(idx)}</span>
                     <span class="caravan__column-value ${valueClass}">${col.value}</span>
                 </div>
-                ${slotsHtml || '<div class="caravan__slot" data-col="' + idx + '" data-slot="-1" style="opacity:.6">empty</div>'}
+                ${slotsHtml || '<div class="caravan__slot" data-col="' + idx + '" data-slot="-1" style="opacity:.55;justify-content:center;">empty</div>'}
             </div>
         `;
     }
 
+    function renderFinishedBanner() {
+        if (!state.isFinished) return '';
+        const isWin = state.winner === playerId;
+        const isDraw = !state.winner;
+        const cls = isDraw ? 'minigame-finished--draw'
+            : isWin ? 'minigame-finished--win' : 'minigame-finished--loss';
+        const msg = isDraw ? 'Caravans ended in a draw.'
+            : isWin ? 'You won the caravans!'
+            : 'AI won the caravans.';
+        return `<div class="minigame-finished ${cls}">${msg}</div>`;
+    }
+
     function render() {
         if (!state || !state.playerStates || state.playerStates.length < 2) {
-            root.innerHTML = '<div class="caravan"><h2>Caravan</h2><p>Loading...</p></div>';
+            root.innerHTML = `
+                <div class="caravan minigame-card minigame-card--lobby">
+                    <h2 class="minigame-title">Caravan</h2>
+                    <p class="minigame-prose">Loading...</p>
+                </div>`;
             return;
         }
 
@@ -128,29 +149,26 @@
         const oppColumns = state.columns.filter(c => c.ownerId === oppState.playerId);
 
         const myTurn = state.currentTurnIndex === myIdx && !state.isFinished;
-        const finishedHtml = state.isFinished
-            ? `<div class="caravan__finished">${state.winner === playerId ? 'You won the caravans!' : (state.winner ? 'AI won the caravans.' : 'Caravans ended in a draw.')}</div>`
-            : '';
 
         root.innerHTML = `
-            <div class="caravan">
-                <h2>Caravan</h2>
-                <div class="caravan__status">${state.lastMoveDescription || (myTurn ? 'Your turn.' : 'Opponent thinking...')}</div>
+            <div class="caravan minigame-card">
+                <h2 class="minigame-title">Caravan</h2>
+                <div class="minigame-status">${state.lastMoveDescription || (myTurn ? 'Your turn.' : 'Opponent thinking...')}</div>
                 <div class="caravan__board">
                     <div class="caravan__side-label">Opponent caravans</div>
                     ${oppColumns.map((c) => renderColumn(c, state.columns.indexOf(c))).join('')}
                     <div class="caravan__side-label">Your caravans</div>
                     ${myColumns.map((c) => renderColumn(c, state.columns.indexOf(c))).join('')}
                 </div>
-                <h3>Hand</h3>
+                <h3 class="minigame-section-title">Hand</h3>
                 <div class="caravan__hand">
                     ${myState.hand.map((card, idx) => `<div class="caravan__hand-card" data-handidx="${idx}">${renderCard(card, { selected: idx === selectedHandIdx, handIdx: idx })}</div>`).join('')}
                 </div>
-                <div class="caravan__actions">
-                    <button class="caravan__btn" data-action="discard-card" ${selectedHandIdx < 0 || !myTurn ? 'disabled' : ''}>Discard selected card</button>
-                    <button class="caravan__btn" data-action="discard-caravan" ${!myTurn ? 'disabled' : ''}>Discard a caravan...</button>
+                <div class="minigame-actions">
+                    <button class="minigame-btn minigame-btn--danger" data-action="discard-card" ${selectedHandIdx < 0 || !myTurn ? 'disabled' : ''}>Discard selected card</button>
+                    <button class="minigame-btn minigame-btn--secondary" data-action="discard-caravan" ${!myTurn ? 'disabled' : ''}>Discard a caravan...</button>
                 </div>
-                ${finishedHtml}
+                ${renderFinishedBanner()}
             </div>
         `;
 

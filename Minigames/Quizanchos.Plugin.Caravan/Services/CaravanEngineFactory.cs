@@ -48,8 +48,14 @@ public sealed class CaravanEngineFactory
 
         state.GameId = gameId;
         state.Players = loaded.PlayerIds;
-        state.IsFinished = loaded.IsFinished;
-        state.Winner = loaded.Winner;
+        state.IsFinished = state.IsFinished || loaded.IsFinished;
+        // Don't let a null loaded.Winner overwrite the JSON winner: when the internal AI wins,
+        // its id ("__caravan_ai__") isn't in GameSession.Players so GameService can't persist
+        // it to GameSession.WinnerId, leaving loaded.Winner null while the JSON has the truth.
+        if (!string.IsNullOrEmpty(loaded.Winner))
+        {
+            state.Winner = loaded.Winner;
+        }
 
         var logic = new CaravanLogic();
         return new GameEngine<CaravanState, CaravanMove>(logic, state);

@@ -1,0 +1,142 @@
+name: Release plugin
+
+# Tag a single plugin to ship it as an installable ZIP attached to a GitHub
+# Release. Operators download the asset and drop it into the host's plugins/
+# folder (or the docker-compose.plugins.yml volume) — no host rebuild needed.
+#
+# Tag format: plugin/<Name>/v<Version>
+#   plugin/Caravan/v0.2.0
+#   plugin/CountryGuesser/v1.0.0
+#   plugin/CountryGuesserMultiplayer/v0.3.1
+#   plugin/CaravanMultiplayer/v0.1.0
+#
+# Manual run via workflow_dispatch lets you publish a pre-release ZIP without
+# tagging.
+
+on:
+  push:
+    tags: ['plugin/*/v*']
+  workflow_dispatch:
+    inputs:
+      plugin:
+        description: 'Plugin name (e.g. Caravan)'
+        required: true
+        type: choice
+        options:
+          - Caravan
+          - CaravanMultiplayer
+          - CountryGuesser
+          - CountryGuesserMultiplayer
+          - Game2048
+          - TicketToRideEurope
+      version:
+        description: 'Version label (e.g. 0.2.0-rc1)'
+        required: true
+
+env:
+  DOTNET_NOLOGO: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+jobs:
+  release:
+    name: Build & publish plugin ZIP
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse plugin name & version from tag
+        id: parse
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            name="${{ inputs.plugin }}"
+            version="${{ inputs.version }}"
+            tag=""
+          else
+            ref="${GITHUB_REF#refs/tags/}"
+            # plugin/<Name>/v<Version>
+            name="$(echo "$ref" | cut -d/ -f2)"
+            version="$(echo "$ref" | cut -d/ -f3 | sed 's/^v//')"
+            tag="$ref"
+          fi
+          if [[ ! "$name" =~ ^(Caravan|CaravanMultiplayer|CountryGuesser|CountryGuesserMultiplayer|Game2048|TicketToRideEurope)$ ]]; then
+            echo "::error::Unknown plugin '$name'"
+            exit 1
+          fi
+          echo "name=$name"       >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag"         >> "$GITHUB_OUTPUT"
+          echo "Releasing $name v$version"
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Pack SDK (provides Quizanchos.Core to the local feed)
+        run: |
+          dotnet pack Quizanchos/Quizanchos.Common/Quizanchos.Common.csproj -c Release -o Quizanchos/nupkgs
+          dotnet pack Quizanchos/Quizanchos.Core/Quizanchos.Core.csproj     -c Release -o Quizanchos/nupkgs
+
+      - name: Stamp plugin.json with release version
+        run: |
+          manifest="Minigames/Quizanchos.Plugin.${{ steps.parse.outputs.name }}/plugin.json"
+          tmp=$(mktemp)
+          jq --arg v "${{ steps.parse.outputs.version }}" '.version = $v' "$manifest" > "$tmp"
+          mv "$tmp" "$manifest"
+          cat "$manifest"
+
+      - name: Publish plugin
+        working-directory: Minigames
+        run: |
+          dotnet publish "Quizanchos.Plugin.${{ steps.parse.outputs.name }}/Quizanchos.Plugin.${{ steps.parse.outputs.name }}.csproj" \
+            -c Release -o "publish/${{ steps.parse.outputs.name }}" \
+            /p:UseAppHost=false /p:ErrorOnDuplicatePublishOutputFiles=false
+
+      - name: Strip host-provided assemblies
+        run: |
+          cd "Minigames/publish/${{ steps.parse.outputs.name }}"
+          rm -f Quizanchos.Core.dll Quizanchos.Core.pdb \
+                Quizanchos.Common.dll Quizanchos.Common.pdb \
+                Microsoft.Extensions.DependencyInjection.Abstractions.dll \
+                Microsoft.Extensions.Logging.Abstractions.dll
+
+      - name: Generate SHA256 + ZIP
+        id: zip
+        working-directory: Minigames/publish
+        run: |
+          asset="Quizanchos.Plugin.${{ steps.parse.outputs.name }}-${{ steps.parse.outputs.version }}.zip"
+          zip -r "../$asset" "${{ steps.parse.outputs.name }}"
+          sha256sum "../$asset" > "../$asset.sha256"
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact (always)
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-${{ steps.parse.outputs.name }}-${{ steps.parse.outputs.version }}
+          path: |
+            Minigames/${{ steps.zip.outputs.asset }}
+            Minigames/${{ steps.zip.outputs.asset }}.sha256
+
+      - name: Create GitHub Release (tag-triggered only)
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.parse.outputs.tag }}
+          name: '${{ steps.parse.outputs.name }} v${{ steps.parse.outputs.version }}'
+          body: |
+            **Plugin:** `${{ steps.parse.outputs.name }}`
+            **Version:** `${{ steps.parse.outputs.version }}`
+
+            ### Install
+            ```bash
+            unzip ${{ steps.zip.outputs.asset }} -d /srv/quizanchos/plugins/
+            docker compose restart app
+            ```
+
+            See `Minigames/README.md` for plugin-loader details.
+          files: |
+            Minigames/${{ steps.zip.outputs.asset }}
+            Minigames/${{ steps.zip.outputs.asset }}.sha256
+          fail_on_unmatched_files: true
