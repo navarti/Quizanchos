@@ -27,6 +27,9 @@
 
 # Docs (don't bust cache when only README changes)
 **/*.md
+# ...except the two READMEs that ship inside the SDK nupkgs (PackageReadmeFile).
+!Quizanchos/Quizanchos.Common/README.md
+!Quizanchos/Quizanchos.Core/README.md
 
 # Local nupkg cache — the Dockerfile re-packs from source.
 Quizanchos/nupkgs
