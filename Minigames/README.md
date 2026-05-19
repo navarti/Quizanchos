@@ -1,7 +1,8 @@
 # Quizanchos Minigames
 
 Standalone solution containing third-party Quizanchos minigame plugins, built against the
-`Quizanchos.Core` NuGet package (consumed from a local feed at `../Quizanchos/nupkgs`).
+[`Quizanchos.Core`](https://www.nuget.org/packages/Quizanchos.Core) NuGet package from
+nuget.org. No local feed or `../Quizanchos` checkout is required to build the plugins.
 
 ## Plugins
 
