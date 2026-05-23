@@ -21,6 +21,12 @@ internal static class CaravanAi
 
         var logic = new CaravanLogic();
 
+        // Opening phase: must place a number card or ace on each empty own caravan.
+        if (CaravanLogic.IsInOpeningPhase(state, 1))
+        {
+            return PickOpeningMove(state, ps);
+        }
+
         // Phase 1: Try to play a number card on a sub-21 own caravan, picking the move that
         // either sells the caravan or gets it closer without busting.
         for (int handIdx = 0; handIdx < ps.Hand.Count; handIdx++)
@@ -172,6 +178,51 @@ internal static class CaravanAi
         {
             Type = CaravanMoveType.DiscardCard,
             HandIndex = discardIdx,
+        };
+    }
+
+    private static CaravanMove? PickOpeningMove(CaravanState state, CaravanPlayerState ps)
+    {
+        // Find the first empty owned caravan (AI is player index 1, so cols 3-5).
+        int targetCol = -1;
+        for (int colIdx = 3; colIdx < 3 + CaravanConstants.CaravansPerPlayer; colIdx++)
+        {
+            if (state.Columns[colIdx].Slots.Count == 0)
+            {
+                targetCol = colIdx;
+                break;
+            }
+        }
+
+        // Prefer the highest-value number card so the opening caravan starts closer to the 21-26 range.
+        int bestHandIdx = -1;
+        int bestValue = -1;
+        for (int i = 0; i < ps.Hand.Count; i++)
+        {
+            var card = ps.Hand[i];
+            if (!card.IsNumber) continue;
+            if (card.NumericValue > bestValue)
+            {
+                bestValue = card.NumericValue;
+                bestHandIdx = i;
+            }
+        }
+
+        if (targetCol < 0 || bestHandIdx < 0)
+        {
+            // No legal opening move (no empty caravan or no number card in hand) — discard so we don't deadlock.
+            return new CaravanMove
+            {
+                Type = CaravanMoveType.DiscardCard,
+                HandIndex = 0,
+            };
+        }
+
+        return new CaravanMove
+        {
+            Type = CaravanMoveType.PlayNumber,
+            HandIndex = bestHandIdx,
+            TargetColumnIndex = targetCol,
         };
     }
 }

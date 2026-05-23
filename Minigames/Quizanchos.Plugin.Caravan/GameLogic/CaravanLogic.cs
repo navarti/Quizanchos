@@ -73,6 +73,13 @@ public sealed class CaravanLogic : IGameLogic<CaravanState, CaravanMove>
         }
         var ps = state.PlayerStates[playerIdx];
 
+        // Opening phase: each player must start each of their three caravans by placing a
+        // number card or ace on every empty owned caravan before any other move is allowed.
+        if (IsInOpeningPhase(state, playerIdx))
+        {
+            return ValidateOpeningMove(state, move, playerId, ps);
+        }
+
         if (move.Type == CaravanMoveType.DiscardCaravan)
         {
             if (move.TargetColumnIndex < 0 || move.TargetColumnIndex >= state.Columns.Count)
@@ -310,46 +317,28 @@ public sealed class CaravanLogic : IGameLogic<CaravanState, CaravanMove>
             return true;
         }
 
-        // A player wins when they outscore the opponent on at least 2 of the 3 head-to-head caravan pairs,
-        // where each caravan is in the "sold" range (21-26). Busted caravans count as 0 for that pairing.
-        int p0Wins = 0;
-        int p1Wins = 0;
+        // Per Caravan rules: "When each of the three competing caravans has sold, the game is over."
+        // Each of the three caravan pairs must have at least one side in the 21-26 "sold" range.
         int decided = 0;
         for (int i = 0; i < CaravanConstants.CaravansPerPlayer; i++)
         {
             var p0Col = state.Columns[i];
             var p1Col = state.Columns[i + CaravanConstants.CaravansPerPlayer];
 
-            bool p0Sold = p0Col.IsSold;
-            bool p1Sold = p1Col.IsSold;
-
-            if (!p0Sold && !p1Sold)
+            if (p0Col.IsSold || p1Col.IsSold)
             {
-                continue;
-            }
-
-            decided++;
-            int p0Score = p0Sold ? p0Col.Value : 0;
-            int p1Score = p1Sold ? p1Col.Value : 0;
-
-            if (p0Score > p1Score)
-            {
-                p0Wins++;
-            }
-            else if (p1Score > p0Score)
-            {
-                p1Wins++;
+                decided++;
             }
         }
 
-        if (p0Wins >= 2 || p1Wins >= 2)
+        if (decided == CaravanConstants.CaravansPerPlayer)
         {
             return true;
         }
 
-        // Stalemate: both players out of cards (deck + hand) and no further moves possible.
+        // Stalemate: nobody has cards left and no further moves possible.
         bool anyCardsLeft = state.PlayerStates.Any(p => p.Hand.Count > 0 || p.Deck.Count > 0);
-        return !anyCardsLeft && decided == CaravanConstants.CaravansPerPlayer;
+        return !anyCardsLeft;
     }
 
     public string? DetermineWinner(CaravanState state)
@@ -581,6 +570,44 @@ public sealed class CaravanLogic : IGameLogic<CaravanState, CaravanMove>
             state.OpeningCardsRemainingP0--;
         else if (playerIdx == 1 && state.OpeningCardsRemainingP1 > 0)
             state.OpeningCardsRemainingP1--;
+    }
+
+    internal static bool IsInOpeningPhase(CaravanState state, int playerIdx)
+    {
+        return playerIdx == 0
+            ? state.OpeningCardsRemainingP0 > 0
+            : state.OpeningCardsRemainingP1 > 0;
+    }
+
+    private static MoveResult ValidateOpeningMove(CaravanState state, CaravanMove move, string playerId, CaravanPlayerState ps)
+    {
+        if (move.Type != CaravanMoveType.PlayNumber)
+        {
+            return MoveResult.Failure("Opening: place a number card or ace on each of your empty caravans before any other move");
+        }
+        if (move.HandIndex < 0 || move.HandIndex >= ps.Hand.Count)
+        {
+            return MoveResult.Failure("Invalid hand index");
+        }
+        var card = ps.Hand[move.HandIndex];
+        if (!card.IsNumber)
+        {
+            return MoveResult.Failure("Opening: only number cards or aces are allowed");
+        }
+        if (move.TargetColumnIndex < 0 || move.TargetColumnIndex >= state.Columns.Count)
+        {
+            return MoveResult.Failure("Invalid caravan");
+        }
+        var col = state.Columns[move.TargetColumnIndex];
+        if (col.OwnerId != playerId)
+        {
+            return MoveResult.Failure("Opening: place on your own caravan");
+        }
+        if (col.Slots.Count > 0)
+        {
+            return MoveResult.Failure("Opening: target caravan must be empty (one opening card per caravan)");
+        }
+        return MoveResult.Success;
     }
 
     private static int IndexOf(CaravanState state, string playerId)

@@ -24,6 +24,13 @@ public sealed class CaravanMpState : IGameState
     public string? SurrenderedPlayerId { get; set; }
 
     public Dictionary<string, string> PlayerNicknames { get; set; } = new();
+
+    /// <summary>
+    /// Number of opening cards each player still needs to place. Per Caravan rules, each player must
+    /// start each of their three caravans with a number card or ace before any other move is allowed.
+    /// </summary>
+    public int OpeningCardsRemainingP0 { get; set; } = CaravanMpConstants.CaravansPerPlayer;
+    public int OpeningCardsRemainingP1 { get; set; } = CaravanMpConstants.CaravansPerPlayer;
 }
 
 public sealed class CaravanMpPlayerState
