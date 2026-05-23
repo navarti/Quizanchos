@@ -27,7 +27,7 @@ public class SignalRGameNotifier : IGameNotifier
         await _hubContext.Clients.Group(groupName).SendAsync("GameStateChanged", new
         {
             GameId = gameId,
-            State = state,
+            State = (object)state,
             IsFinished = state.IsFinished,
             Winner = state.Winner
         });
@@ -42,7 +42,7 @@ public class SignalRGameNotifier : IGameNotifier
         {
             GameId = gameId,
             PlayerId = playerId,
-            State = state,
+            State = (object)state,
             IsFinished = state.IsFinished,
             Winner = state.Winner
         });
@@ -56,7 +56,7 @@ public class SignalRGameNotifier : IGameNotifier
         await _hubContext.Clients.Group(groupName).SendAsync("GameFinished", new
         {
             GameId = gameId,
-            State = state,
+            State = (object)state,
             Winner = winner
         });
     }

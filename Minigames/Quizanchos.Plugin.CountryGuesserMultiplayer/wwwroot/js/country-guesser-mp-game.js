@@ -176,9 +176,12 @@
             : null;
         const answers = card ? (card.playerAnswers || {}) : {};
         el.innerHTML = players.map(id => {
-            const baseLabel = nicknames[id] || (id === playerId ? 'You' : id.substring(0, 8));
-            const label = id === playerId ? `You (${baseLabel})` : baseLabel;
-            const cls = id === playerId ? 'minigame-score is-me' : 'minigame-score';
+            const nickname = nicknames[id];
+            const isMe = id === playerId;
+            const label = isMe
+                ? (nickname ? `You (${nickname})` : 'You')
+                : (nickname || id.substring(0, 8));
+            const cls = isMe ? 'minigame-score is-me' : 'minigame-score';
             const answered = id in answers ? ' ✓' : '';
             return `<div class="${cls}"><span>${label}${answered}</span><strong>${scores[id] || 0}</strong></div>`;
         }).join('');
@@ -200,7 +203,7 @@
         const winnerLabel = isWin ? 'You won!'
             : state.winner ? `Winner: ${nicknames[state.winner] || state.winner.substring(0, 8)}`
             : 'Draw — no clear winner';
-        el.innerHTML = `<div class="minigame-finished ${cls}">${winnerLabel} — your score ${myScore}/${state.totalCards}</div>`;
+        el.innerHTML = `<div class="minigame-finished ${cls}">${winnerLabel} — your score ${myScore}/${state.totalCards || 0}</div>`;
     }
 
     function paintProgress() {
@@ -326,7 +329,8 @@
             .build();
 
         const onUpdate = async (payload) => {
-            if (payload && (payload.State || payload.state)) {
+            const inner = payload && (payload.state || payload.State);
+            if (inner && Array.isArray(inner.cards || inner.Cards)) {
                 state = normalize(payload);
                 applyState();
             } else {

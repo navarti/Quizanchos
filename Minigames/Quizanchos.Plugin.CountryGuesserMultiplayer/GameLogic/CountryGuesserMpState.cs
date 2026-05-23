@@ -23,6 +23,7 @@ public sealed class CountryGuesserMpState : IGameState
 
     public List<MpCard> Cards { get; set; } = new();
     public Dictionary<string, int> Scores { get; set; } = new();
+    public Dictionary<string, string> PlayerNicknames { get; set; } = new();
 
     public sealed class MpCard
     {

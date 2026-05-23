@@ -212,7 +212,7 @@ function setupQuizEventListeners(gameState, gameId, userId) {
 
     optionsContainer.addEventListener('click', async (event) => {
         const optionElement = event.target.closest('.quiz-option');
-        if (!optionElement || isAnswerSubmitted) return;
+        if (!optionElement || isAnswerSubmitted || isTimeUp) return;
 
         isAnswerSubmitted = true;
         stopTimeline();
@@ -299,8 +299,10 @@ function showAnswerFeedback(card, selectedIndex) {
 }
 
 let activeTimeline = null;
+let isTimeUp = false;
 
 function startTimeline(creationTime, secondsPerCard) {
+    isTimeUp = false;
     const timeline = document.getElementById('timeline');
     
     // Parse the creation time ensuring it's treated as UTC
@@ -341,6 +343,14 @@ function stopTimeline() {
 }
 
 function showTimeUpModal() {
+    isTimeUp = true;
+    stopTimeline();
+
+    const optionsContainer = document.getElementById('quiz-options');
+    if (optionsContainer) {
+        optionsContainer.classList.add('time-up');
+    }
+
     showModal("Time's up!", "What's next? Your call!", false, [returnToLobbyButton()]);
 }
 

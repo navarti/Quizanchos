@@ -69,6 +69,16 @@ public sealed class CaravanMpLogic : IGameLogic<CaravanMpState, CaravanMpMove>
         {
             return MoveResult.Failure("Player not in game");
         }
+
+        if (move.Type == CaravanMpMoveType.Surrender)
+        {
+            if (state.IsFinished || state.SurrenderedPlayerId != null)
+            {
+                return MoveResult.Failure("Game is already finished");
+            }
+            return MoveResult.Success;
+        }
+
         if (state.CurrentTurnIndex != playerIdx)
         {
             return MoveResult.Failure("Not your turn");
@@ -156,6 +166,13 @@ public sealed class CaravanMpLogic : IGameLogic<CaravanMpState, CaravanMpMove>
         var ps = state.PlayerStates[playerIdx];
         string desc;
 
+        if (move.Type == CaravanMpMoveType.Surrender)
+        {
+            state.SurrenderedPlayerId = playerId;
+            state.LastMoveDescription = $"{ShortName(state, playerId)} surrendered";
+            return;
+        }
+
         if (move.Type == CaravanMpMoveType.DiscardCaravan)
         {
             var col = state.Columns[move.TargetColumnIndex];
@@ -210,6 +227,11 @@ public sealed class CaravanMpLogic : IGameLogic<CaravanMpState, CaravanMpMove>
             return true;
         }
 
+        if (state.SurrenderedPlayerId != null)
+        {
+            return true;
+        }
+
         int p0Wins = 0;
         int p1Wins = 0;
         int decided = 0;
@@ -248,6 +270,12 @@ public sealed class CaravanMpLogic : IGameLogic<CaravanMpState, CaravanMpMove>
         if (state.PlayerStates.Count < 2)
         {
             return null;
+        }
+
+        if (state.SurrenderedPlayerId != null)
+        {
+            var loser = state.SurrenderedPlayerId;
+            return state.PlayerStates.First(p => p.PlayerId != loser).PlayerId;
         }
 
         int p0Wins = 0;

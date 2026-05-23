@@ -8,6 +8,7 @@ public enum CaravanMpMoveType
     AttachFace = 1,
     DiscardCard = 2,
     DiscardCaravan = 3,
+    Surrender = 4,
 }
 
 public sealed record CaravanMpMove : GameMove

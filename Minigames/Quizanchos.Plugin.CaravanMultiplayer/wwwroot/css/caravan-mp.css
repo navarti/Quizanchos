@@ -1,21 +1,630 @@
 /* =========================================================================
    Caravan Multiplayer — head-to-head card battle (Fallout: New Vegas).
    Chrome (card / buttons / status / finished) comes from /css/minigame-shell.css.
-   This file owns lobby-extras and the felt-table board.
+   This file owns the lobby flow and the felt-table board.
    ======================================================================== */
 
-/* Lobby extras --------------------------------------------------------- */
-#minigame-root .caravan-mp-lobby .caravan-mp-rules {
-    list-style: disc;
-    padding-left: 1.4rem;
-    margin: 0 0 var(--space-4) 0;
-    font-size: var(--font-size-sm);
-    color: var(--color-text-muted, #9ca3af);
-    line-height: 1.6;
+/* Lobby — palette & layout -------------------------------------------- */
+#minigame-root .caravan-mp-lobby {
+    --caravan-felt-deep:    #1a1208;
+    --caravan-felt-mid:     #2a1c0d;
+    --caravan-paper:        #f4e9d0;
+    --caravan-paper-dim:    #d8c099;
+    --caravan-gold:         #f3c773;
+    --caravan-gold-soft:    rgba(243, 199, 115, 0.35);
+    --caravan-gold-line:    rgba(252, 211, 77, 0.45);
+    --caravan-magenta:      #b85c9e;
+    --caravan-ink:          #f7f1e8;
+    --caravan-ink-dim:      #d6c4a4;
 }
 
-#minigame-root .caravan-mp-lobby .caravan-mp-rules li + li {
+#minigame-root .caravan-mp-lobby {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: var(--space-5) clamp(8px, 2vw, 16px) var(--space-10);
+    color: var(--caravan-ink);
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas:
+        "create rooms"
+        "detail detail";
+    gap: clamp(12px, 2vw, 24px);
+}
+
+#minigame-root .caravan-mp-lobby .panel {
+    background:
+        radial-gradient(900px 320px at 0% 0%, rgba(184, 92, 158, 0.10), transparent 60%),
+        radial-gradient(700px 320px at 100% 100%, rgba(124, 58, 237, 0.08), transparent 60%),
+        linear-gradient(160deg, var(--caravan-felt-mid) 0%, var(--caravan-felt-deep) 100%);
+    border: 1px solid var(--caravan-gold-line);
+    border-radius: var(--radius-2xl);
+    padding: clamp(18px, 2vw, 28px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    position: relative;
+    overflow: hidden;
+    color: var(--caravan-ink);
+}
+
+#minigame-root .caravan-mp-lobby .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--caravan-gold), var(--caravan-magenta), var(--caravan-gold));
+    pointer-events: none;
+}
+
+#minigame-root .caravan-mp-lobby .create-panel    { grid-area: create; }
+#minigame-root .caravan-mp-lobby .rooms-panel     { grid-area: rooms;  }
+#minigame-root .caravan-mp-lobby .room-detail-panel { grid-area: detail; }
+
+/* Hero ----------------------------------------------------------------- */
+#minigame-root .caravan-mp-hero {
+    margin-bottom: var(--space-5);
+}
+
+#minigame-root .caravan-mp-hero__eyebrow {
+    display: inline-block;
+    font-family: var(--font-mono, 'Consolas', monospace);
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--caravan-gold);
+    border: 1px solid var(--caravan-gold-line);
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(243, 199, 115, 0.08);
+    margin-bottom: var(--space-3);
+}
+
+#minigame-root .caravan-mp-lobby .panel h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 2.5vw + 1rem, 2.4rem);
+    font-weight: 800;
+    margin: 0 0 var(--space-1);
+    background: linear-gradient(135deg, var(--caravan-gold) 0%, var(--caravan-magenta) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+#minigame-root .caravan-mp-lobby .subtitle {
+    color: var(--caravan-ink-dim);
+    margin: var(--space-1) 0 var(--space-3);
+    font-size: var(--font-size-sm);
+    max-width: 36rem;
+    line-height: 1.55;
+}
+
+#minigame-root .caravan-mp-hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
     margin-top: var(--space-2);
+}
+
+#minigame-root .caravan-mp-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--caravan-gold);
+    background: rgba(243, 199, 115, 0.10);
+    border: 1px solid var(--caravan-gold-line);
+    border-radius: var(--radius-pill);
+}
+
+/* Rules -------------------------------------------------------------- */
+#minigame-root .caravan-mp-rules {
+    border: 1px solid var(--caravan-gold-line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+    margin: 0 0 var(--space-5);
+}
+
+#minigame-root .caravan-mp-rules__head {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-3) var(--space-4);
+    background: linear-gradient(90deg, rgba(243, 199, 115, 0.10), transparent);
+    color: var(--caravan-gold);
+    font-family: var(--font-display);
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: none;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+    list-style: none;
+    user-select: none;
+}
+
+#minigame-root .caravan-mp-rules__head::-webkit-details-marker {
+    display: none;
+}
+
+#minigame-root .caravan-mp-rules__head:hover {
+    background: linear-gradient(90deg, rgba(243, 199, 115, 0.18), rgba(184, 92, 158, 0.10));
+    color: #fff;
+}
+
+#minigame-root .caravan-mp-rules__chev {
+    font-size: var(--font-size-md);
+    transition: transform var(--transition-fast);
+    display: inline-block;
+}
+
+#minigame-root .caravan-mp-rules[open] .caravan-mp-rules__chev {
+    transform: rotate(180deg);
+}
+
+#minigame-root .caravan-mp-rules__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-3);
+    padding: var(--space-4);
+    border-top: 1px dashed var(--caravan-gold-line);
+}
+
+#minigame-root .caravan-mp-rule {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    color: var(--caravan-ink-dim);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+#minigame-root .caravan-mp-rule strong {
+    display: block;
+    color: var(--caravan-gold);
+    font-family: var(--font-display);
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.01em;
+    margin-bottom: 2px;
+}
+
+#minigame-root .caravan-mp-rule p {
+    margin: 0;
+    color: var(--caravan-ink-dim);
+}
+
+#minigame-root .caravan-mp-rule__icon {
+    font-size: 1.2rem;
+    line-height: 1.2;
+    flex-shrink: 0;
+}
+
+/* Form --------------------------------------------------------------- */
+#minigame-root .caravan-mp-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+#minigame-root .caravan-mp-form__row {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+#minigame-root .caravan-mp-form__field {
+    flex: 1 1 220px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#minigame-root .caravan-mp-form__field label {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--caravan-ink-dim);
+}
+
+#minigame-root .caravan-mp-form__hint {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: rgba(214, 196, 164, 0.65);
+    font-size: var(--font-size-xs);
+    margin-left: 6px;
+}
+
+#minigame-root .caravan-mp-seed-input {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+}
+
+#minigame-root .caravan-mp-seed-input input {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.40);
+    color: var(--caravan-paper);
+    border: 1px solid var(--caravan-gold-line);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3);
+    font-family: var(--font-mono, 'Consolas', monospace);
+    font-size: var(--font-size-sm);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#minigame-root .caravan-mp-seed-input input::placeholder {
+    color: rgba(214, 196, 164, 0.55);
+    font-style: italic;
+}
+
+#minigame-root .caravan-mp-seed-input input:focus {
+    outline: none;
+    border-color: var(--caravan-gold);
+    box-shadow: 0 0 0 3px rgba(243, 199, 115, 0.20);
+}
+
+#minigame-root .caravan-mp-seed-btn {
+    width: 36px;
+    background: rgba(243, 199, 115, 0.10);
+    border: 1px solid var(--caravan-gold-line);
+    color: var(--caravan-gold);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+#minigame-root .caravan-mp-seed-btn:hover {
+    background: rgba(243, 199, 115, 0.22);
+    transform: translateY(-1px);
+}
+
+#minigame-root .caravan-mp-btn-create {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: var(--space-3) var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--font-size-base);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1a1208;
+    background: linear-gradient(135deg, var(--caravan-gold) 0%, #e08a3a 100%);
+    border: 1px solid var(--caravan-gold);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    box-shadow: var(--shadow-md), 0 1px 0 rgba(255, 255, 255, 0.35) inset;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+}
+
+#minigame-root .caravan-mp-btn-create:hover,
+#minigame-root .caravan-mp-btn-create:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 1px 0 rgba(255, 255, 255, 0.45) inset, 0 0 0 3px var(--caravan-gold-soft);
+    filter: brightness(1.05);
+}
+
+#minigame-root .caravan-mp-btn-create:active {
+    transform: translateY(0);
+}
+
+#minigame-root .caravan-mp-form__footnote {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--caravan-ink-dim);
+    text-align: center;
+    font-style: italic;
+    opacity: 0.85;
+}
+
+/* Rooms list / detail -------------------------------------------------- */
+#minigame-root .caravan-mp-lobby .rooms-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
+}
+
+#minigame-root .caravan-mp-lobby .rooms-header h2,
+#minigame-root .caravan-mp-lobby .room-detail-panel h2 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--caravan-gold);
+    letter-spacing: -0.005em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+#minigame-root .caravan-mp-lobby .rooms-header h2::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(180deg, var(--caravan-gold), var(--caravan-magenta));
+    border-radius: 2px;
+}
+
+#minigame-root .caravan-mp-lobby .btn-refresh {
+    background: rgba(243, 199, 115, 0.10);
+    border: 1px solid var(--caravan-gold-line);
+    color: var(--caravan-gold);
+    font-size: 1.1rem;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background var(--transition-fast), transform var(--transition-base), color var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#minigame-root .caravan-mp-lobby .btn-refresh:hover {
+    background: rgba(243, 199, 115, 0.24);
+    color: #fff;
+    transform: rotate(90deg);
+}
+
+#minigame-root .caravan-mp-lobby .rooms-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+#minigame-root .caravan-mp-lobby .empty-msg {
+    text-align: center;
+    color: var(--caravan-ink-dim);
+    font-style: italic;
+    padding: var(--space-6);
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px dashed var(--caravan-gold-line);
+    border-radius: var(--radius-lg);
+}
+
+#minigame-root .caravan-mp-lobby .room-card {
+    background: rgba(0, 0, 0, 0.30);
+    border: 1px solid var(--caravan-gold-line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    transition: transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+}
+
+#minigame-root .caravan-mp-lobby .room-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--caravan-gold);
+    background: rgba(184, 92, 158, 0.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+#minigame-root .caravan-mp-lobby .room-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+    color: var(--caravan-gold);
+    font-weight: 600;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+#minigame-root .caravan-mp-lobby .room-id {
+    font-family: var(--font-mono, 'Consolas', monospace);
+    font-size: var(--font-size-xs);
+    color: var(--caravan-ink-dim);
+    background: rgba(0, 0, 0, 0.40);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--caravan-gold-line);
+}
+
+#minigame-root .caravan-mp-lobby .room-expires {
+    font-size: var(--font-size-xs);
+    color: var(--caravan-gold);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+#minigame-root .caravan-mp-lobby .room-expires.expiring-soon {
+    color: #ff8a65;
+}
+
+#minigame-root .caravan-mp-lobby .room-players {
+    font-size: var(--font-size-xs);
+    color: var(--caravan-ink-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+#minigame-root .caravan-mp-lobby .room-teams {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+#minigame-root .caravan-mp-lobby .room-team {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgba(0, 0, 0, 0.40);
+    border: 1px solid var(--caravan-gold-line);
+    color: var(--caravan-ink);
+    padding: 4px var(--space-3);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-sm);
+}
+
+#minigame-root .caravan-mp-lobby .tag-full {
+    background: rgba(160, 32, 32, 0.25);
+    color: #ffb4b4;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+#minigame-root .caravan-mp-lobby .btn-join {
+    padding: 4px var(--space-3);
+    border: 1px solid var(--caravan-gold);
+    border-radius: var(--radius-pill);
+    background: linear-gradient(135deg, var(--caravan-gold), #e08a3a);
+    color: #1a1208;
+    font-family: inherit;
+    font-weight: 800;
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+#minigame-root .caravan-mp-lobby .btn-join:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 3px var(--caravan-gold-soft);
+    filter: brightness(1.05);
+}
+
+#minigame-root .caravan-mp-lobby .room-status {
+    font-size: var(--font-size-sm);
+    color: var(--caravan-ink-dim);
+    margin: var(--space-1) 0 var(--space-4);
+}
+
+#minigame-root .caravan-mp-lobby .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+#minigame-root .caravan-mp-lobby .team-card {
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid var(--caravan-gold-line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
+    position: relative;
+    overflow: hidden;
+    transition: transform var(--transition-base), border-color var(--transition-base);
+}
+
+#minigame-root .caravan-mp-lobby .team-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--caravan-gold);
+}
+
+#minigame-root .caravan-mp-lobby .team-card::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4px;
+}
+
+#minigame-root .caravan-mp-lobby .team-card.team-0::before {
+    background: linear-gradient(90deg, var(--caravan-gold), #e08a3a);
+}
+
+#minigame-root .caravan-mp-lobby .team-card.team-1::before {
+    background: linear-gradient(90deg, var(--caravan-magenta), #6b3a8a);
+}
+
+#minigame-root .caravan-mp-lobby .team-card h3 {
+    font-family: var(--font-display);
+    font-size: var(--font-size-md);
+    color: var(--caravan-gold);
+    margin: 0 0 var(--space-2);
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+#minigame-root .caravan-mp-lobby .team-count {
+    color: var(--caravan-ink-dim);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+}
+
+#minigame-root .caravan-mp-lobby .player-slot {
+    padding: 6px var(--space-3);
+    border-radius: var(--radius-md);
+    margin-bottom: 4px;
+    font-size: var(--font-size-sm);
+    transition: background var(--transition-fast);
+}
+
+#minigame-root .caravan-mp-lobby .player-slot.filled {
+    background: rgba(243, 199, 115, 0.16);
+    border: 1px solid var(--caravan-gold-line);
+    color: var(--caravan-gold);
+    font-weight: 600;
+}
+
+#minigame-root .caravan-mp-lobby .player-slot.empty {
+    background: transparent;
+    border: 1px dashed var(--caravan-gold-line);
+    color: var(--caravan-ink-dim);
+    font-style: italic;
+    opacity: 0.7;
+}
+
+#minigame-root .caravan-mp-lobby .room-actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+#minigame-root .caravan-mp-lobby .btn-leave {
+    padding: var(--space-2) var(--space-5);
+    border: 1px solid rgba(160, 32, 32, 0.55);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: #ffb4b4;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+#minigame-root .caravan-mp-lobby .btn-leave:hover {
+    background: rgba(160, 32, 32, 0.30);
+    color: #fff;
+    border-color: #c04848;
+}
+
+/* Responsive ----------------------------------------------------------- */
+@media (max-width: 860px) {
+    #minigame-root .caravan-mp-lobby {
+        grid-template-columns: 1fr;
+        grid-template-areas: "create" "rooms" "detail";
+    }
+}
+
+@media (max-width: 480px) {
+    #minigame-root .caravan-mp-lobby { padding: var(--space-3) 8px var(--space-6); gap: var(--space-3); }
+    #minigame-root .caravan-mp-lobby .panel { padding: var(--space-4); border-radius: var(--radius-lg); }
+    #minigame-root .caravan-mp-rules__grid { grid-template-columns: 1fr; padding: var(--space-3); }
+    #minigame-root .caravan-mp-hero__chips { gap: 4px; }
+    #minigame-root .caravan-mp-form__row { flex-direction: column; }
+    #minigame-root .caravan-mp-lobby .room-card-header { flex-wrap: wrap; gap: var(--space-1); }
 }
 
 /* Game accents --------------------------------------------------------- */
@@ -35,6 +644,21 @@
 #minigame-root .caravan-mp-pill--opp {
     background: rgba(255, 255, 255, 0.08);
     color: var(--color-text-muted, #9ca3af);
+}
+
+#minigame-root .caravan-mp-btn--surrender {
+    background: linear-gradient(135deg, #6b3a1a, #b85c9e);
+    color: #fff;
+    border: 1px solid rgba(252, 211, 77, 0.45);
+    box-shadow: var(--shadow-sm), 0 1px 0 rgba(255, 255, 255, 0.18) inset;
+    letter-spacing: 0.04em;
+}
+
+#minigame-root .caravan-mp-btn--surrender:hover:not(:disabled),
+#minigame-root .caravan-mp-btn--surrender:focus-visible:not(:disabled) {
+    background: linear-gradient(135deg, #8a4a26, #d36fb6);
+    border-color: var(--color-highlight-400);
+    box-shadow: var(--shadow-md), 0 0 0 1px var(--color-highlight-400) inset;
 }
 
 /* Felt-style board ----------------------------------------------------- */

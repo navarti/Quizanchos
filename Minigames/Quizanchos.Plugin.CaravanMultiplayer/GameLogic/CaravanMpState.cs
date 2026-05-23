@@ -21,6 +21,8 @@ public sealed class CaravanMpState : IGameState
 
     public string? LastMoveDescription { get; set; }
 
+    public string? SurrenderedPlayerId { get; set; }
+
     public Dictionary<string, string> PlayerNicknames { get; set; } = new();
 }
 

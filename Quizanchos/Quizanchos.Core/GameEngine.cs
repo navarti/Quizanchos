@@ -64,7 +64,13 @@ public class GameEngine<TState, TMove>
         if (State.IsFinished)
             return false;
 
-        return _logic.NeedToFinish(State);
+        bool needToFinish = _logic.NeedToFinish(State);
+        if (needToFinish)
+        {
+            State.IsFinished = true;
+            State.Winner = _logic.DetermineWinner(State);
+        }
+        return needToFinish;
     }
 
     public IReadOnlyDictionary<string, int> GetPlayerScores()

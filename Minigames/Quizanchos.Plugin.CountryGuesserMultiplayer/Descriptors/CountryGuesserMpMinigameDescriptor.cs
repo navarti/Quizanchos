@@ -33,7 +33,8 @@ public sealed class CountryGuesserMpMinigameDescriptor : IMinigameDescriptor
         int secondsPerCard = GetInt(parameters, "secondsPerCard", 20);
         double maxDistanceKm = GetDouble(parameters, "maxDistanceKm", 600);
         int seed = GetInt(parameters, "seed", 0);
-        var engine = await factory.CreateAsync(gameId, playerIds, totalCards, secondsPerCard, maxDistanceKm, seed);
+        var nicknames = GetNicknames(parameters);
+        var engine = await factory.CreateAsync(gameId, playerIds, totalCards, secondsPerCard, maxDistanceKm, seed, nicknames);
         return new GameEngineWrapper<CountryGuesserMpState, CountryGuesserMpMove>(engine);
     }
 
@@ -79,5 +80,31 @@ public sealed class CountryGuesserMpMinigameDescriptor : IMinigameDescriptor
             JsonElement { ValueKind: JsonValueKind.String } e when double.TryParse(e.GetString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var p) => p,
             _ => fallback,
         };
+    }
+
+    private static Dictionary<string, string> GetNicknames(Dictionary<string, object> parameters)
+    {
+        if (!parameters.TryGetValue("playerNicknames", out var raw) || raw is null)
+        {
+            return new Dictionary<string, string>();
+        }
+
+        try
+        {
+            string? json = raw switch
+            {
+                string s => s,
+                JsonElement { ValueKind: JsonValueKind.String } e => e.GetString(),
+                JsonElement el => el.GetRawText(),
+                _ => null,
+            };
+            if (string.IsNullOrWhiteSpace(json)) return new Dictionary<string, string>();
+            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                ?? new Dictionary<string, string>();
+        }
+        catch
+        {
+            return new Dictionary<string, string>();
+        }
     }
 }

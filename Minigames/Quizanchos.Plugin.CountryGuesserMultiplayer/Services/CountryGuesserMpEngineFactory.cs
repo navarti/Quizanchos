@@ -23,9 +23,10 @@ public sealed class CountryGuesserMpEngineFactory
         int totalCards,
         int secondsPerCard,
         double maxDistanceKm,
-        int seed)
+        int seed,
+        Dictionary<string, string>? nicknames)
     {
-        var logic = new CountryGuesserMpLogic(_repository, totalCards, secondsPerCard, maxDistanceKm, seed);
+        var logic = new CountryGuesserMpLogic(_repository, totalCards, secondsPerCard, maxDistanceKm, seed, nicknames);
         var engine = new GameEngine<CountryGuesserMpState, CountryGuesserMpMove>(logic, gameId, playerIds);
 
         await _persistence.CreateAsync(

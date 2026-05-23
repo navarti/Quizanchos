@@ -13,19 +13,22 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
     private readonly int _secondsPerCard;
     private readonly double _maxDistanceKm;
     private readonly int _seed;
+    private readonly Dictionary<string, string> _nicknames;
 
     public CountryGuesserMpLogic(
         CountryRepository repository,
         int totalCards = 5,
         int secondsPerCard = 20,
         double maxDistanceKm = 600,
-        int seed = 0)
+        int seed = 0,
+        Dictionary<string, string>? nicknames = null)
     {
         _repository = repository;
         _totalCards = Math.Max(1, totalCards);
         _secondsPerCard = Math.Max(5, secondsPerCard);
         _maxDistanceKm = Math.Max(50, maxDistanceKm);
         _seed = seed == 0 ? Random.Shared.Next() : seed;
+        _nicknames = nicknames ?? new Dictionary<string, string>();
     }
 
     public CountryGuesserMpState CreateInitialState(Guid gameId, ImmutableArray<string> players)
@@ -39,6 +42,7 @@ public sealed class CountryGuesserMpLogic : IGameLogic<CountryGuesserMpState, Co
             TotalCards = _totalCards,
             SecondsPerCard = _secondsPerCard,
             MaxDistanceKm = _maxDistanceKm,
+            PlayerNicknames = new Dictionary<string, string>(_nicknames),
         };
         foreach (var p in state.Players) state.Scores[p] = 0;
 

@@ -147,9 +147,18 @@
             : isWin ? 'minigame-finished--win' : 'minigame-finished--loss';
         const opp = state.players && state.players.find(p => p !== playerId);
         const oppName = nicknameFor(opp, 'opponent');
-        const msg = isDraw ? 'Caravans ended in a draw.'
-            : isWin ? 'You won the caravans!'
-            : `${oppName} won the caravans.`;
+        const surrenderedId = state.surrenderedPlayerId || state.SurrenderedPlayerId;
+        let msg;
+        if (surrenderedId) {
+            const iSurrendered = surrenderedId === playerId;
+            msg = iSurrendered
+                ? `You surrendered. ${oppName} wins.`
+                : `${oppName} surrendered. You win!`;
+        } else {
+            msg = isDraw ? 'Caravans ended in a draw.'
+                : isWin ? 'You won the caravans!'
+                : `${oppName} won the caravans.`;
+        }
         return `<div class="minigame-finished ${cls}">${msg}</div>`;
     }
 
@@ -213,6 +222,7 @@
                 <div class="minigame-actions">
                     <button class="minigame-btn minigame-btn--danger" data-action="discard-card" ${selectedHandIdx < 0 || !myTurn ? 'disabled' : ''}>Discard selected card</button>
                     <button class="minigame-btn minigame-btn--secondary" data-action="discard-caravan" ${!myTurn ? 'disabled' : ''}>Discard a caravan...</button>
+                    <button class="minigame-btn caravan-mp-btn--surrender" data-action="surrender" ${!myTurn || state.isFinished ? 'disabled' : ''} title="${myTurn ? 'Concede the match to your opponent' : 'You can only surrender on your turn'}">🏳️ Surrender</button>
                 </div>
                 ${renderFinishedBanner()}
             </div>
@@ -283,6 +293,13 @@
                 return;
             }
             submitMove({ type: 3, targetColumnIndex: target });
+        });
+
+        root.querySelector('[data-action="surrender"]')?.addEventListener('click', () => {
+            if (state.isFinished) return;
+            if (!confirm('Surrender this match? Your opponent will be declared the winner.')) return;
+            submitMove({ type: 4 });
+            selectedHandIdx = -1;
         });
     }
 

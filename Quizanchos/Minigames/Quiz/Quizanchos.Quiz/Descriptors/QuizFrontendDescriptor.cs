@@ -26,7 +26,6 @@ public class QuizFrontendDescriptor : IMinigameFrontendDescriptor
     [
         "/js/game-client.js",
         "/minigames/quiz/js/quiz-client.js",
-        "/js/common.js",
         "/minigames/quiz/js/quiz-lobby.js"
     ];
     public IReadOnlyList<string> GameStyles =>
@@ -37,7 +36,6 @@ public class QuizFrontendDescriptor : IMinigameFrontendDescriptor
     [
         "/js/game-client.js",
         "/minigames/quiz/js/quiz-client.js",
-        "/js/common.js",
         "/minigames/quiz/js/quiz-game.js"
     ];
     public string ActionText => "START →";

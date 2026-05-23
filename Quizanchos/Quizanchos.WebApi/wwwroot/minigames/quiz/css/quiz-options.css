@@ -305,6 +305,11 @@
     pointer-events: none;
     opacity: 0.7;
 }
+#minigame-root .quiz-options.time-up .quiz-option {
+    pointer-events: none;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 #minigame-root .quiz-option.selected-option {
     outline: 3px solid var(--color-highlight-300);
     outline-offset: -3px;
