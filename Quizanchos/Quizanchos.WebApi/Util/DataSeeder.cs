@@ -73,15 +73,35 @@ public static class DataSeeder
 
         UserManager<ApplicationUser> userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        foreach (ApplicationUser ownerToDelete in await userManager.GetUsersInRoleAsync(AppRole.Owner))
+        // Demote anyone holding the Owner role whose email doesn't match config.
+        // Never delete — the user may own rows (top-up orders, sessions, etc.) with
+        // restricted FKs back to AspNetUsers.
+        foreach (ApplicationUser staleOwner in await userManager.GetUsersInRoleAsync(AppRole.Owner))
         {
-            await userManager.DeleteAsync(ownerToDelete);
+            if (string.Equals(staleOwner.Email, ownerEmail, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            IdentityResult demote = await userManager.RemoveFromRoleAsync(staleOwner, AppRole.Owner);
+            if (!demote.Succeeded)
+            {
+                throw CriticalExceptionFactory.CreateIdentityResultException(demote);
+            }
         }
 
         ApplicationUser? owner = await userManager.FindByEmailAsync(ownerEmail);
         if (owner is not null)
         {
-            throw CriticalExceptionFactory.Create($"{ownerEmail} can not be used for owner. It is already taken.");
+            if (!await userManager.IsInRoleAsync(owner, AppRole.Owner))
+            {
+                IdentityResult promote = await userManager.AddToRoleAsync(owner, AppRole.Owner);
+                if (!promote.Succeeded)
+                {
+                    throw CriticalExceptionFactory.CreateIdentityResultException(promote);
+                }
+            }
+            return;
         }
 
         owner = new ApplicationUser
