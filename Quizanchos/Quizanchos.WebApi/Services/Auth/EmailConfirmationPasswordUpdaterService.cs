@@ -3,6 +3,7 @@ using Quizanchos.Common.Util;
 using Quizanchos.Domain.Entities;
 using Quizanchos.WebApi.Services;
 using Quizanchos.WebApi.Util;
+using Quizanchos.WebApi.Validation;
 
 namespace Quizanchos.WebApi.Services.Auth;
 
@@ -63,6 +64,8 @@ public class EmailConfirmationPasswordUpdaterService : IUserPasswordUpdaterServi
 
     public async Task ConfirmPasswordResetAsync(string email, string code, string newPassword)
     {
+        PasswordPolicy.Validate(newPassword, "New password");
+
         UserData? userData;
         lock (_containerService.PendingPasswordDictionary)
         {

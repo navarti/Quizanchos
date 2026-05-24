@@ -4,6 +4,7 @@ using Quizanchos.WebApi.Dto;
 using Quizanchos.WebApi.Constants;
 using Quizanchos.Common.Util;
 using Quizanchos.WebApi.Util;
+using Quizanchos.WebApi.Validation;
 using Quizanchos.Common.Enums;
 using System.Security.Claims;
 
@@ -55,6 +56,13 @@ public class AuthorizationService
     {
         _ = dto ?? throw HandledExceptionFactory.CreateNullException(nameof(dto));
 
+        PasswordPolicy.Validate(dto.NewPassword, "New password");
+
+        if (string.Equals(dto.CurrentPassword, dto.NewPassword, StringComparison.Ordinal))
+        {
+            throw HandledExceptionFactory.Create("New password must be different from the current password");
+        }
+
         ApplicationUser user = await _userManager.GetUserAsync(claimsPrincipal)
             ?? throw HandledExceptionFactory.CreateNullException(nameof(ApplicationUser));
 
@@ -72,6 +80,18 @@ public class AuthorizationService
     private async Task<RegisterUserResult> RegisterWithRole(RegisterModelDto registerModelDto, string roleName, UserStatusEnum userStatus)
     {
         _ = registerModelDto ?? throw HandledExceptionFactory.CreateNullException(nameof(registerModelDto));
+
+        if (string.IsNullOrWhiteSpace(registerModelDto.Email))
+        {
+            throw HandledExceptionFactory.Create("Email is required");
+        }
+
+        if (!new System.ComponentModel.DataAnnotations.EmailAddressAttribute().IsValid(registerModelDto.Email))
+        {
+            throw HandledExceptionFactory.Create("Email format is invalid");
+        }
+
+        PasswordPolicy.Validate(registerModelDto.Password);
 
         ApplicationUser? user = await _userManager.FindByEmailAsync(registerModelDto.Email);
         if (user is not null)

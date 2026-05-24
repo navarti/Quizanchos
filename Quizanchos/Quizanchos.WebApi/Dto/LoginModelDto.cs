@@ -1,3 +1,7 @@
-﻿namespace Quizanchos.WebApi.Dto;
+using System.ComponentModel.DataAnnotations;
 
-public record LoginModelDto(string Email, string Password);
+namespace Quizanchos.WebApi.Dto;
+
+public record LoginModelDto(
+    [Required, EmailAddress, StringLength(254)] string Email,
+    [Required] string Password);

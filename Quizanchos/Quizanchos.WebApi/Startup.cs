@@ -23,6 +23,7 @@ using Quizanchos.WebApi.Util;
 using Quizanchos.WebApi.Hubs;
 using Quizanchos.WebApi.Options;
 using Quizanchos.WebApi.Services.Payment;
+using Quizanchos.WebApi.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.StaticFiles;
 using Serilog.Extensions.Logging;
@@ -74,11 +75,14 @@ public static class Startup
 
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequiredLength = 1;
+            options.Password.RequireDigit = PasswordPolicy.RequireDigit;
+            options.Password.RequireLowercase = PasswordPolicy.RequireLowercase;
+            options.Password.RequireUppercase = PasswordPolicy.RequireUppercase;
+            options.Password.RequireNonAlphanumeric = PasswordPolicy.RequireNonAlphanumeric;
+            options.Password.RequiredLength = PasswordPolicy.MinLength;
+            options.Password.RequiredUniqueChars = PasswordPolicy.RequiredUniqueChars;
+
+            options.User.RequireUniqueEmail = true;
         })
         .AddEntityFrameworkStores<QuizanchosDbContext>()
         .AddDefaultTokenProviders();
