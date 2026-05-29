@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_Popovnennya"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+  <bpmn:collaboration id="Collaboration_1">
+    <bpmn:participant id="Participant_1" name="Поповнення балансу" processRef="Process_Popovnennya" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_Popovnennya" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_1">
+      <bpmn:lane id="Lane_User" name="Користувач">
+        <bpmn:flowNodeRef>StartEvent_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Auth</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SelectPackage</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_SendUsdt</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Support</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ContactSupport</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Redirect</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Auth</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Cancelled</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_System" name="Система">
+        <bpmn:flowNodeRef>Task_CreateOrder</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_PollBinance</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_DepositStatus</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CreditAuto</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Expire</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_Join</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndEvent_Done</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Admin" name="Адміністратор (тех. підтримка)">
+        <bpmn:flowNodeRef>Task_ReviewSupport</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_ManualCredit</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- USER -->
+    <bpmn:startEvent id="StartEvent_1" name="Початок">
+      <bpmn:outgoing>Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="Gateway_Auth" name="Користувач авторизований?">
+      <bpmn:incoming>Flow_1</bpmn:incoming>
+      <bpmn:outgoing>Flow_3</bpmn:outgoing>
+      <bpmn:outgoing>Flow_2</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_Redirect" name="Перенаправлення до сторінки авторизації">
+      <bpmn:incoming>Flow_2</bpmn:incoming>
+      <bpmn:outgoing>Flow_4</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_Auth" name="Кінець">
+      <bpmn:incoming>Flow_4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Task_SelectPackage" name="Вибір пакету монет і мережі (BEP20 / TRC20)">
+      <bpmn:incoming>Flow_3</bpmn:incoming>
+      <bpmn:outgoing>Flow_5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_SendUsdt" name="Переказ USDT на наданий гаманець">
+      <bpmn:incoming>Flow_6</bpmn:incoming>
+      <bpmn:outgoing>Flow_7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Support" name="Звернутися в тех. підтримку?">
+      <bpmn:incoming>Flow_13</bpmn:incoming>
+      <bpmn:outgoing>Flow_14</bpmn:outgoing>
+      <bpmn:outgoing>Flow_15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_ContactSupport" name="Звернення до тех. підтримки">
+      <bpmn:incoming>Flow_14</bpmn:incoming>
+      <bpmn:outgoing>Flow_16</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndEvent_Cancelled" name="Замовлення скасовано">
+      <bpmn:incoming>Flow_15</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- SYSTEM -->
+    <bpmn:serviceTask id="Task_CreateOrder" name="Створення замовлення: адреса гаманця + унікальна сума USDT">
+      <bpmn:incoming>Flow_5</bpmn:incoming>
+      <bpmn:outgoing>Flow_6</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_PollBinance" name="Запит депозитів через Binance API">
+      <bpmn:incoming>Flow_7</bpmn:incoming>
+      <bpmn:incoming>Flow_11</bpmn:incoming>
+      <bpmn:outgoing>Flow_8</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_DepositStatus" name="Статус депозиту?">
+      <bpmn:incoming>Flow_8</bpmn:incoming>
+      <bpmn:outgoing>Flow_9</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11</bpmn:outgoing>
+      <bpmn:outgoing>Flow_12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_CreditAuto" name="Автоматичне зарахування монет на баланс">
+      <bpmn:incoming>Flow_9</bpmn:incoming>
+      <bpmn:outgoing>Flow_10</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_Expire" name="Позначення замовлення простроченим">
+      <bpmn:incoming>Flow_12</bpmn:incoming>
+      <bpmn:outgoing>Flow_13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_Join">
+      <bpmn:incoming>Flow_10</bpmn:incoming>
+      <bpmn:incoming>Flow_18</bpmn:incoming>
+      <bpmn:outgoing>Flow_19</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="EndEvent_Done" name="Баланс поповнено">
+      <bpmn:incoming>Flow_19</bpmn:incoming>
+    </bpmn:endEvent>
+
+    <!-- ADMIN -->
+    <bpmn:userTask id="Task_ReviewSupport" name="Розгляд звернення">
+      <bpmn:incoming>Flow_16</bpmn:incoming>
+      <bpmn:outgoing>Flow_17</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_ManualCredit" name="Ручне зарахування монет адміністратором">
+      <bpmn:incoming>Flow_17</bpmn:incoming>
+      <bpmn:outgoing>Flow_18</bpmn:outgoing>
+    </bpmn:userTask>
+
+    <!-- FLOWS -->
+    <bpmn:sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Gateway_Auth" />
+    <bpmn:sequenceFlow id="Flow_2" name="Не авторизований" sourceRef="Gateway_Auth" targetRef="Task_Redirect" />
+    <bpmn:sequenceFlow id="Flow_3" name="Авторизований" sourceRef="Gateway_Auth" targetRef="Task_SelectPackage" />
+    <bpmn:sequenceFlow id="Flow_4" sourceRef="Task_Redirect" targetRef="EndEvent_Auth" />
+    <bpmn:sequenceFlow id="Flow_5" sourceRef="Task_SelectPackage" targetRef="Task_CreateOrder" />
+    <bpmn:sequenceFlow id="Flow_6" sourceRef="Task_CreateOrder" targetRef="Task_SendUsdt" />
+    <bpmn:sequenceFlow id="Flow_7" sourceRef="Task_SendUsdt" targetRef="Task_PollBinance" />
+    <bpmn:sequenceFlow id="Flow_8" sourceRef="Task_PollBinance" targetRef="Gateway_DepositStatus" />
+    <bpmn:sequenceFlow id="Flow_9" name="Депозит надійшов" sourceRef="Gateway_DepositStatus" targetRef="Task_CreditAuto" />
+    <bpmn:sequenceFlow id="Flow_10" sourceRef="Task_CreditAuto" targetRef="Gateway_Join" />
+    <bpmn:sequenceFlow id="Flow_11" name="Очікування" sourceRef="Gateway_DepositStatus" targetRef="Task_PollBinance" />
+    <bpmn:sequenceFlow id="Flow_12" name="Час вичерпано (30 хв)" sourceRef="Gateway_DepositStatus" targetRef="Task_Expire" />
+    <bpmn:sequenceFlow id="Flow_13" sourceRef="Task_Expire" targetRef="Gateway_Support" />
+    <bpmn:sequenceFlow id="Flow_14" name="Так" sourceRef="Gateway_Support" targetRef="Task_ContactSupport" />
+    <bpmn:sequenceFlow id="Flow_15" name="Ні" sourceRef="Gateway_Support" targetRef="EndEvent_Cancelled" />
+    <bpmn:sequenceFlow id="Flow_16" sourceRef="Task_ContactSupport" targetRef="Task_ReviewSupport" />
+    <bpmn:sequenceFlow id="Flow_17" sourceRef="Task_ReviewSupport" targetRef="Task_ManualCredit" />
+    <bpmn:sequenceFlow id="Flow_18" sourceRef="Task_ManualCredit" targetRef="Gateway_Join" />
+    <bpmn:sequenceFlow id="Flow_19" sourceRef="Gateway_Join" targetRef="EndEvent_Done" />
+  </bpmn:process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1">
+      <bpmndi:BPMNShape id="Participant_1_di" bpmnElement="Participant_1" isHorizontal="true">
+        <dc:Bounds x="160" y="90" width="1480" height="610" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_User_di" bpmnElement="Lane_User" isHorizontal="true">
+        <dc:Bounds x="190" y="90" width="1450" height="215" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_System_di" bpmnElement="Lane_System" isHorizontal="true">
+        <dc:Bounds x="190" y="305" width="1450" height="255" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Admin_di" bpmnElement="Lane_Admin" isHorizontal="true">
+        <dc:Bounds x="190" y="560" width="1450" height="140" />
+      </bpmndi:BPMNShape>
+
+      <!-- USER shapes -->
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="232" y="132" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="236" y="175" width="34" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Auth_di" bpmnElement="Gateway_Auth" isMarkerVisible="true">
+        <dc:Bounds x="320" y="125" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="305" y="95" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SelectPackage_di" bpmnElement="Task_SelectPackage">
+        <dc:Bounds x="415" y="115" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendUsdt_di" bpmnElement="Task_SendUsdt">
+        <dc:Bounds x="585" y="115" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Support_di" bpmnElement="Gateway_Support" isMarkerVisible="true">
+        <dc:Bounds x="895" y="125" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="880" y="95" width="80" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ContactSupport_di" bpmnElement="Task_ContactSupport">
+        <dc:Bounds x="985" y="115" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Redirect_di" bpmnElement="Task_Redirect">
+        <dc:Bounds x="290" y="220" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Auth_di" bpmnElement="EndEvent_Auth">
+        <dc:Bounds x="472" y="237" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="476" y="280" width="34" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Cancelled_di" bpmnElement="EndEvent_Cancelled">
+        <dc:Bounds x="1022" y="237" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1000" y="280" width="80" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- SYSTEM shapes -->
+      <bpmndi:BPMNShape id="Task_CreateOrder_di" bpmnElement="Task_CreateOrder">
+        <dc:Bounds x="415" y="340" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PollBinance_di" bpmnElement="Task_PollBinance">
+        <dc:Bounds x="585" y="340" width="110" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DepositStatus_di" bpmnElement="Gateway_DepositStatus" isMarkerVisible="true">
+        <dc:Bounds x="765" y="350" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="752" y="406" width="76" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreditAuto_di" bpmnElement="Task_CreditAuto">
+        <dc:Bounds x="865" y="340" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_Expire_di" bpmnElement="Task_Expire">
+        <dc:Bounds x="735" y="460" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Join_di" bpmnElement="Gateway_Join" isMarkerVisible="true">
+        <dc:Bounds x="1085" y="350" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Done_di" bpmnElement="EndEvent_Done">
+        <dc:Bounds x="1192" y="357" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1170" y="400" width="80" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- ADMIN shapes -->
+      <bpmndi:BPMNShape id="Task_ReviewSupport_di" bpmnElement="Task_ReviewSupport">
+        <dc:Bounds x="865" y="595" width="110" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ManualCredit_di" bpmnElement="Task_ManualCredit">
+        <dc:Bounds x="1045" y="595" width="130" height="60" />
+      </bpmndi:BPMNShape>
+
+      <!-- EDGES -->
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="268" y="150" /><di:waypoint x="320" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="345" y="175" /><di:waypoint x="345" y="220" />
+        <bpmndi:BPMNLabel><dc:Bounds x="300" y="190" width="90" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="370" y="150" /><di:waypoint x="415" y="150" />
+        <bpmndi:BPMNLabel><dc:Bounds x="368" y="132" width="60" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="400" y="255" /><di:waypoint x="472" y="255" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="470" y="185" /><di:waypoint x="470" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="525" y="375" /><di:waypoint x="555" y="375" /><di:waypoint x="555" y="150" /><di:waypoint x="585" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="640" y="185" /><di:waypoint x="640" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="695" y="375" /><di:waypoint x="765" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_9_di" bpmnElement="Flow_9">
+        <di:waypoint x="815" y="375" /><di:waypoint x="865" y="375" />
+        <bpmndi:BPMNLabel><dc:Bounds x="812" y="357" width="56" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10_di" bpmnElement="Flow_10">
+        <di:waypoint x="995" y="375" /><di:waypoint x="1085" y="375" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11_di" bpmnElement="Flow_11">
+        <di:waypoint x="790" y="350" /><di:waypoint x="790" y="315" /><di:waypoint x="640" y="315" /><di:waypoint x="640" y="340" />
+        <bpmndi:BPMNLabel><dc:Bounds x="685" y="297" width="60" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12_di" bpmnElement="Flow_12">
+        <di:waypoint x="790" y="400" /><di:waypoint x="790" y="460" />
+        <bpmndi:BPMNLabel><dc:Bounds x="796" y="420" width="84" height="27" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13_di" bpmnElement="Flow_13">
+        <di:waypoint x="845" y="490" /><di:waypoint x="850" y="490" /><di:waypoint x="850" y="150" /><di:waypoint x="895" y="150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14_di" bpmnElement="Flow_14">
+        <di:waypoint x="945" y="150" /><di:waypoint x="985" y="150" />
+        <bpmndi:BPMNLabel><dc:Bounds x="957" y="132" width="18" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15_di" bpmnElement="Flow_15">
+        <di:waypoint x="920" y="175" /><di:waypoint x="920" y="255" /><di:waypoint x="1022" y="255" />
+        <bpmndi:BPMNLabel><dc:Bounds x="926" y="200" width="14" height="14" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16_di" bpmnElement="Flow_16">
+        <di:waypoint x="1040" y="185" /><di:waypoint x="1040" y="205" /><di:waypoint x="1070" y="205" /><di:waypoint x="1070" y="560" /><di:waypoint x="920" y="560" /><di:waypoint x="920" y="595" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17_di" bpmnElement="Flow_17">
+        <di:waypoint x="975" y="625" /><di:waypoint x="1045" y="625" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_18_di" bpmnElement="Flow_18">
+        <di:waypoint x="1110" y="595" /><di:waypoint x="1110" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19_di" bpmnElement="Flow_19">
+        <di:waypoint x="1135" y="375" /><di:waypoint x="1192" y="375" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
