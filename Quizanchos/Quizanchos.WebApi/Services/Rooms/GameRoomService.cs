@@ -45,6 +45,10 @@ public class GameRoomService
         if (existingRoom != null)
             return RoomActionResult.Error($"Player is already in room {existingRoom.RoomId}");
 
+        var activeSessionId = await _gameService.GetActiveSessionIdAsync(hostPlayerId);
+        if (activeSessionId != null)
+            return RoomActionResult.Error("You already have a game in progress. Finish or leave it before creating a room.");
+
         if (request.MaxPlayers < 2)
             return RoomActionResult.Error("Multiplayer rooms require at least 2 players");
 
@@ -85,6 +89,10 @@ public class GameRoomService
         var existingRoom = _roomManager.GetRoomByPlayerId(playerId);
         if (existingRoom != null && existingRoom.RoomId != roomId)
             return RoomActionResult.Error($"Player is already in room {existingRoom.RoomId}");
+
+        var activeSessionId = await _gameService.GetActiveSessionIdAsync(playerId);
+        if (activeSessionId != null)
+            return RoomActionResult.Error("You already have a game in progress. Finish or leave it before joining a room.");
 
         var room = _roomManager.GetRoom(roomId);
         if (room == null)

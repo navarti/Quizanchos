@@ -143,6 +143,16 @@ public class GameService
         };
     }
 
+    /// <summary>
+    /// Returns the id of the player's active (unfinished) game session, or <c>null</c> if none.
+    /// Used to block a player from creating/joining a room while a game is still in progress.
+    /// </summary>
+    public async Task<Guid?> GetActiveSessionIdAsync(string playerId)
+    {
+        var activeGame = await _gameSessionRepository.GetActiveByPlayerIdAsync(playerId);
+        return activeGame?.Id;
+    }
+
     public async Task<GameMoveResult> MakeMoveAsync(GameRequest request, string playerId)
     {
         // Load game session from DB
